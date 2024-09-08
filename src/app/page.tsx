@@ -1,0 +1,69 @@
+"use client"
+
+import React, { useState, useEffect } from 'react';
+import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar"
+import AboutMeModal from "@/components/ui/AboutMeModal";
+
+export default function HomePage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(0);
+
+  useEffect(() => {
+    setViewportHeight(window.innerHeight);
+    const handleResize = () => setViewportHeight(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleModalToggle = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  return (
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        className="absolute top-0 left-0 w-full h-full object-cover"
+      >
+        <source src="/video/space.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Overlay Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-white bg-black bg-opacity-50">
+        <div className="absolute top-[55%] transform -translate-y-1/2 text-center">
+          <h1 className="text-5xl font-medium bold tracking-widest"> AASHMAN RASTOGI </h1>
+          <p className="font-thin tracking-widest"> STATISTICS AND DATA SCIENCE </p>
+        </div>
+        <div className="absolute bottom-40 mb-8 flex space-x-4 justify-center">
+          <Menubar>
+            <MenubarMenu>
+              <MenubarTrigger onClick={handleModalToggle}>ABOUT ME</MenubarTrigger>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger>PROJECTS</MenubarTrigger>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger>CV</MenubarTrigger>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger>CONTACT</MenubarTrigger>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger>RESEARCH</MenubarTrigger>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger>ART</MenubarTrigger>
+            </MenubarMenu>
+          </Menubar>
+        </div>
+      </div>
+
+      {/* About Me Modal */}
+      <AboutMeModal isOpen={isModalOpen} onClose={handleModalToggle} viewportHeight={viewportHeight} />
+    </div>
+  )
+}

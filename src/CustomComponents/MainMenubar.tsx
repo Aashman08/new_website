@@ -16,7 +16,7 @@ const MainMenubar: React.FC<MainMenubarProps> = ({ titles, onItemClick }) => {
           variant="outline"
           onClick={() => onItemClick(title)}
           className={cn(
-            "border border-white text-white bg-black hover:bg-white hover:text-black",
+            " font-thin tracking-wider border border-white text-white bg-black hover:bg-white hover:text-black",
           )}
         >
           {title.toUpperCase()}

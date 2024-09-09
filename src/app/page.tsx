@@ -7,6 +7,7 @@ import AboutMeModal from "@/components/ui/AboutMeModal";
 export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(0);
+  const [isContentVisible, setIsContentVisible] = useState(true);
 
   useEffect(() => {
     setViewportHeight(window.innerHeight);
@@ -14,6 +15,14 @@ export default function HomePage() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const handleMenuClick = (action: string) => {
+    setIsContentVisible(false);
+    if (action === 'ABOUT ME') {
+      setIsModalOpen(true);
+    }
+    // Handle other menu actions here
+  };
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
@@ -33,37 +42,39 @@ export default function HomePage() {
       </video>
 
       {/* Overlay Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-white bg-black bg-opacity-50">
-        <div className="absolute top-[55%] transform -translate-y-1/2 text-center">
-          <h1 className="text-5xl font-medium bold tracking-widest"> AASHMAN RASTOGI </h1>
-          <p className="font-thin tracking-widest"> STATISTICS AND DATA SCIENCE </p>
+      {isContentVisible && (
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-white bg-black bg-opacity-50">
+          <div className="absolute top-[55%] transform -translate-y-1/2 text-center">
+            <h1 className="text-5xl font-medium bold tracking-widest"> AASHMAN RASTOGI </h1>
+            <p className="font-thin tracking-widest"> STATISTICS AND DATA SCIENCE </p>
+          </div>
+          <div className="absolute bottom-40 mb-8 flex space-x-4 justify-center">
+            <Menubar>
+              <MenubarMenu>
+                <MenubarTrigger onClick={() => handleMenuClick('ABOUT ME')}>ABOUT ME</MenubarTrigger>
+              </MenubarMenu>
+              <MenubarMenu>
+                <MenubarTrigger onClick={() => handleMenuClick('PROJECTS')}>PROJECTS</MenubarTrigger>
+              </MenubarMenu>
+              <MenubarMenu>
+                <MenubarTrigger onClick={() => handleMenuClick('CV')}>CV</MenubarTrigger>
+              </MenubarMenu>
+              <MenubarMenu>
+                <MenubarTrigger onClick={() => handleMenuClick('CONTACT')}>CONTACT</MenubarTrigger>
+              </MenubarMenu>
+              <MenubarMenu>
+                <MenubarTrigger onClick={() => handleMenuClick('RESEARCH')}>RESEARCH</MenubarTrigger>
+              </MenubarMenu>
+              <MenubarMenu>
+                <MenubarTrigger onClick={() => handleMenuClick('ART')}>ART</MenubarTrigger>
+              </MenubarMenu>
+            </Menubar>
+          </div>
         </div>
-        <div className="absolute bottom-40 mb-8 flex space-x-4 justify-center">
-          <Menubar>
-            <MenubarMenu>
-              <MenubarTrigger onClick={handleModalToggle}>ABOUT ME</MenubarTrigger>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger>PROJECTS</MenubarTrigger>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger>CV</MenubarTrigger>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger>CONTACT</MenubarTrigger>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger>RESEARCH</MenubarTrigger>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger>ART</MenubarTrigger>
-            </MenubarMenu>
-          </Menubar>
-        </div>
-      </div>
+      )}
 
       {/* About Me Modal */}
-      <AboutMeModal isOpen={isModalOpen} onClose={handleModalToggle} viewportHeight={viewportHeight} />
+      <AboutMeModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setIsContentVisible(true);}} viewportHeight={viewportHeight} />
     </div>
   )
 }

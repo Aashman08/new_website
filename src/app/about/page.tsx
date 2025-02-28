@@ -1,0 +1,120 @@
+"use client";
+
+import React, { useEffect, useRef } from 'react';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import MainMenubar from "@/CustomComponents/MainMenubar";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {TimelineDemo} from "@/CustomComponents/timeline"
+import { FloatingDock } from "@/components/ui/floating-dock";
+import ProjectsModal from "@/CustomComponents/ProjectsModal"
+
+interface AboutMeModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onMenuItemClick: (title: string) => void; 
+}
+
+
+
+const AboutMeModal: React.FC<AboutMeModalProps> = ({ isOpen, onClose, onMenuItemClick }) => {
+    const modalRef = useRef<HTMLDivElement>(null);
+  
+    useEffect(() => {
+      if (isOpen) {
+        document.body.style.overflow = 'hidden';
+        if (modalRef.current) {
+          modalRef.current.scrollTop = 0;
+        }
+      } else {
+        document.body.style.overflow = '';
+      }
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }, [isOpen]);
+  
+  
+    const MenuTitles = ["PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"];
+  
+    if (!isOpen) return null;
+  
+    return (
+      <div
+        ref={modalRef}
+        className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-70 font-sans"
+      >
+        <div className="relative w-full max-w-6xl mx-auto mt-40 mb-10 p-10 bg-black text-white rounded-lg shadow-lg ">
+          {/* Close Button */}
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 text-white hover:bg-white/10"
+          >
+            <X className="h-6 w-6" />
+            <span className="sr-only">Close</span>
+          </Button>
+
+          {/* Title */}
+          {/* <h1 className="text-4xl font-bold text-center mb-6">ABOUT ME</h1> */}
+          <div className="flex flex-col items-center pt-2 justify-center">
+            <h2 className="text-lg md:text-4xl mb-6 text-white dark:text-white max-w-4xl">
+                About Me
+            </h2>
+          </div>
+
+
+
+          {/* Profile Picture */}
+          <div className="flex justify-center mt-8 mb-6">
+          <Avatar className="w-80 h-80">
+              <AvatarImage src="/img/NYC_pic.png" alt="Aashman Rastogi" />
+              <AvatarFallback>AR</AvatarFallback>
+          </Avatar>
+          </div>
+        
+          {/* content 1 */}
+          <div className="max-w-5xl mx-auto pt-10 pb-12 px-10 md:px-8 lg:px-10">
+              <p className="text-lg md:text-4xl mb-4 text-white dark:text-white max-w-5xl text-center">
+              Hi, I am Aashman Rastogi
+              </p>
+              <div className="w-full border-b border-white mb-4 mx-auto"></div>
+              <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-center">
+              <br></br>
+              I'm a senior at the{" "}
+              <i><b>
+                  <a href="https://www.ucla.edu/" className="underline">
+                  University of California, Los Angeles (UCLA)
+                  </a>
+              </b></i>{" "}
+              and am majoring in <i><b>Statistics and Data Science</b></i> with a minor in <i><b>Data Science Engineering</b></i> focusing towards{" "}
+              <i><b>Artificial Intelligence and Machine Learning</b></i>.
+              </p>
+
+              <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-center">
+              My journey into technology has been quite interesting and purpose driven, and I'm eager to share it with you. As you explore my story below, I hope you feel inspired and energized by my experiences.
+              </p>
+          </div>
+
+          {/* SVG Icon */}
+          <img src="/icon.svg" alt="Description of SVG" className="w-15 h-5 mx-auto" />
+
+          {/* <div className="justify-start text-justify ml-4"> */}
+          <div > {/* Ensure this has a higher z-index */}
+            <TimelineDemo />
+          </div>
+          {/* </div> */}
+
+          {/* MainMenubar */}
+          <div className="mt-8">
+            <MainMenubar titles={MenuTitles} onItemClick={onMenuItemClick} />
+          </div>
+        <br /> 
+    </div>
+    </div>
+);
+};
+
+export default AboutMeModal;
+  

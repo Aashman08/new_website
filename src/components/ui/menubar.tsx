@@ -27,8 +27,8 @@ const Menubar = React.forwardRef<
   <MenubarPrimitive.Root
     ref={ref}
     className={cn(
-      "flex h-15 items-center justify-center space-x-0", // Remove space-x to eliminate extra spacing
-      "rounded-md border border-white bg-transparent p-0 shadow-sm text-white font-thin",
+      "flex h-16 items-center justify-center space-x-0", // Remove space-x to eliminate extra spacing
+      "rounded-md border border-white bg-transparent p-0 shadow-sm text-white font-medium",
       className
     )}
     {...props}
@@ -46,7 +46,7 @@ const MenubarTrigger = React.forwardRef<
     className={cn(
       "flex cursor-default select-none items-center justify-center", // Center content
       "w-32 h-12", // Fixed width and height
-      "px-6 py-3 text-sm font-thin text-white outline-none focus:bg-transparent focus:text-white tracking-wider",
+      "px-6 py-3 text-sm font-light text-white outline-none focus:bg-transparent focus:text-white tracking-wider",
       "border-r border-white last:border-r-0", // Border styling
       "hover:bg-white/10 hover:backdrop-blur-md focus:bg-white/10 focus:backdrop-blur-md transition-colors duration-300", // Hover and focus effect with transparency and blur
       className

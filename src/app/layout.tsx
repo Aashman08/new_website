@@ -58,3 +58,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     </html>
   )
 }
+
+// src/app/layout.tsx
+
+

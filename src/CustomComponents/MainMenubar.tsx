@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import React from "react";
+import { Button } from "./Button"; // Custom Button component
+import { Text } from "@/CustomComponents/Typography"; // Ensure you import the Text component
 
 interface MainMenubarProps {
   titles: string[];
@@ -9,17 +9,18 @@ interface MainMenubarProps {
 
 const MainMenubar: React.FC<MainMenubarProps> = ({ titles, onItemClick }) => {
   return (
-    <div className="flex justify-center gap-4">
+    <div className="flex justify-center gap-4 flex-wrap">
       {titles.map((title) => (
         <Button
           key={title}
-          variant="outline"
           onClick={() => onItemClick(title)}
-          className={cn(
-            " font-thin tracking-wider border border-white text-white bg-black hover:bg-white hover:text-black",
-          )}
+          primary
+          big // Use the `big` option for larger buttons
+          className="tracking-wider text-white bg-transparent hover:bg-[rgba(255,255,255,0.1)] hover:text-white border border-white"
         >
-          {title.toUpperCase()}
+          <Text as="span" className="uppercase">
+            {title}
+          </Text>
         </Button>
       ))}
     </div>
@@ -27,3 +28,5 @@ const MainMenubar: React.FC<MainMenubarProps> = ({ titles, onItemClick }) => {
 };
 
 export default MainMenubar;
+
+

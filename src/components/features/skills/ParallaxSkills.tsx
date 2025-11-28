@@ -2,7 +2,7 @@
 import { useScroll, useTransform, motion } from "framer-motion";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
-import { SkillCard } from "./skills"; // Adjust the path as needed
+import { SkillCard } from "./SkillCard";
 
 export const ParallaxSkills = ({
   skills,
@@ -17,12 +17,10 @@ export const ParallaxSkills = ({
     offset: ["start start", "end start"],
   });
 
-  // Define different vertical translations for each column
   const translateFirst = useTransform(scrollYProgress, [0, 1], [0, -200]);
   const translateSecond = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const translateThird = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
-  // Divide skills into three roughly equal parts
   const third = Math.ceil(skills.length / 3);
 
   const firstPart = skills.slice(0, third);
@@ -32,8 +30,6 @@ export const ParallaxSkills = ({
   return (
     <div
       className={cn("h-[70rem] overflow-y-auto w-full mt-10 mb-20", className)}
-      // className={cn("w-full mt-20 mb-20", className)}
-      // className={cn("w-full", className)}
       ref={gridRef}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start max-w-7xl mx-auto gap-10 py-40 px-10">
@@ -44,14 +40,13 @@ export const ParallaxSkills = ({
                 key={"grid-1" + idx}
                 style={{ y: translateFirst }}
             >
-              
               <SkillCard
                 title={skill.title}
                 icon={skill.icon}
                 gradient={skill.gradient}
                 href={skill.href}
                 borderColor={skill.style?.borderColor}
-                brightness = {skill.style?.filter}
+                brightness={skill.style?.filter}
               />
             </motion.div>
           ))}
@@ -70,7 +65,7 @@ export const ParallaxSkills = ({
                 gradient={skill.gradient}
                 href={skill.href}
                 borderColor={skill.style?.borderColor}
-                brightness = {skill.style?.filter}
+                brightness={skill.style?.filter}
               />
             </motion.div>
           ))}
@@ -88,7 +83,7 @@ export const ParallaxSkills = ({
                 gradient={skill.gradient}
                 href={skill.href}
                 borderColor={skill.style?.borderColor}
-                brightness = {skill.style?.filter}
+                brightness={skill.style?.filter}
               />
             </motion.div>
           ))}
@@ -97,3 +92,4 @@ export const ParallaxSkills = ({
     </div>
   );
 };
+

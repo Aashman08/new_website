@@ -2,16 +2,15 @@
 
 import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
-import MainMenubar from "@/CustomComponents/MainMenubar";
+import MainMenubar from "@/components/layout/MainMenubar";
 import { Button } from "@/components/ui/button";
 
-
-interface CVModalProps {
+interface CVSectionProps {
     isOpen: boolean;
     onClose: () => void;
   }
 
-  const CVModal: React.FC<CVModalProps> = ({ isOpen, onClose }) => {
+  const CVSection: React.FC<CVSectionProps> = ({ isOpen, onClose }) => {
     const modalRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
@@ -67,5 +66,5 @@ interface CVModalProps {
   );
   };
   
-  export default CVModal;
+  export default CVSection;
 

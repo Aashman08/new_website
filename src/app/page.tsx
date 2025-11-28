@@ -1,16 +1,18 @@
 "use client";
 
-import {Heading} from "@/CustomComponents/Heading"
-import { Text } from "@/CustomComponents/Typography";
+import { Heading } from "@/components/common/Heading";
+import { Text } from "@/components/common/Typography";
 import React, { useState, useEffect } from "react";
 import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
-import ProjectsModal from "./projects/page"
-import AboutMeModal from "./about/page";
-import ContactModal from "./contact/page";
-import ArtModal from "./art/page";
-import SkillsModal from "./skills/page";
-import ResearchModal from "./research/page";
-import CVModal from "./CV/page"; 
+
+// Section components
+import AboutSection from "@/components/sections/AboutSection";
+import ProjectsSection from "@/components/sections/ProjectsSection";
+import SkillsSection from "@/components/sections/SkillsSection";
+import CVSection from "@/components/sections/CVSection";
+import ContactSection from "@/components/sections/ContactSection";
+import ResearchSection from "@/components/sections/ResearchSection";
+import ArtSection from "@/components/sections/ArtSection";
 
 export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,14 +36,13 @@ export default function HomePage() {
         if (["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"].includes(action)) {
           setIsModalOpen(true);
         }
-      }, 0); // Adjust delay to match your closing animation, if any.
+      }, 0);
     } else {
       setMenuAction(action);
       if (["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"].includes(action)) {
         setIsModalOpen(true);
       }
     }
-    // Add logic for other menu actions (e.g., PROJECTS, CONTACT)
   };
 
   const handleModalClose = () => {
@@ -68,8 +69,6 @@ export default function HomePage() {
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-white">
           <div className="absolute top-[57%] transform -translate-y-1/2 text-center">
             <Heading level="h1">AASHMAN RASTOGI</Heading>
-            {/* <h1 className="text-5xl font-bold tracking-widest">AASHMAN RASTOGI</h1> */}
-            {/* <p className="mt-4 text-xl font-thin tracking-widest">STATISTICS AND DATA SCIENCE</p> */}
             <Text style={{ letterSpacing: '0.2em', fontSize: "90%" }}>STATISTICS AND DATA SCIENCE</Text>
           </div>
           <div className="absolute bottom-52 flex space-x-4">
@@ -88,55 +87,50 @@ export default function HomePage() {
         </div>
       )}
 
-    
-
-      {/* Modals */}
+      {/* Section Modals */}
       {menuAction === "ABOUT ME" && (
-        <AboutMeModal
+        <AboutSection
           isOpen={isModalOpen}
           onClose={handleModalClose}
-          onMenuItemClick={handleMenuClick} // Pass the callback to the modal
-          // viewportHeight={viewportHeight}
+          onMenuItemClick={handleMenuClick}
         />
       )}
       {menuAction === "PROJECTS" && (
-        <ProjectsModal 
+        <ProjectsSection 
           isOpen={isModalOpen} 
           onClose={handleModalClose} 
         />
       )}
       {menuAction === "SKILLS" && (
-        <SkillsModal 
+        <SkillsSection 
           isOpen={isModalOpen} 
           onClose={handleModalClose} 
         />
       )}
       {menuAction === "CONTACT" && (
-        <ContactModal 
+        <ContactSection 
           isOpen={isModalOpen} 
           onClose={handleModalClose} 
         />
       )}
       {menuAction === "RESEARCH" && (
-        <ResearchModal 
+        <ResearchSection 
           isOpen={isModalOpen} 
           onClose={handleModalClose} 
         />
       )}
       {menuAction === "ART" && (
-        <ArtModal 
+        <ArtSection 
           isOpen={isModalOpen} 
           onClose={handleModalClose} 
         />
       )}
       {menuAction === "CV" && (
-        <CVModal 
+        <CVSection 
           isOpen={isModalOpen} 
           onClose={handleModalClose} 
         />
-
       )}
-      {/* Add other modals here for PROJECTS, CV, etc. */}
     </div>
   );
 }

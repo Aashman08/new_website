@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "./Button"; // Custom Button component
-import { Text } from "@/CustomComponents/Typography"; // Ensure you import the Text component
+import { Button } from "@/components/common/Button";
+import { Text } from "@/components/common/Typography";
 
 interface MainMenubarProps {
   titles: string[];
@@ -15,7 +15,7 @@ const MainMenubar: React.FC<MainMenubarProps> = ({ titles, onItemClick }) => {
           key={title}
           onClick={() => onItemClick(title)}
           primary
-          big // Use the `big` option for larger buttons
+          big
           className="tracking-wider text-white bg-transparent hover:bg-[rgba(255,255,255,0.1)] hover:text-white border border-white"
         >
           <Text as="span" className="uppercase">
@@ -28,5 +28,4 @@ const MainMenubar: React.FC<MainMenubarProps> = ({ titles, onItemClick }) => {
 };
 
 export default MainMenubar;
-
 

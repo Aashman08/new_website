@@ -2,16 +2,15 @@
 
 import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
-import MainMenubar from "@/CustomComponents/MainMenubar";
+import MainMenubar from "@/components/layout/MainMenubar";
 import { Button } from "@/components/ui/button";
 
-
-interface ResearchModalProps {
+interface ArtSectionProps {
     isOpen: boolean;
     onClose: () => void;
   }
 
-  const ResearchModal: React.FC<ResearchModalProps> = ({ isOpen, onClose }) => {
+  const ArtSection: React.FC<ArtSectionProps> = ({ isOpen, onClose }) => {
     const modalRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
@@ -28,7 +27,7 @@ interface ResearchModalProps {
       };
     }, [isOpen]);
 
-    const MenuTitles = ["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "ART"];
+    const MenuTitles = ["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH"];
 
     if (!isOpen) return null;
 
@@ -52,7 +51,7 @@ interface ResearchModalProps {
             {/* Title */}
             <div className="flex flex-col items-center pt-2 justify-center">
               <h2 className="text-lg md:text-4xl mb-6 text-white dark:text-white max-w-4xl">
-                  RESEARCH
+                  ART
               </h2>
             </div>
   
@@ -67,5 +66,5 @@ interface ResearchModalProps {
   );
   };
   
-  export default ResearchModal;
+  export default ArtSection;
 

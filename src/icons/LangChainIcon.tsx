@@ -8,7 +8,6 @@ const LangChainIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     id="Langchain--Streamline-Simple-Icons.svg"
     height="48"
     width="48"
-    // style={{ backgroundColor: '#000000' }}
     {...props}
   >
     <desc>Langchain Streamline Icon: https://streamlinehq.com</desc>
@@ -18,3 +17,4 @@ const LangChainIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 export default LangChainIcon;
+

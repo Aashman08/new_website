@@ -1,23 +1,20 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
+import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import MainMenubar from "@/CustomComponents/MainMenubar";
+import MainMenubar from "@/components/layout/MainMenubar";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {TimelineDemo} from "@/CustomComponents/timeline"
-import { FloatingDock } from "@/components/ui/floating-dock";
-import ProjectsModal from "@/CustomComponents/ProjectsModal"
+import { CareerTimeline } from "@/components/features/timeline/CareerTimeline";
 
-interface AboutMeModalProps {
+interface AboutSectionProps {
     isOpen: boolean;
     onClose: () => void;
     onMenuItemClick: (title: string) => void; 
 }
 
-
-
-const AboutMeModal: React.FC<AboutMeModalProps> = ({ isOpen, onClose, onMenuItemClick }) => {
+const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItemClick }) => {
     const modalRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
@@ -33,7 +30,6 @@ const AboutMeModal: React.FC<AboutMeModalProps> = ({ isOpen, onClose, onMenuItem
         document.body.style.overflow = '';
       };
     }, [isOpen]);
-  
   
     const MenuTitles = ["PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"];
   
@@ -57,14 +53,11 @@ const AboutMeModal: React.FC<AboutMeModalProps> = ({ isOpen, onClose, onMenuItem
           </Button>
 
           {/* Title */}
-          {/* <h1 className="text-4xl font-bold text-center mb-6">ABOUT ME</h1> */}
           <div className="flex flex-col items-center pt-2 justify-center">
             <h2 className="text-lg md:text-4xl mb-6 text-white dark:text-white max-w-4xl">
                 About Me
             </h2>
           </div>
-
-
 
           {/* Profile Picture */}
           <div className="flex justify-center mt-8 mb-6">
@@ -82,7 +75,7 @@ const AboutMeModal: React.FC<AboutMeModalProps> = ({ isOpen, onClose, onMenuItem
               <div className="w-full border-b border-white mb-4 mx-auto"></div>
               <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-center">
               <br></br>
-              I'm a senior at the{" "}
+              I&apos;m a senior at the{" "}
               <i><b>
                   <a href="https://www.ucla.edu/" className="underline">
                   University of California, Los Angeles (UCLA)
@@ -93,18 +86,49 @@ const AboutMeModal: React.FC<AboutMeModalProps> = ({ isOpen, onClose, onMenuItem
               </p>
 
               <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-center">
-              My journey into technology has been quite interesting and purpose driven, and I'm eager to share it with you. As you explore my story below, I hope you feel inspired and energized by my experiences.
+              My journey into technology has been quite interesting and purpose driven, and I&apos;m eager to share it with you. As you explore my story below, I hope you feel inspired and energized by my experiences.
               </p>
           </div>
 
-          {/* SVG Icon */}
-          <img src="/icon.svg" alt="Description of SVG" className="w-15 h-5 mx-auto" />
+          {/* Scroll down arrow */}
+          <button 
+            onClick={() => {
+              const target = document.getElementById('career-timeline');
+              if (!target) return;
+              
+              const start = modalRef.current?.scrollTop || 0;
+              const end = target.offsetTop - 100;
+              const duration = 1200; // ms - adjust for slower/faster scroll
+              const startTime = performance.now();
+              
+              const easeInOutCubic = (t: number) => 
+                t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+              
+              const scroll = (currentTime: number) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = easeInOutCubic(progress);
+                
+                if (modalRef.current) {
+                  modalRef.current.scrollTop = start + (end - start) * eased;
+                }
+                
+                if (progress < 1) {
+                  requestAnimationFrame(scroll);
+                }
+              };
+              
+              requestAnimationFrame(scroll);
+            }}
+            className="mx-auto block cursor-pointer hover:opacity-70 transition-opacity"
+            aria-label="Scroll to timeline"
+          >
+            <Image src="/icon.svg" alt="Scroll down" width={28} height={10} />
+          </button>
 
-          {/* <div className="justify-start text-justify ml-4"> */}
-          <div > {/* Ensure this has a higher z-index */}
-            <TimelineDemo />
+          <div id="career-timeline">
+            <CareerTimeline />
           </div>
-          {/* </div> */}
 
           {/* MainMenubar */}
           <div className="mt-8">
@@ -116,5 +140,5 @@ const AboutMeModal: React.FC<AboutMeModalProps> = ({ isOpen, onClose, onMenuItem
 );
 };
 
-export default AboutMeModal;
-  
+export default AboutSection;
+

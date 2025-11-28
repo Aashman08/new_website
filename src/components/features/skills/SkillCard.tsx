@@ -24,7 +24,7 @@ export const SkillCard = ({
     <div
       className="rounded-6xl"
       style={{
-        border: `2px solid ${borderColor ? `rgba(${parseInt(borderColor.slice(1, 3), 16)}, ${parseInt(borderColor.slice(3, 5), 16)}, ${parseInt(borderColor.slice(5, 7), 16)}, 0.5` : "transparent"}`, // Convert hex to RGBA with 50% opacity
+        border: `2px solid ${borderColor ? `rgba(${parseInt(borderColor.slice(1, 3), 16)}, ${parseInt(borderColor.slice(3, 5), 16)}, ${parseInt(borderColor.slice(5, 7), 16)}, 0.5` : "transparent"}`,
       }}
     >
       <div
@@ -47,21 +47,20 @@ export const SkillCard = ({
 
   return href ? <Link href={href}>{cardContent}</Link> : cardContent;
 };
-  
-  // SkillsGrid: Renders a responsive grid of SkillCards.
-  export const SkillsGrid = ({
-    skills,
-  }: {
-    skills: { title: string; icon: React.ReactNode; gradient: string; href?: string }[];
-  }) => {
-    return (
-      <div className="pb-40 px-4 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto gap-20">
-          {skills.map((skill, idx) => (
-            <SkillCard key={idx} icon={skill.icon} title={skill.title} gradient={skill.gradient} href={skill.href} />
-          ))}
-        </div>
+
+export const SkillsGrid = ({
+  skills,
+}: {
+  skills: { title: string; icon: React.ReactNode; gradient: string; href?: string }[];
+}) => {
+  return (
+    <div className="pb-40 px-4 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto gap-20">
+        {skills.map((skill, idx) => (
+          <SkillCard key={idx} icon={skill.icon} title={skill.title} gradient={skill.gradient} href={skill.href} />
+        ))}
       </div>
-    );
-  };
-  
+    </div>
+  );
+};
+

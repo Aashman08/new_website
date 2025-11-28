@@ -3,19 +3,14 @@ import { cn } from "@/lib/utils";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import {
   IconBoxAlignRightFilled,
-  IconClipboardCopy,
   IconFileBroken,
   IconSignature,
   IconTableColumn,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
-import Link from "next/link";
-import React, { useRef, useState, MouseEvent } from "react";
 
-
-export function BentoGridThirdDemo() {
+export function ProjectsGrid() {
   return (
     <BentoGrid className="max-w-4xl mx-auto md:auto-rows-[22rem]">
       {items.map((item, i) => (
@@ -32,69 +27,7 @@ export function BentoGridThirdDemo() {
   );
 }
 
-// const SkeletonOne = () => {
-//   const variants = {
-//     initial: {
-//       x: 0,
-//     },
-//     animate: {
-//       x: 10,
-//       rotate: 5,
-//       transition: {
-//         duration: 0.2,
-//       },
-//     },
-//   };
-//   const variantsSecond = {
-//     initial: {
-//       x: 0,
-//     },
-//     animate: {
-//       x: -10,
-//       rotate: -5,
-//       transition: {
-//         duration: 0.2,
-//       },
-//     },
-//   };
-
-//   return (
-//     <motion.div
-//       initial="initial"
-//       whileHover="animate"
-//       className="flex flex-1 w-full h-full min-h-[6rem] dark:bg-dot-white/[0.2] bg-dot-black/[0.2] flex-col space-y-2"
-//     >
-//       <motion.div
-//         variants={variants}
-//         className="flex flex-row rounded-full border border-neutral-100 dark:border-white/[0.2] p-2  items-center space-x-2 bg-white dark:bg-black"
-//       >
-//         <div className="h-6 w-6 rounded-full bg-gradient-to-r from-pink-500 to-violet-500 flex-shrink-0" />
-//         <div className="w-full bg-gray-100 h-4 rounded-full dark:bg-neutral-900" />
-//       </motion.div>
-//       <motion.div
-//         variants={variantsSecond}
-//         className="flex flex-row rounded-full border border-neutral-100 dark:border-white/[0.2] p-2 items-center space-x-2 w-3/4 ml-auto bg-white dark:bg-black"
-//       >
-//         <div className="w-full bg-gray-100 h-4 rounded-full dark:bg-neutral-900" />
-//         <div className="h-6 w-6 rounded-full bg-gradient-to-r from-pink-500 to-violet-500 flex-shrink-0" />
-//       </motion.div>
-//       <motion.div
-//         variants={variants}
-//         className="flex flex-row rounded-full border border-neutral-100 dark:border-white/[0.2] p-2 items-center space-x-2 bg-white dark:bg-black"
-//       >
-//         <div className="h-6 w-6 rounded-full bg-gradient-to-r from-pink-500 to-violet-500 flex-shrink-0" />
-//         <div className="w-full bg-gray-100 h-4 rounded-full dark:bg-neutral-900" />
-//       </motion.div>
-//     </motion.div>
-//   );
-// };
-
-
-// No export needed unless you want to consume it outside this file.
-
 const SkeletonOne = () => {
-  const getRandomAngle = () => Math.random() * 20 - 10; // Random angle between -10 and 10
-
   const containerVariants = {
     initial: {
       rotateY: 0,
@@ -172,10 +105,7 @@ const SkeletonOne = () => {
             className="text-xl font-bold text-neutral-600 dark:text-white"
             variants={titleVariants}
           >
-            {/* <br></br>
-            Make things float in air */}
           </motion.div>
-  
     </div>
   );
 };
@@ -219,6 +149,7 @@ const SkeletonTwo = () => {
     </motion.div>
   );
 };
+
 const SkeletonThree = () => {
   const variants = {
     initial: {
@@ -249,6 +180,7 @@ const SkeletonThree = () => {
     </motion.div>
   );
 };
+
 const SkeletonFour = () => {
   const first = {
     initial: {
@@ -331,6 +263,7 @@ const SkeletonFour = () => {
     </motion.div>
   );
 };
+
 const SkeletonFive = () => {
   const variants = {
     initial: {
@@ -389,6 +322,7 @@ const SkeletonFive = () => {
     </motion.div>
   );
 };
+
 const items = [
   {
     title: "Make things float in air",
@@ -396,10 +330,6 @@ const items = [
     header: <SkeletonOne />,
     className: "md:col-span-1",
     icon: null
-    // <IconClipboardCopy className="h-4 w-4 text-neutral-500" />,
-
-
-    // icon: <IconClipboardCopy className="h-4 w-4 text-neutral-500" />,
   },
   {
     title: "Automated Proofreading",
@@ -434,7 +364,6 @@ const items = [
     className: "md:col-span-2",
     icon: <IconTableColumn className="h-4 w-4 text-neutral-500" />,
   },
-
   {
     title: "Text Summarization",
     description: (

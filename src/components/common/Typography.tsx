@@ -3,15 +3,15 @@ import React from "react";
 type TextProps = {
   as?: "p" | "span" | "div";
   children: React.ReactNode;
-  className?: string; // For additional customization
-  style?: React.CSSProperties; // Inline styles
+  className?: string;
+  style?: React.CSSProperties;
 };
 
 export const Text: React.FC<TextProps> = ({
-  as = "p", // Default to `p`
+  as = "p",
   children,
   className = "",
-  style, // Accept inline styles
+  style,
 }) => {
   const baseClasses = "text-lg font-light leading-[1.75] mb-8";
 
@@ -23,6 +23,7 @@ export const Text: React.FC<TextProps> = ({
     </Tag>
   );
 };
+
 type LinkProps = {
   href: string;
   children: React.ReactNode;
@@ -48,3 +49,4 @@ export const StyledLink: React.FC<LinkProps> = ({
     </a>
   );
 };
+

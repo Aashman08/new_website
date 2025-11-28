@@ -6,7 +6,7 @@ type HeadingProps = {
 };
 
 export const Heading: React.FC<HeadingProps> = ({
-  level = "h2", // Default to `h2`
+  level = "h2",
   children,
 }) => {
   const baseClasses =
@@ -25,3 +25,4 @@ export const Heading: React.FC<HeadingProps> = ({
 
   return <Tag className={`${baseClasses} ${sizeClasses[level]}`}>{children}</Tag>;
 };
+

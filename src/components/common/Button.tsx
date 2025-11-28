@@ -1,12 +1,12 @@
 import React from "react";
-import { cn } from "@/lib/utils"; // Utility for conditional class merging
+import { cn } from "@/lib/utils";
 import { Button as ShadcnButton, ButtonProps as ShadcnButtonProps } from "@/components/ui/button";
 
 type CustomButtonProps = ShadcnButtonProps & {
   fit?: boolean;
   small?: boolean;
   primary?: boolean;
-  big?: boolean; // Add a `big` prop for larger size buttons
+  big?: boolean;
 };
 
 export const Button: React.FC<CustomButtonProps> = ({
@@ -36,10 +36,10 @@ export const Button: React.FC<CustomButtonProps> = ({
 
   const fitStyles = fit ? "w-full" : "inline-block";
   const sizeStyles = small
-    ? "h-8 px-4" // Small size
+    ? "h-8 px-4"
     : big
-    ? "h-14 px-8 text-lg" // Big size with larger height, padding, and font size
-    : "h-12 px-6"; // Default size
+    ? "h-14 px-8 text-lg"
+    : "h-12 px-6";
   const colorStyles = primary
     ? "bg-white text-[#1b1f22] font-semibold hover:bg-opacity-90"
     : "hover:bg-white hover:text-black";
@@ -51,5 +51,4 @@ export const Button: React.FC<CustomButtonProps> = ({
     />
   );
 };
-
 

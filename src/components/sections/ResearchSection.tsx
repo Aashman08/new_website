@@ -2,16 +2,15 @@
 
 import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
-import MainMenubar from "@/CustomComponents/MainMenubar";
+import MainMenubar from "@/components/layout/MainMenubar";
 import { Button } from "@/components/ui/button";
 
-
-interface ContactModalProps {
+interface ResearchSectionProps {
     isOpen: boolean;
     onClose: () => void;
   }
 
-  const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
+  const ResearchSection: React.FC<ResearchSectionProps> = ({ isOpen, onClose }) => {
     const modalRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
@@ -28,7 +27,7 @@ interface ContactModalProps {
       };
     }, [isOpen]);
 
-    const MenuTitles = ["ABOUT ME", "PROJECTS", "CV", "SKILLS", "RESEARCH", "ART"];
+    const MenuTitles = ["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "ART"];
 
     if (!isOpen) return null;
 
@@ -67,5 +66,5 @@ interface ContactModalProps {
   );
   };
   
-  export default ContactModal;
+  export default ResearchSection;
 

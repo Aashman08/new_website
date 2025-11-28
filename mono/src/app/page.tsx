@@ -14,10 +14,52 @@ import ContactSection from "@/components/sections/ContactSection";
 import ResearchSection from "@/components/sections/ResearchSection";
 import ArtSection from "@/components/sections/ArtSection";
 
+// Map URL section params to menu actions
+const sectionMap: Record<string, string> = {
+  "about": "ABOUT ME",
+  "projects": "PROJECTS",
+  "skills": "SKILLS",
+  "cv": "CV",
+  "contact": "CONTACT",
+  "research": "RESEARCH",
+  "art": "ART",
+};
+
+// Storage key for persisting section state
+const SECTION_STORAGE_KEY = "currentSection";
+
+// Get initial section from URL params or sessionStorage (runs synchronously)
+const getInitialSection = (): string | null => {
+  if (typeof window === "undefined") return null;
+  
+  // First check URL params (for direct navigation like /?section=projects)
+  const params = new URLSearchParams(window.location.search);
+  const urlSection = params.get("section");
+  if (urlSection && sectionMap[urlSection]) {
+    // Clean up URL immediately
+    window.history.replaceState({}, "", "/");
+    return sectionMap[urlSection];
+  }
+  
+  // Then check sessionStorage (for back button navigation)
+  const stored = sessionStorage.getItem(SECTION_STORAGE_KEY);
+  if (stored) {
+    // Clear it so refreshing the page goes to landing
+    sessionStorage.removeItem(SECTION_STORAGE_KEY);
+    return stored;
+  }
+  
+  return null;
+};
+
 export default function HomePage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Get initial section once (to avoid calling getInitialSection twice)
+  const [initialSection] = useState<string | null>(() => getInitialSection());
+  
+  // Initialize state from the stored section - no useEffect delay
+  const [menuAction, setMenuAction] = useState<string | null>(initialSection);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(initialSection !== null);
   const [viewportHeight, setViewportHeight] = useState(0);
-  const [menuAction, setMenuAction] = useState<string | null>(null);
 
   useEffect(() => {
     setViewportHeight(window.innerHeight);
@@ -35,12 +77,16 @@ export default function HomePage() {
         setMenuAction(action);
         if (["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"].includes(action)) {
           setIsModalOpen(true);
+          // Save to sessionStorage for back button navigation
+          sessionStorage.setItem(SECTION_STORAGE_KEY, action);
         }
       }, 0);
     } else {
       setMenuAction(action);
       if (["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"].includes(action)) {
         setIsModalOpen(true);
+        // Save to sessionStorage for back button navigation
+        sessionStorage.setItem(SECTION_STORAGE_KEY, action);
       }
     }
   };
@@ -48,6 +94,8 @@ export default function HomePage() {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setMenuAction(null);
+    // Clear sessionStorage when closing modal (user explicitly closed it)
+    sessionStorage.removeItem(SECTION_STORAGE_KEY);
   };
 
   return (

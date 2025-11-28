@@ -7,6 +7,7 @@ import MainMenubar from "@/components/layout/MainMenubar";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CareerTimeline } from "@/components/features/timeline/CareerTimeline";
+import { EducationTimeline } from "@/components/features/education/EducationTimeline";
 
 interface AboutSectionProps {
     isOpen: boolean;
@@ -69,11 +70,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
         
           {/* content 1 */}
           <div className="max-w-5xl mx-auto pt-10 pb-4 px-10 md:px-8 lg:px-10">
-              <p className="text-lg md:text-4xl mb-4 text-white dark:text-white max-w-5xl text-center">
+              <p className="text-lg md:text-4xl mb-4 text-white dark:text-white max-w-5xl text-justify">
               Hi, I&apos;m Aashman
               </p>
               <div className="w-full border-b border-white mb-4 mx-auto"></div>
-              <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-center mt-6">
+              <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-justify mt-6">
               I&apos;m an <i><b>AI Engineer</b></i> at{" "}
               <i><b>
                   <a href="https://kindo.ai/" className="underline">
@@ -83,11 +84,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
               , a Series A cybersecurity AI startup focused on automating security and identity workflows. I&apos;m passionate about building impactful products and thrive in fast-moving, collaborative <i><b>deep tech</b></i> environments, where I&apos;m constantly inspired by the pace of innovation and its real-world impact.
               </p>
 
-              <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-center mt-4">
+              <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-justify mt-4">
               I&apos;ve definitely caught the entrepreneurship bug and love turning early-stage ideas into things people actually use. Since I was a kid, I&apos;ve been deeply fascinated by <i><b>space and space tech</b></i>, and I&apos;m exploring how emerging technologies can drive the next wave of innovation that ultimately benefits life on Earth.
               </p>
 
-              <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-center mt-4">
+              <p className="w-full text-neutral-300 dark:text-neutral-300 text-lg text-justify mt-4">
               I graduated from{" "}
               <i><b>
                   <a href="https://www.ucla.edu/" className="underline">
@@ -136,6 +137,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
 
           <div id="career-timeline">
             <CareerTimeline />
+          </div>
+
+          {/* Education Section */}
+          <div id="education-section" className="mt-16">
+            <EducationTimeline />
           </div>
 
           {/* MainMenubar */}

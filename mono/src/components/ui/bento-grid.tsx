@@ -26,6 +26,7 @@ export const BentoGridItem = ({
   header,
   icon,
   onClick,
+  accentColor,
 }: {
   className?: string;
   title?: string | React.ReactNode;
@@ -33,22 +34,38 @@ export const BentoGridItem = ({
   header?: React.ReactNode;
   icon?: React.ReactNode;
   onClick?: () => void;
+  accentColor?: string; // Hex color for hover border (e.g., "#10b981")
 }) => {
   return (
     <div
       className={cn(
-        "row-span-1 rounded-xl group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 dark:bg-black dark:border-white/[0.2] bg-white border border-transparent justify-between flex flex-col space-y-4",
+        "row-span-1 rounded-xl group/bento transition-all duration-300",
+        "p-4 justify-between flex flex-col space-y-4",
+        // Modern dark glassmorphism style
+        "bg-neutral-900/80 backdrop-blur-sm",
+        "border border-white/10",
+        "shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30",
         className
       )}
+      style={{
+        // Use CSS custom property for hover border color
+        "--accent-color": accentColor || "rgba(255,255,255,0.2)",
+      } as React.CSSProperties}
       onClick={onClick}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = accentColor || "rgba(255,255,255,0.2)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+      }}
     >
       {header}
       <div className="group-hover/bento:translate-x-2 transition duration-200">
         {icon}
-        <div className="font-sans font-bold text-neutral-600 dark:text-neutral-200 mb-2 mt-2">
+        <div className="font-sans font-bold text-neutral-100 mb-2 mt-2">
           {title}
         </div>
-        <div className="font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
+        <div className="font-sans font-normal text-neutral-400 text-xs">
           {description}
         </div>
       </div>

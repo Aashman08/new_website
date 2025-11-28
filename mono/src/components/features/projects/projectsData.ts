@@ -59,6 +59,7 @@ export const projectsData: Project[] = [
     className: "md:col-span-1",
     color: "from-blue-500 to-indigo-600",
     headerImage: "/img/pandas.png",
+    headerAnimation: "parallax",
     fullDescription: {
       intro: "The primary objective of this project is to democratize advanced DataFrame analysis, making it accessible to both technical and non-technical users. By allowing users to upload datasets and ask questions in natural language, the system generates comprehensive answers with textual explanations, graphical representations, and data visualizations.",
       features: [
@@ -72,22 +73,24 @@ export const projectsData: Project[] = [
     },
   },
   {
-    id: "ml-ghana",
-    title: "ML Deployment in Ghana",
-    shortDescription: "Empowering business growth with AI solutions for telecommunications",
+    id: "actuals",
+    title: "AI for SMB Acquisitions",
+    shortDescription: "Founding Engineer at an AI startup streamlining business acquisitions",
     iconName: "rocket",
     className: "md:col-span-1",
-    color: "from-orange-500 to-red-600",
-    headerImage: "/img/ghana.png",
+    color: "from-orange-500 to-amber-500",
+    headerImage: "/img/actuals.png",
+    headerAnimation: "parallax",
     fullDescription: {
-      intro: "The project revolved around the dockerization of the 'Navik - Marketing AI' application within a Python environment, specifically tailored for deployment by a telecommunications firm in Africa looking to expand its services in the Ghanaian Market.",
+      intro: "Joined Actuals as a Founding Software Engineer, an AI startup backed by F7 Ventures, aimed at streamlining the acquisition process for Small and Medium Businesses (SMBs) across the United States.",
       features: [
-        { title: "Containerization", desc: "Implemented Docker for streamlined deployment, making the process more efficient and scalable." },
-        { title: "Revenue Impact", desc: "Strategic implementation estimated to increase potential revenue growth in Ghana by 15%." },
-        { title: "Business Analytics", desc: "Explored CLTV prediction, cross-selling, up-selling, churn reduction, and customer retention strategies." },
-        { title: "DevOps Skills", desc: "Developed expertise in Docker and Git through hands-on practical learning." },
+        { title: "AI-Powered Deal Flow", desc: "Built intelligent systems to analyze and qualify potential acquisition targets, reducing manual screening time significantly." },
+        { title: "Due Diligence Automation", desc: "Developed automated tools to extract and analyze key financial metrics from business documents." },
+        { title: "Full-Stack Development", desc: "Contributed to the entire product stack from frontend interfaces to backend data pipelines." },
+        { title: "Startup Experience", desc: "Gained hands-on experience in early-stage product development, rapid iteration, and working directly with founders." },
       ],
-      conclusion: "This project enriched technical skills and provided a comprehensive understanding of employing data-driven strategies to achieve tangible business results.",
+      conclusion: "This venture into entrepreneurship provided invaluable experience in building AI products from the ground up and understanding the SMB acquisition landscape.",
+      image: "/img/actuals.png",
     },
   },
   {
@@ -98,6 +101,7 @@ export const projectsData: Project[] = [
     className: "md:col-span-1",
     color: "from-green-500 to-emerald-600",
     headerImage: "/img/drone.png",
+    headerAnimation: "zoom",
     fullDescription: {
       intro: "During the summer of 2022, I interned at the Edge of Space Academy at the University of Iowa, focusing on spaceflight instrumentation and mission design. As Project Manager for the Ashton Prairie Near Infrared Sensing team, I explored drone technology's potential in land and ecology management.",
       features: [

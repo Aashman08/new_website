@@ -51,14 +51,9 @@ export const timelineData: TimelineEntryData[] = [
     subtitle: "Founding Software Engineer at Actuals (May – Oct 2024)",
     paragraphs: [
       {
-        text: "Ventured into entrepreneurship, joined {Actuals} as a Founding Software Engineer, an AI startup aimed at streamlining the acquisition process for Small and Medium Businesses (SMBs) across the United States.",
-        links: [{ text: "Actuals", href: "https://useactuals.com" }]
-      },
-      {
-        text: "With initial backing from {F7 Ventures}, we refined our product to enhance efficiency in financial analysis and due diligence.",
-        links: [{ text: "F7 Ventures", href: "https://www.f7ventures.com" }]
-      },
-      "Throughout this process, I developed a strong proficiency in Retrieval-Augmented Generation (RAG) systems and AWS."
+        text: "Ventured into entrepreneurship, joined {Actuals} as a Founding Software Engineer, an AI startup backed by {F7 Ventures}, aimed at streamlining the acquisition process for Small and Medium Businesses (SMBs) across the United States.",
+        links: [{ text: "Actuals", href: "https://useactuals.com" }, { text: "F7 Ventures", href: "https://www.f7ventures.com" }]
+      }
     ],
     images: [
       { src: "/img/actuals.png", alt: "Actuals platform" },
@@ -88,8 +83,7 @@ export const timelineData: TimelineEntryData[] = [
         text: "Visited Iowa as an Undergraduate Researcher selected for the {Edge of Space Academy: Spaceflight Instrumentation and Mission Design} program.",
         links: [{ text: "Edge of Space Academy: Spaceflight Instrumentation and Mission Design", href: "https://edgeofspace.sites.uiowa.edu" }]
       },
-      "Developed a proof-of-concept, drone-mounted dual-camera system designed for accessible NDVI and SFM visualization. This system was designed to provide accessible and cost-effective methods for monitoring vegetation stress caused by heat waves.",
-      "My first time officially working with spectral data."
+      "Developed a proof-of-concept, drone-mounted dual-camera imaging system designed for Vegetation health monitoring and stress analysis caused by heat waves.",
     ],
     images: [
       { src: "/img/drone.png", alt: "Drone imaging system" },
@@ -102,10 +96,10 @@ export const timelineData: TimelineEntryData[] = [
     paragraphs: [
       "My fascination with space and nature began during my childhood, fueled by captivating documentaries that sparked my curiosity about the universe.",
       {
-        text: "This passion deepened during my ninth grade when I joined {Aeross}, an aerospace club that became a defining part of my high school experience. Through Aeross, I not only discovered my aspiration to become a planetary scientist but also forged lifelong friendships.",
+        text: "This passion deepened during my ninth grade when I joined {Aeross}, an aerospace club that became a defining part of my high school experience.",
         links: [{ text: "Aeross", href: "https://aeross.org" }]
       },
-      "One of the most unforgettable milestones was representing **India** on an international stage at the Kennedy Space Center. This experience solidified my desire to explore the unknown, setting me on a path that continues to shape both my academic pursuits and career aspirations."
+      "One of the most unforgettable milestones was representing **India** on an international stage at the Kennedy Space Center."
     ],
     images: [
       { src: "/img/SSDC1.jpg", alt: "SSDC competition" },

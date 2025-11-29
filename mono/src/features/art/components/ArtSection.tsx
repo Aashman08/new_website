@@ -143,10 +143,10 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h3 className="text-xl lg:text-2xl font-semibold text-white tracking-[0.2em] uppercase mb-4">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white tracking-[0.2em] uppercase mb-4">
                   {currentArt.title}
                 </h3>
-                <p className="text-neutral-400 text-base">
+                <p className="text-neutral-400 text-sm sm:text-base">
                   Medium: {currentArt.medium}
                 </p>
               </motion.div>

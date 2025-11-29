@@ -58,9 +58,9 @@ const EducationCard: React.FC<{ entry: EducationEntry; index: number }> = ({
       transition={{ delay: index * 0.1, duration: 0.4 }}
       className="group"
     >
-      <div className="flex gap-5">
+      <div className="flex gap-3 sm:gap-5">
         {/* Logo */}
-        <div className="relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-white">
+        <div className="relative flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-white">
           <Image
             src={entry.logo}
             alt={entry.institution}
@@ -72,9 +72,9 @@ const EducationCard: React.FC<{ entry: EducationEntry; index: number }> = ({
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Header row */}
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4">
             <div>
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-base sm:text-lg font-semibold text-white">
                 {entry.degree}
               </h3>
               {entry.institutionUrl ? (
@@ -82,29 +82,29 @@ const EducationCard: React.FC<{ entry: EducationEntry; index: number }> = ({
                   href={entry.institutionUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-400 hover:text-neutral-300 text-sm transition-colors"
+                  className="text-neutral-400 hover:text-neutral-300 text-xs sm:text-sm transition-colors"
                 >
                   {entry.institution}
                 </a>
               ) : (
-                <p className="text-neutral-400 text-sm">{entry.institution}</p>
+                <p className="text-neutral-400 text-xs sm:text-sm">{entry.institution}</p>
               )}
             </div>
-            <span className="text-neutral-500 text-sm whitespace-nowrap">
+            <span className="text-neutral-500 text-xs sm:text-sm whitespace-nowrap">
               {entry.period}
             </span>
           </div>
 
           {/* Description */}
-          <p className="text-neutral-400 text-sm leading-relaxed mt-3">
+          <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed mt-2 sm:mt-3">
             {renderTextWithLinks(entry.description, entry.links)}
           </p>
 
           {/* Highlights */}
           {entry.highlights && entry.highlights.length > 0 && (
-            <ul className="mt-3 space-y-1">
+            <ul className="mt-2 sm:mt-3 space-y-1">
               {entry.highlights.map((highlight, idx) => (
-                <li key={idx} className="text-neutral-500 text-sm flex items-start gap-2">
+                <li key={idx} className="text-neutral-500 text-xs sm:text-sm flex items-start gap-2">
                   <span className="text-neutral-600">•</span>
                   <span>{renderTextWithLinks(highlight, entry.links)}</span>
                 </li>
@@ -119,15 +119,15 @@ const EducationCard: React.FC<{ entry: EducationEntry; index: number }> = ({
 
 export function EducationTimeline() {
   return (
-    <div className="w-full max-w-3xl mx-auto py-10">
+    <div className="w-full max-w-3xl mx-auto py-6 sm:py-8 md:py-10 px-2 sm:px-0">
       {/* Section Header */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-3 mb-10"
+        className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 md:mb-10"
       >
-        <IconSchool className="w-6 h-6 text-neutral-400" />
-        <h2 className="text-2xl font-semibold text-white">Education</h2>
+        <IconSchool className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-400" />
+        <h2 className="text-xl sm:text-2xl font-semibold text-white">Education</h2>
       </motion.div>
 
       {/* Education Cards */}

@@ -5,7 +5,7 @@ import { timelineData, TimelineEntryData } from "../data/timelineData";
 
 // Shared styles as constants
 const IMAGE_SHADOW = "shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]";
-const PARAGRAPH_STYLES = "w-full text-neutral-300 dark:text-neutral-300 text-justify text-base md:text-lg leading-relaxed";
+const PARAGRAPH_STYLES = "w-full text-neutral-300 dark:text-neutral-300 text-justify text-sm sm:text-base md:text-lg leading-relaxed";
 
 // Reusable link component for timeline entries
 const TimelineLink: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
@@ -73,7 +73,7 @@ const renderTextWithLinks = (
 
 // Image grid component
 const TimelineImageGrid: React.FC<{ images: { src: string; alt: string }[] }> = ({ images }) => (
-  <div className="grid grid-cols-2 gap-4">
+  <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
     {images.map((img, idx) => (
       <Image
         key={idx}
@@ -81,7 +81,7 @@ const TimelineImageGrid: React.FC<{ images: { src: string; alt: string }[] }> = 
         alt={img.alt}
         width={500}
         height={500}
-        className={`rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full ${IMAGE_SHADOW}`}
+        className={`rounded-md sm:rounded-lg object-cover h-24 sm:h-32 md:h-44 lg:h-60 w-full ${IMAGE_SHADOW}`}
       />
     ))}
   </div>

@@ -31,13 +31,13 @@ export default function SRILabPage() {
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="fixed top-0 left-0 right-0 z-50 p-4 md:p-6"
+        className="fixed top-0 left-0 right-0 z-50 p-3 sm:p-4 md:p-6"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link
             href="/"
             onClick={handleBackToResearch}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all"
           >
             <IconArrowLeft size={18} />
             <span className="text-sm font-medium">Back to Research</span>
@@ -46,7 +46,7 @@ export default function SRILabPage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <header className="relative h-[70vh] min-h-[500px] overflow-hidden">
+      <header className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] overflow-hidden">
         <Image
           src={research.heroImage}
           alt={research.title}
@@ -108,7 +108,7 @@ export default function SRILabPage() {
       </header>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-6 md:px-8 py-16 md:py-24">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-10 sm:py-16 md:py-24">
         <Section>
           <Paragraph>
             As an <strong className="text-white">Undergraduate Research Assistant</strong> at the{" "}
@@ -149,10 +149,10 @@ export default function SRILabPage() {
             pre and post-event satellite imagery across a variety of disaster events with building polygons 
             (masks) and labels of damage levels.
           </Paragraph>
-          <ul className="my-6 space-y-2 list-disc pl-10">
-            <li className="text-neutral-300 text-lg"><strong className="text-white">850,736</strong> building annotations across <strong className="text-white">45,362 km²</strong></li>
-            <li className="text-neutral-300 text-lg">Covers hurricanes (Florence, Harvey, Matthew, Michael), earthquakes, flooding, tsunamis, volcanoes, and wildfires</li>
-            <li className="text-neutral-300 text-lg">Four damage classification levels: Undamaged, Lightly Damaged, Severely Damaged, and Completely Destroyed</li>
+          <ul className="my-6 space-y-2 list-disc pl-6 sm:pl-10">
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg"><strong className="text-white">850,736</strong> building annotations across <strong className="text-white">45,362 km²</strong></li>
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Covers hurricanes (Florence, Harvey, Matthew, Michael), earthquakes, flooding, tsunamis, volcanoes, and wildfires</li>
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Four damage classification levels: Undamaged, Lightly Damaged, Severely Damaged, and Completely Destroyed</li>
           </ul>
         </Section>
 
@@ -229,11 +229,11 @@ export default function SRILabPage() {
             Developed a comprehensive <strong className="text-white">ETL pipeline</strong> to transform raw 
             satellite imagery into a structured training dataset:
           </Paragraph>
-          <ul className="my-6 space-y-3 list-disc pl-10">
-            <li className="text-neutral-300 text-lg">Extracted and structured data by parsing large-scale JSON label files</li>
-            <li className="text-neutral-300 text-lg">Created DataFrames organizing pre-event, post-event, and mask images for each sample</li>
-            <li className="text-neutral-300 text-lg">Calculated net damage per sample to subset data for meaningful training examples</li>
-            <li className="text-neutral-300 text-lg">Converted paths and prepared PyTorch DataLoaders for efficient batch processing</li>
+          <ul className="my-6 space-y-3 list-disc pl-6 sm:pl-10">
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Extracted and structured data by parsing large-scale JSON label files</li>
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Created DataFrames organizing pre-event, post-event, and mask images for each sample</li>
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Calculated net damage per sample to subset data for meaningful training examples</li>
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Converted paths and prepared PyTorch DataLoaders for efficient batch processing</li>
           </ul>
         </Section>
 
@@ -350,7 +350,7 @@ export default function SRILabPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-12">
+      <footer className="border-t border-white/10 py-8 sm:py-10 md:py-12">
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <Link
             href="/"

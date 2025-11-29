@@ -107,20 +107,20 @@ const ProjectsSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
       className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-70 font-sans"
     >
       {/* Modal content container */}
-      <div className="relative w-full max-w-6xl mx-auto mt-40 mb-10 p-10 bg-black text-white rounded-lg shadow-lg ">
+      <div className="relative w-full max-w-6xl mx-auto mt-16 sm:mt-24 md:mt-40 mb-6 md:mb-10 p-4 sm:p-6 md:p-10 bg-black text-white rounded-lg shadow-lg">
         {/* Close button */}
         <Button
           onClick={onClose}
           variant="ghost"
           size="icon"
-          className="absolute top-4 right-4 text-white hover:bg-white/10"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white hover:bg-white/10"
         >
-          <X className="h-6 w-6" />
+          <X className="h-5 w-5 sm:h-6 sm:w-6" />
           <span className="sr-only">Close</span>
         </Button>
 
-        <div className="flex flex-col items-center mb-6 justify-center">
-          <h2 className="text-lg md:text-4xl mb-4 text-white dark:text-white max-w-4xl">
+        <div className="flex flex-col items-center mb-4 sm:mb-6 justify-center">
+          <h2 className="text-xl sm:text-2xl md:text-4xl mb-3 sm:mb-4 text-white dark:text-white max-w-4xl">
           Projects
           </h2>
         </div>
@@ -128,24 +128,24 @@ const ProjectsSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
         <ProjectsGrid />
 
         {/* Skills Section */}
-        <div className="flex flex-col items-center mb-6 pt-10 justify-center">
-          <h2 className="text-lg md:text-4xl mb-10 text-white dark:text-white max-w-4xl pt-10">
+        <div className="flex flex-col items-center mb-4 sm:mb-6 pt-6 sm:pt-8 md:pt-10 justify-center">
+          <h2 className="text-xl sm:text-2xl md:text-4xl mb-6 sm:mb-8 md:mb-10 text-white dark:text-white max-w-4xl pt-6 sm:pt-8 md:pt-10">
           Skills
           </h2>
         </div>
 
         {Object.entries(skillCategories).map(([category, items]) => (
-          <div key={category} className="flex flex-col items-center mt-8">
-            <span className="text-xs font-medium tracking-[0.3em] text-neutral-400 uppercase mb-6">
+          <div key={category} className="flex flex-col items-center mt-4 sm:mt-6 md:mt-8">
+            <span className="text-[10px] sm:text-xs font-medium tracking-[0.2em] sm:tracking-[0.3em] text-neutral-400 uppercase mb-4 sm:mb-6 text-center px-2">
               {category}
             </span>
-            <div className="flex items-center justify-center h-[8rem] w-full">
+            <div className="flex items-center justify-center h-[6rem] sm:h-[7rem] md:h-[8rem] w-full">
               <FloatingDock items={items} />
             </div>
           </div>
         ))}
 
-        <div className="mt-16 mb-8">
+        <div className="mt-10 sm:mt-12 md:mt-16 mb-6 sm:mb-8 px-2 sm:px-0">
           <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
         </div>
       </div>

@@ -31,13 +31,13 @@ export default function TibetanPlateauPage() {
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="fixed top-0 left-0 right-0 z-50 p-4 md:p-6"
+        className="fixed top-0 left-0 right-0 z-50 p-3 sm:p-4 md:p-6"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link
             href="/"
             onClick={handleBackToResearch}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all"
           >
             <IconArrowLeft size={18} />
             <span className="text-sm font-medium">Back to Research</span>
@@ -46,7 +46,7 @@ export default function TibetanPlateauPage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <header className="relative h-[70vh] min-h-[500px] overflow-hidden">
+      <header className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] overflow-hidden">
         <Image
           src={research.heroImage}
           alt={research.title}
@@ -108,7 +108,7 @@ export default function TibetanPlateauPage() {
       </header>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-6 md:px-8 py-16 md:py-24">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-10 sm:py-16 md:py-24">
         <Section>
           <Paragraph>
             In a fulfilling learning opportunity with <strong className="text-white">Abijah Simons</strong>, 
@@ -167,7 +167,7 @@ export default function TibetanPlateauPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-12">
+      <footer className="border-t border-white/10 py-8 sm:py-10 md:py-12">
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <Link
             href="/"

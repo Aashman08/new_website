@@ -88,7 +88,7 @@ const ProjectDetailModal = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-8"
         onClick={onClose}
       >
         {/* Backdrop with blur */}
@@ -103,7 +103,7 @@ const ProjectDetailModal = ({
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 30 }}
           transition={{ type: "spring", damping: 30, stiffness: 400 }}
-          className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-[#0a0a0a] rounded-3xl shadow-2xl"
+          className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden bg-[#0a0a0a] rounded-xl sm:rounded-2xl md:rounded-3xl shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button - floating */}
@@ -112,13 +112,13 @@ const ProjectDetailModal = ({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
             onClick={onClose}
-            className="absolute top-4 right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:scale-110"
+            className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 p-2 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:scale-110"
           >
-            <IconX size={18} className="text-white" />
+            <IconX size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
           </motion.button>
 
           {/* Scrollable content */}
-          <div className="overflow-y-auto max-h-[90vh] custom-scrollbar">
+          <div className="overflow-y-auto max-h-[95vh] sm:max-h-[90vh] custom-scrollbar">
             {/* Hero Section with Image/Video */}
             <div className="relative">
               {/* Hero Media */}
@@ -132,7 +132,7 @@ const ProjectDetailModal = ({
                   />
                 </div>
               ) : project.headerImage || project.fullDescription.image ? (
-                <div className="relative h-64 md:h-80 overflow-hidden">
+                <div className="relative h-48 sm:h-56 md:h-80 overflow-hidden">
                   <Image
                     src={project.headerImage || project.fullDescription.image || ""}
                     alt={project.title}
@@ -143,23 +143,23 @@ const ProjectDetailModal = ({
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
                 </div>
               ) : (
-                <div className={`h-32 bg-gradient-to-br ${gradientClass}`} />
+                <div className={`h-24 sm:h-32 bg-gradient-to-br ${gradientClass}`} />
               )}
 
               {/* Title overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="flex items-center gap-3 mb-3"
+                  className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3"
                 >
-                  <div className={`p-2.5 rounded-xl bg-gradient-to-br ${gradientClass} shadow-lg`}>
+                  <div className={`p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl bg-gradient-to-br ${gradientClass} shadow-lg`}>
                     {React.cloneElement(iconMap[project.iconName] as React.ReactElement, {
-                      className: "h-5 w-5 text-white"
+                      className: "h-4 w-4 sm:h-5 sm:w-5 text-white"
                     })}
                   </div>
-                  <span className="text-sm font-medium text-neutral-400 uppercase tracking-wider">
+                  <span className="text-xs sm:text-sm font-medium text-neutral-400 uppercase tracking-wider">
                     Project
                   </span>
                 </motion.div>
@@ -168,7 +168,8 @@ const ProjectDetailModal = ({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 }}
-                  className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight"
+                  className="text-xl sm:text-2xl md:text-4xl font-bold text-white mb-1 sm:mb-2 tracking-tight"
+                  style={{ textTransform: "none", letterSpacing: "-0.02em" }}
                 >
                   {project.title}
                 </motion.h2>
@@ -177,7 +178,7 @@ const ProjectDetailModal = ({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="text-lg text-neutral-300"
+                  className="text-sm sm:text-base md:text-lg text-neutral-300"
                 >
                   {project.shortDescription}
                 </motion.p>
@@ -185,14 +186,14 @@ const ProjectDetailModal = ({
             </div>
 
             {/* Main Content */}
-            <div className="p-6 md:p-8 space-y-8">
+            <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
               {/* Introduction */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
               >
-                <p className="text-lg text-neutral-300 leading-relaxed">
+                <p className="text-sm sm:text-base md:text-lg text-neutral-300 leading-relaxed">
                   {project.fullDescription.intro}
                 </p>
               </motion.div>
@@ -202,35 +203,35 @@ const ProjectDetailModal = ({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="space-y-5"
+                className="space-y-4 sm:space-y-5"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <div className={`h-px flex-1 bg-gradient-to-r ${gradientClass} opacity-30`} />
-                  <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-widest">
+                  <h3 className="text-xs sm:text-sm font-semibold text-neutral-400 uppercase tracking-widest whitespace-nowrap">
                     Key Features
                   </h3>
                   <div className={`h-px flex-1 bg-gradient-to-l ${gradientClass} opacity-30`} />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                   {project.fullDescription.features.map((feature, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.35 + i * 0.05 }}
-                      className="group relative p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 hover:bg-white/[0.04] transition-all duration-300"
+                      className="group relative p-3 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/10 hover:bg-white/[0.04] transition-all duration-300"
                     >
                       {/* Feature number */}
-                      <span className={`absolute -top-3 -left-1 text-5xl font-black bg-gradient-to-br ${gradientClass} bg-clip-text text-transparent opacity-20 group-hover:opacity-30 transition-opacity`}>
+                      <span className={`absolute -top-2 sm:-top-3 -left-1 text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-br ${gradientClass} bg-clip-text text-transparent opacity-20 group-hover:opacity-30 transition-opacity`}>
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       
                       <div className="relative">
-                        <h4 className="font-semibold text-white mb-2 text-lg">
+                        <h4 className="font-semibold text-white mb-1 sm:mb-2 text-sm sm:text-base md:text-lg">
                           {feature.title}
                         </h4>
-                        <p className="text-neutral-400 text-sm leading-relaxed">
+                        <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
                           {feature.desc}
                         </p>
                       </div>
@@ -244,21 +245,21 @@ const ProjectDetailModal = ({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="relative overflow-hidden rounded-2xl"
+                className="relative overflow-hidden rounded-xl sm:rounded-2xl"
               >
                 {/* Background gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-10`} />
                 <div className="absolute inset-0 bg-[#0a0a0a]/80" />
                 
                 {/* Content */}
-                <div className="relative p-6 md:p-8">
-                  <div className="flex items-start gap-4">
-                    <div className={`flex-shrink-0 w-1 h-full min-h-[60px] rounded-full bg-gradient-to-b ${gradientClass}`} />
+                <div className="relative p-4 sm:p-6 md:p-8">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className={`flex-shrink-0 w-1 h-full min-h-[40px] sm:min-h-[60px] rounded-full bg-gradient-to-b ${gradientClass}`} />
                     <div>
-                      <span className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3 block">
+                      <span className="text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-2 sm:mb-3 block">
                         Impact & Outcome
                       </span>
-                      <p className="text-neutral-200 leading-relaxed text-lg">
+                      <p className="text-neutral-200 leading-relaxed text-sm sm:text-base md:text-lg">
                         {project.fullDescription.conclusion}
                       </p>
                     </div>
@@ -267,7 +268,7 @@ const ProjectDetailModal = ({
               </motion.div>
 
               {/* Bottom spacer */}
-              <div className="h-4" />
+              <div className="h-2 sm:h-4" />
             </div>
           </div>
         </motion.div>

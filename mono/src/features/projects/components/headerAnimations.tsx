@@ -133,7 +133,7 @@ export const AnimatedHeader = ({
   return (
     <div
       style={use3DPerspective ? { perspective: "1000px" } : undefined}
-      className="flex flex-1 w-full h-full min-h-[6rem]"
+      className="flex flex-1 w-full h-full min-h-[10rem] sm:min-h-[8rem] md:min-h-[6rem]"
     >
       <motion.div
         className={`relative w-full h-full rounded-lg overflow-hidden bg-gradient-to-br ${color}`}
@@ -173,7 +173,7 @@ interface GradientHeaderProps {
 export const GradientHeader = ({ color, icon }: GradientHeaderProps) => {
   return (
     <motion.div
-      className={`flex flex-1 w-full h-full min-h-[6rem] rounded-lg overflow-hidden bg-gradient-to-br ${color}`}
+      className={`flex flex-1 w-full h-full min-h-[10rem] sm:min-h-[8rem] md:min-h-[6rem] rounded-lg overflow-hidden bg-gradient-to-br ${color}`}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3 }}
     >

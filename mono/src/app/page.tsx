@@ -39,12 +39,12 @@ export default function HomePage() {
 
       {/* Overlay Content */}
       {!isModalOpen && (
-        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-white">
-          <div className="absolute top-[57%] transform -translate-y-1/2 text-center">
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-white px-4 md:px-0">
+          <div className="absolute top-[57%] transform -translate-y-1/2 text-center w-full px-4">
             <Heading level="h1">AASHMAN RASTOGI</Heading>
-            <Text style={{ letterSpacing: '0.2em', fontSize: "90%" }}>STATISTICS AND DATA SCIENCE</Text>
+            <Text className="text-xs sm:text-sm md:text-base" style={{ letterSpacing: '0.15em' }}>ENTREPRENEURSHIP, AI AND SPACE</Text>
           </div>
-          <div className="absolute bottom-52 flex space-x-4">
+          <div className="absolute bottom-16 sm:bottom-24 md:bottom-36 lg:bottom-52 w-full max-w-2xl px-4">
             <Menubar>
               {MAIN_MENU_ITEMS.map((item) => (
                 <MenubarMenu key={item}>

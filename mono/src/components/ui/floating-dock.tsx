@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import {
   AnimatePresence,
   MotionValue,
@@ -37,44 +36,47 @@ const FloatingDockMobile = ({
   items: { title: string; icon: React.ReactNode; href: string }[];
   className?: string;
 }) => {
-  const [open, setOpen] = useState(false);
+  const [activeItem, setActiveItem] = useState<string | null>(null);
+
   return (
-    <div className={cn("relative block md:hidden", className)}>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            layoutId="nav"
-            className="absolute bottom-full mb-2 inset-x-0 flex flex-col gap-2"
+    <div className={cn("block md:hidden w-full", className)}>
+      <div className="flex flex-wrap justify-center gap-2 px-2">
+        {items.map((item) => (
+          <div
+            key={item.title}
+            className="relative"
+            onClick={() => setActiveItem(activeItem === item.title ? null : item.title)}
           >
-            {items.map((item, idx) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{
-                  opacity: 0,
-                  y: 10,
-                  transition: { delay: idx * 0.02 },
-                }}
-                transition={{ delay: (items.length - 1 - idx) * 0.02 }}
-              >
-                <Link
-                  href={item.href}
-                  className="h-11 w-11 rounded-lg bg-neutral-900 border border-neutral-700 flex items-center justify-center"
+            <AnimatePresence>
+              {activeItem === item.title && (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 5 }}
+                  transition={{ duration: 0.15 }}
+                  className={cn(
+                    "absolute left-1/2 -translate-x-1/2 -top-9 z-50",
+                    "px-2.5 py-1 rounded-lg",
+                    "bg-white text-black",
+                    "text-xs font-medium whitespace-nowrap",
+                    "pointer-events-none"
+                  )}
                 >
-                  <div className="h-5 w-5">{item.icon}</div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <button
-        onClick={() => setOpen(!open)}
-        className="h-11 w-11 rounded-lg bg-neutral-900 border border-neutral-700 flex items-center justify-center"
-      >
-        <IconLayoutNavbarCollapse className="h-5 w-5 text-white" />
-      </button>
+                  {item.title}
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <div
+              className={cn(
+                "h-11 w-11 rounded-xl bg-neutral-800 border border-neutral-700 flex items-center justify-center",
+                activeItem === item.title && "bg-neutral-700 border-neutral-500"
+              )}
+            >
+              <div className="h-5 w-5">{item.icon}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

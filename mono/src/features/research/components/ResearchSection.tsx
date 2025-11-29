@@ -47,7 +47,7 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
       </motion.button>
 
       {/* Hero Banner */}
-      <div className="relative w-full h-[50vh] min-h-[400px] overflow-hidden">
+      <div className="relative w-full h-[35vh] sm:h-[40vh] md:h-[50vh] min-h-[280px] sm:min-h-[320px] md:min-h-[400px] overflow-hidden">
         <Image
           src="/img/project_images/mars.jpeg"
           alt="Mars"
@@ -64,35 +64,35 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="absolute inset-0 flex flex-col items-center justify-center"
+          className="absolute inset-0 flex flex-col items-center justify-center px-4"
         >
-          <h2 className="text-4xl md:text-6xl font-light text-white tracking-[0.3em] uppercase">
+          <h2 className="text-xl sm:text-2xl md:text-6xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase">
             Research
           </h2>
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: "6rem" }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="h-[2px] bg-gradient-to-r from-transparent via-orange-500 to-transparent mt-4"
+            className="h-[2px] bg-gradient-to-r from-transparent via-orange-500 to-transparent mt-3 sm:mt-4"
           />
         </motion.div>
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-6 md:px-8 py-12 md:py-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-16">
         {/* Introduction */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-neutral-300 text-lg leading-relaxed mb-16 text-center max-w-3xl mx-auto"
+          className="text-neutral-300 text-sm sm:text-base md:text-lg leading-relaxed mb-10 sm:mb-12 md:mb-16 text-center max-w-3xl mx-auto"
         >
           Throughout my academic journey at UCLA, I&apos;ve been privileged to embark on an eclectic range of research projects 
           and expeditions that have expanded the horizons of my understanding and experience.
         </motion.p>
 
         {/* Research Projects Grid */}
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {researchProjects.map((project, index) => (
             <motion.div
               key={project.id}
@@ -101,9 +101,9 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
               transition={{ delay: 0.5 + index * 0.15 }}
             >
               <Link href={`/research/${project.slug}`}>
-                <div className="group relative rounded-2xl overflow-hidden cursor-pointer">
+                <div className="group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer">
                   {/* Background Image */}
-                  <div className="relative h-72 md:h-80 overflow-hidden">
+                  <div className="relative h-56 sm:h-64 md:h-80 overflow-hidden">
                     <Image
                       src={project.heroImage}
                       alt={project.title}
@@ -115,35 +115,40 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
                   </div>
                   
                   {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
                     {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.tags.map((tag, i) => (
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                      {project.tags.slice(0, 3).map((tag, i) => (
                         <span
                           key={i}
-                          className="px-3 py-1 text-xs font-medium text-white/70 bg-white/10 backdrop-blur-sm rounded-full border border-white/10"
+                          className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium text-white/70 bg-white/10 backdrop-blur-sm rounded-full border border-white/10"
                         >
                           {tag}
                         </span>
                       ))}
+                      {project.tags.length > 3 && (
+                        <span className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium text-white/50">
+                          +{project.tags.length - 3} more
+                        </span>
+                      )}
                     </div>
                     
-                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 group-hover:text-white transition-colors">
+                    <h3 className="text-lg sm:text-xl md:text-3xl font-bold text-white mb-1 sm:mb-2 group-hover:text-white transition-colors">
                       {project.title}
                     </h3>
-                    <p className="text-neutral-400 text-sm md:text-base mb-4 line-clamp-2">
+                    <p className="text-neutral-400 text-xs sm:text-sm md:text-base mb-3 sm:mb-4 line-clamp-2">
                       {project.subtitle}
                     </p>
                     
                     {/* Read More */}
                     <div className="flex items-center gap-2 text-white/70 group-hover:text-white transition-colors">
-                      <span className="text-sm font-medium">Explore</span>
-                      <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                      <span className="text-xs sm:text-sm font-medium">Explore</span>
+                      <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 transform group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
 
                   {/* Hover Border */}
-                  <div className="absolute inset-0 rounded-2xl border border-white/0 group-hover:border-white/20 transition-colors duration-300" />
+                  <div className="absolute inset-0 rounded-xl sm:rounded-2xl border border-white/0 group-hover:border-white/20 transition-colors duration-300" />
                 </div>
               </Link>
             </motion.div>
@@ -151,7 +156,7 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
         </div>
 
         {/* MainMenubar */}
-        <div className="mt-20 mb-8">
+        <div className="mt-12 sm:mt-16 md:mt-20 mb-6 sm:mb-8 px-2 sm:px-0">
           <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
         </div>
       </div>

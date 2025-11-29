@@ -27,7 +27,9 @@ const Menubar = React.forwardRef<
   <MenubarPrimitive.Root
     ref={ref}
     className={cn(
-      "flex h-16 items-center justify-center space-x-0", // Remove space-x to eliminate extra spacing
+      // Mobile: 2-column grid, Desktop: flex row
+      "grid grid-cols-2 md:flex md:flex-row",
+      "h-auto md:h-16 items-center justify-center",
       "rounded-md border border-white bg-transparent p-0 shadow-sm text-white font-medium",
       className
     )}
@@ -44,11 +46,26 @@ const MenubarTrigger = React.forwardRef<
   <MenubarPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center justify-center", // Center content
-      "w-32 h-12", // Fixed width and height
-      "px-6 py-3 text-sm font-light text-white outline-none focus:bg-transparent focus:text-white tracking-wider",
-      "border-r border-white last:border-r-0", // Border styling
-      "hover:bg-white/10 hover:backdrop-blur-md focus:bg-white/10 focus:backdrop-blur-md transition-colors duration-300", // Hover and focus effect with transparency and blur
+      "flex cursor-default select-none items-center justify-center",
+      // Equal width for all items using flex-1 on desktop
+      "w-full md:flex-1 h-10 md:h-12",
+      "px-4 md:px-6 py-2 md:py-3",
+      "text-xs md:text-sm font-light text-white outline-none",
+      "focus:bg-transparent focus:text-white tracking-wider",
+      "whitespace-nowrap", // Prevent text wrapping
+      // Mobile: all items get bottom and right borders by default
+      "border-b border-r border-white",
+      // Desktop: no bottom borders, right borders except last
+      "md:border-b-0 md:border-r md:last:border-r-0",
+      // Mobile: last item has no bottom border (always last row)
+      "last:border-b-0",
+      // Mobile: even-positioned items (2nd, 4th, 6th...) are at end of row, no right border
+      "[&:nth-child(even)]:border-r-0",
+      // Desktop: restore right borders for even items
+      "md:[&:nth-child(even)]:border-r",
+      // Mobile: if last item is odd-positioned (alone in row), center it by spanning 2 columns
+      "[&:last-child:nth-child(odd)]:col-span-2 [&:last-child:nth-child(odd)]:border-r-0",
+      "hover:bg-white/10 hover:backdrop-blur-md focus:bg-white/10 focus:backdrop-blur-md transition-colors duration-300",
       className
     )}
     {...props}

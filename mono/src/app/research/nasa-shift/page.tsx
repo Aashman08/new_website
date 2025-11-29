@@ -31,13 +31,13 @@ export default function NASAShiftPage() {
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="fixed top-0 left-0 right-0 z-50 p-4 md:p-6"
+        className="fixed top-0 left-0 right-0 z-50 p-3 sm:p-4 md:p-6"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link
             href="/"
             onClick={handleBackToResearch}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all"
           >
             <IconArrowLeft size={18} />
             <span className="text-sm font-medium">Back to Research</span>
@@ -46,7 +46,7 @@ export default function NASAShiftPage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <header className="relative h-[70vh] min-h-[500px] overflow-hidden">
+      <header className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] overflow-hidden">
         <Image
           src={research.heroImage}
           alt={research.title}
@@ -108,7 +108,7 @@ export default function NASAShiftPage() {
       </header>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-6 md:px-8 py-16 md:py-24">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-10 sm:py-16 md:py-24">
         <Section>
           <Paragraph>
             This research trip was a part of a project by <strong className="text-white">NASA JPL</strong> in 
@@ -157,11 +157,11 @@ export default function NASAShiftPage() {
           <Paragraph>
             Over the two days, we collected samples in pre-dawn and mid-day to take different measurements including:
           </Paragraph>
-          <ul className="my-6 space-y-2 list-disc pl-10">
-            <li className="text-neutral-300 text-lg">Pre-dawn water potential</li>
-            <li className="text-neutral-300 text-lg">Mid-day water potential</li>
-            <li className="text-neutral-300 text-lg">Relative water potential</li>
-            <li className="text-neutral-300 text-lg">Turgor loss point</li>
+          <ul className="my-6 space-y-2 list-disc pl-6 sm:pl-10">
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Pre-dawn water potential</li>
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Mid-day water potential</li>
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Relative water potential</li>
+            <li className="text-neutral-300 text-sm sm:text-base md:text-lg">Turgor loss point</li>
           </ul>
           <Paragraph>
             I further assisted the JPL team and the research group in processing of samples which included 
@@ -182,7 +182,7 @@ export default function NASAShiftPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-12">
+      <footer className="border-t border-white/10 py-8 sm:py-10 md:py-12">
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <Link
             href="/"

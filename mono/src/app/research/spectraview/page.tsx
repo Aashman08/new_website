@@ -22,7 +22,7 @@ export default function SpectraViewPage() {
     heroImage: "/img/satellite.png", 
     color: "from-violet-500 to-purple-600",
     date: "Dec 2024 – June 2025",
-    tags: ["Satellite Sensing", "Python", "Signal Processing", "Startup", "Stanford Collaboration"],
+    tags: ["Satellite Sensing", "Python", "Signal Processing", "Stanford Collaboration"],
     websiteLink: "https://spectraview.co",
     labLink: "https://gatkine.astro.ucla.edu/research.html"
   };

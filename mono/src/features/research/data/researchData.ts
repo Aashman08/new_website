@@ -21,7 +21,7 @@ export const researchProjects: ResearchProject[] = [
     subtitle: "Satellite-based trace gas detection with ultra-high precision photonic spectrograph technology",
     heroImage: "/img/island.png",
     color: "from-violet-500/20 to-purple-600/20",
-    tags: ["Satellite Sensing", "Algorithm Development", "Ha"],
+    tags: ["Satellite Sensing", "Algorithm Development", "Hyperspectral Imaging"],
   },
   {
     id: "sri-lab",

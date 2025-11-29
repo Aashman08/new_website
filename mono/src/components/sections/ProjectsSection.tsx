@@ -97,7 +97,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isOpen, onClose, onMe
     };
   }, [isOpen]);
 
-  const MenuTitles = ['About Me', "Skills", 'CV', 'Contact', 'Research', 'Art'];
+  const MenuTitles = ['About Me', 'CV', 'Contact', 'Research', 'Art'];
 
   const skillCategories = {
     "LANGUAGES": languages,

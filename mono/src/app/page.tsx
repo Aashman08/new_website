@@ -8,7 +8,6 @@ import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 // Section components
 import AboutSection from "@/components/sections/AboutSection";
 import ProjectsSection from "@/components/sections/ProjectsSection";
-import SkillsSection from "@/components/sections/SkillsSection";
 import CVSection from "@/components/sections/CVSection";
 import ContactSection from "@/components/sections/ContactSection";
 import ResearchSection from "@/components/sections/ResearchSection";
@@ -18,7 +17,6 @@ import ArtSection from "@/components/sections/ArtSection";
 const sectionMap: Record<string, string> = {
   "about": "ABOUT ME",
   "projects": "PROJECTS",
-  "skills": "SKILLS",
   "cv": "CV",
   "contact": "CONTACT",
   "research": "RESEARCH",
@@ -75,7 +73,7 @@ export default function HomePage() {
       setIsModalOpen(false);
       setTimeout(() => {
         setMenuAction(action);
-        if (["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"].includes(action)) {
+        if (["ABOUT ME", "PROJECTS", "CV", "CONTACT", "RESEARCH", "ART"].includes(action)) {
           setIsModalOpen(true);
           // Save to sessionStorage for back button navigation
           sessionStorage.setItem(SECTION_STORAGE_KEY, action);
@@ -83,7 +81,7 @@ export default function HomePage() {
       }, 0);
     } else {
       setMenuAction(action);
-      if (["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"].includes(action)) {
+      if (["ABOUT ME", "PROJECTS", "CV", "CONTACT", "RESEARCH", "ART"].includes(action)) {
         setIsModalOpen(true);
         // Save to sessionStorage for back button navigation
         sessionStorage.setItem(SECTION_STORAGE_KEY, action);
@@ -121,7 +119,7 @@ export default function HomePage() {
           </div>
           <div className="absolute bottom-52 flex space-x-4">
             <Menubar>
-              {["ABOUT ME", "PROJECTS", "SKILLS", "CV", "CONTACT", "RESEARCH", "ART"].map(
+              {["ABOUT ME", "PROJECTS", "CV", "CONTACT", "RESEARCH", "ART"].map(
                 (item) => (
                   <MenubarMenu key={item}>
                     <MenubarTrigger onClick={() => handleMenuClick(item)}>
@@ -145,13 +143,6 @@ export default function HomePage() {
       )}
       {menuAction === "PROJECTS" && (
         <ProjectsSection 
-          isOpen={isModalOpen} 
-          onClose={handleModalClose}
-          onMenuItemClick={handleMenuClick}
-        />
-      )}
-      {menuAction === "SKILLS" && (
-        <SkillsSection 
           isOpen={isModalOpen} 
           onClose={handleModalClose}
           onMenuItemClick={handleMenuClick}

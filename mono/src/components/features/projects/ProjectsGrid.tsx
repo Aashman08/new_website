@@ -280,6 +280,9 @@ const ProjectDetailModal = ({
 const dedicatedPages: Record<string, string> = {
   "satellite-fire": "satellite-fire",
   "actuals": "actuals",
+  "genai-deloitte": "genai-deloitte",
+  "data-analysis-deloitte": "data-analysis-deloitte",
+  "drone-ndvi": "drone-ndvi",
 };
 
 export function ProjectsGrid() {

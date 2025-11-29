@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { IconSchool } from "@tabler/icons-react";
 import { educationData, EducationEntry } from "./educationData";
+import { Divider } from "@/components/features/projects/ProjectPageComponents";
 
 // Render text with links
 const renderTextWithLinks = (
@@ -29,7 +30,7 @@ const renderTextWithLinks = (
           href={link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors"
+          className="text-neutral-200 hover:text-white underline underline-offset-2 transition-colors"
         >
           {link.text}
         </a>
@@ -55,12 +56,11 @@ const EducationCard: React.FC<{ entry: EducationEntry; index: number }> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.4 }}
-      className="relative p-6 rounded-xl bg-neutral-900/60 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 group"
+      className="group"
     >
-      {/* Header with logo, title, and date */}
-      <div className="flex items-start gap-4 mb-4">
+      <div className="flex gap-5">
         {/* Logo */}
-        <div className="relative flex-shrink-0 w-16 h-16 rounded-lg bg-white overflow-hidden">
+        <div className="relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-white">
           <Image
             src={entry.logo}
             alt={entry.institution}
@@ -69,69 +69,74 @@ const EducationCard: React.FC<{ entry: EducationEntry; index: number }> = ({
           />
         </div>
 
-        {/* Title and institution */}
+        {/* Content */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-white leading-tight">
-            {entry.degree}
-          </h3>
-          {entry.institutionUrl ? (
-            <a
-              href={entry.institutionUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-neutral-400 hover:text-neutral-300 transition-colors"
-            >
-              {entry.institution}
-            </a>
-          ) : (
-            <p className="text-neutral-400">{entry.institution}</p>
+          {/* Header row */}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                {entry.degree}
+              </h3>
+              {entry.institutionUrl ? (
+                <a
+                  href={entry.institutionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-400 hover:text-neutral-300 text-sm transition-colors"
+                >
+                  {entry.institution}
+                </a>
+              ) : (
+                <p className="text-neutral-400 text-sm">{entry.institution}</p>
+              )}
+            </div>
+            <span className="text-neutral-500 text-sm whitespace-nowrap">
+              {entry.period}
+            </span>
+          </div>
+
+          {/* Description */}
+          <p className="text-neutral-400 text-sm leading-relaxed mt-3">
+            {renderTextWithLinks(entry.description, entry.links)}
+          </p>
+
+          {/* Highlights */}
+          {entry.highlights && entry.highlights.length > 0 && (
+            <ul className="mt-3 space-y-1">
+              {entry.highlights.map((highlight, idx) => (
+                <li key={idx} className="text-neutral-500 text-sm flex items-start gap-2">
+                  <span className="text-neutral-600">•</span>
+                  <span>{renderTextWithLinks(highlight, entry.links)}</span>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
-
-        {/* Date badge */}
-        <div className="flex-shrink-0">
-          <span className="px-3 py-1 text-sm font-medium text-neutral-300 bg-white/5 border border-white/10 rounded-full">
-            {entry.period}
-          </span>
-        </div>
       </div>
-
-      {/* Description */}
-      <p className="text-neutral-300 text-sm leading-relaxed mb-3">
-        {renderTextWithLinks(entry.description, entry.links)}
-      </p>
-
-      {/* Highlights */}
-      {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="space-y-1">
-          {entry.highlights.map((highlight, idx) => (
-            <li
-              key={idx}
-              className="flex items-start gap-2 text-sm text-neutral-400"
-            >
-              <span className="text-white">•</span>
-              <span>{renderTextWithLinks(highlight, entry.links)}</span>
-            </li>
-          ))}
-        </ul>
-      )}
     </motion.div>
   );
 };
 
 export function EducationTimeline() {
   return (
-    <div className="w-full max-w-4xl mx-auto py-10">
+    <div className="w-full max-w-3xl mx-auto py-10">
       {/* Section Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <IconSchool className="w-8 h-8 text-white" />
-        <h3 className="text-lg md:text-4xl text-white dark:text-white max-w-5xl text-justify">Education</h3>
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3 mb-10"
+      >
+        <IconSchool className="w-6 h-6 text-neutral-400" />
+        <h2 className="text-2xl font-semibold text-white">Education</h2>
+      </motion.div>
 
       {/* Education Cards */}
-      <div className="space-y-4">
+      <div>
         {educationData.map((entry, index) => (
-          <EducationCard key={entry.id} entry={entry} index={index} />
+          <React.Fragment key={entry.id}>
+            <EducationCard entry={entry} index={index} />
+            {index < educationData.length - 1 && <Divider />}
+          </React.Fragment>
         ))}
       </div>
     </div>

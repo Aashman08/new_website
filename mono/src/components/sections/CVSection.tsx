@@ -28,7 +28,7 @@ interface CVSectionProps {
       };
     }, [isOpen]);
 
-    const MenuTitles = ["ABOUT ME", "PROJECTS", "SKILLS", "RESEARCH", "CONTACT", "ART"];
+    const MenuTitles = ["ABOUT ME", "PROJECTS", "RESEARCH", "CONTACT", "ART"];
 
     if (!isOpen) return null;
 

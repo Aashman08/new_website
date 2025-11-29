@@ -117,7 +117,7 @@ const ArtSection: React.FC<ArtSectionProps> = ({ isOpen, onClose, onMenuItemClic
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const MenuTitles = ["ABOUT ME", "PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH"];
+  const MenuTitles = ["ABOUT ME", "PROJECTS", "CV", "CONTACT", "RESEARCH"];
 
   const goToPrevious = () => {
     setCurrentIndex((prev) => (prev === 0 ? artworks.length - 1 : prev - 1));

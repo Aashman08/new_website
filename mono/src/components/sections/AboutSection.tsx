@@ -32,7 +32,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
       };
     }, [isOpen]);
   
-    const MenuTitles = ["PROJECTS", "CV", "SKILLS", "CONTACT", "RESEARCH", "ART"];
+    const MenuTitles = ["PROJECTS", "CV", "CONTACT", "RESEARCH", "ART"];
   
     if (!isOpen) return null;
   

@@ -30,6 +30,7 @@ export default function HomePage() {
         autoPlay
         loop
         muted
+        playsInline
         className="absolute top-0 left-0 w-full h-full object-cover"
         style={{ width: '100vw', height: '100vh', objectFit: 'cover' }}
       >

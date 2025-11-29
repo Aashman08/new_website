@@ -15,7 +15,7 @@ import {
   Divider,
   Callout,
   Quote,
-} from "@/components/features/projects/ProjectPageComponents";
+} from "@/features/projects";
 
 // Main Page Component
 export default function SatelliteFirePage() {
@@ -265,7 +265,7 @@ export default function SatelliteFirePage() {
             vegetation and soil conditions, especially due to the presence of water and moisture. 
             Higher Burn Area Index values correspond to more severe burn scars and a greater impact 
             of the fire on the vegetation and soil of the affected area. We clearly see that this 
-            index allows us to pierce through the smoke and see what's actually happening.
+            index allows us to pierce through the smoke and see what&apos;s actually happening.
           </Paragraph>
           <ImagePair
             first={{

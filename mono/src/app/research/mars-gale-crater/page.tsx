@@ -13,7 +13,7 @@ import {
   ImageFigure,
   Divider,
   Quote,
-} from "@/components/features/research/ResearchPageComponents";
+} from "@/features/research";
 
 export default function MarsGaleCraterPage() {
   const research = {
@@ -171,10 +171,10 @@ export default function MarsGaleCraterPage() {
         <Section>
           <SectionHeading>Hydrothermal Activity</SectionHeading>
           <Paragraph>
-            My analysis also extends to the role of hydrothermal activity in shaping the crater's environment. 
+            My analysis also extends to the role of hydrothermal activity in shaping the crater&apos;s environment. 
             I pay close attention to findings from the Curiosity Rover, particularly those concerning alteration halos 
             in the Murray and Stimpson formations. These features have important implications for the mineralogical 
-            makeup of Gale Crater and contribute to our broader understanding of the region's environmental history.
+            makeup of Gale Crater and contribute to our broader understanding of the region&apos;s environmental history.
           </Paragraph>
         </Section>
 
@@ -215,7 +215,7 @@ export default function MarsGaleCraterPage() {
           </Quote>
           <Paragraph>
             This review aims to highlight the importance of different evidences pivotal in the ongoing quest to 
-            comprehend the Red Planet's capacity to sustain life, both in the past and potentially in the future.
+            comprehend the Red Planet&apos;s capacity to sustain life, both in the past and potentially in the future.
           </Paragraph>
         </Section>
       </main>

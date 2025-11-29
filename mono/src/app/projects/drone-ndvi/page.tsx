@@ -14,7 +14,7 @@ import {
   ImagePair,
   Divider,
   Quote,
-} from "@/components/features/projects/ProjectPageComponents";
+} from "@/features/projects";
 
 // Main Page Component
 export default function DroneNDVIPage() {
@@ -128,7 +128,7 @@ export default function DroneNDVIPage() {
             </a>{" "}
             at the University of Iowa, focusing on spaceflight instrumentation and mission design. 
             As Project Manager for the Ashton Prairie Near Infrared Sensing team, I explored drone 
-            technology's potential in land and ecology management.
+            technology&apos;s potential in land and ecology management.
           </Paragraph>
         </Section>
 
@@ -168,7 +168,7 @@ export default function DroneNDVIPage() {
           <SectionHeading>Building the Imaging System</SectionHeading>
           <Paragraph>
             Our project aimed to monitor vegetation health during a heatwave using near-infrared sensing 
-            technology, all within a <strong className="text-white">$1000 budget</strong>. We built the imaging system's 
+            technology, all within a <strong className="text-white">$1000 budget</strong>. We built the imaging system&apos;s 
             hardware from scratch, including two cameras, two Raspberry Pi units, a battery pack, and a 
             3D-printed container. Each component was meticulously integrated with the drone for optimal 
             stability and safety during operation.
@@ -206,7 +206,7 @@ export default function DroneNDVIPage() {
             I developed a Python script for post-processing aerial images, extracting relevant pixel 
             values from RGB and IR images. We used Normalized Difference Vegetation Index (NDVI) values 
             to assess vegetation health and stress during the heatwave. NDVI, a key indicator of live 
-            green vegetation, provided valuable insights into the vegetation's response to heatwave conditions. 
+            green vegetation, provided valuable insights into the vegetation&apos;s response to heatwave conditions. 
             I also created a false-color image to visualize vegetation stress based on NDVI values. 
             This data can be used to predict potential ecological changes and implement preventive measures.
           </Paragraph>

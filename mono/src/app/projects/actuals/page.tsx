@@ -14,7 +14,7 @@ import {
   Divider,
   Quote,
   FeatureCard,
-} from "@/components/features/projects/ProjectPageComponents";
+} from "@/features/projects";
 
 // Main Page Component
 export default function ActualsPage() {
@@ -129,12 +129,12 @@ export default function ActualsPage() {
           <SectionHeading>The Opportunity</SectionHeading>
           <Paragraph>
             By 2030, most baby boomers will be over 65. Many of them own small businesses that could 
-            soon close their doors—not because they're failing, but because there's no one to take over. 
-            That's where Actuals comes in.
+            soon close their doors—not because they&apos;re failing, but because there&apos;s no one to take over. 
+            That&apos;s where Actuals comes in.
           </Paragraph>
           <Quote borderColor="border-orange-500/50">
-            We believe buying a business shouldn't be complicated or out of reach. You've worked hard, 
-            you have a vision, and now it's time to own something that's yours.
+            We believe buying a business shouldn&apos;t be complicated or out of reach. You&apos;ve worked hard, 
+            you have a vision, and now it&apos;s time to own something that&apos;s yours.
           </Quote>
         </Section>
 
@@ -143,13 +143,13 @@ export default function ActualsPage() {
           <SectionHeading>Our Mission</SectionHeading>
           <Paragraph>
             Our mission is to make buying a small business easier, faster, and more aligned with your goals. 
-            Using AI and expert insights, we connect you with businesses that fit what you're looking for—your 
+            Using AI and expert insights, we connect you with businesses that fit what you&apos;re looking for—your 
             industry preferences, financial goals, and lifestyle vision. No more endless searching or chasing 
             the wrong opportunities.
           </Paragraph>
           <Paragraph>
             We focus on businesses under $1 million, perfect for owner-operators who want to step in and make 
-            a meaningful impact. Whether you're looking for your next career move, a way to leave the grind 
+            a meaningful impact. Whether you&apos;re looking for your next career move, a way to leave the grind 
             behind, or a chance to build something lasting, we make the process clear and tailored to you.
           </Paragraph>
         </Section>
@@ -168,7 +168,7 @@ export default function ActualsPage() {
           <SectionHeading>Technical Implementation</SectionHeading>
           <Paragraph>
             As a Founding Software Engineer, I was responsible for building core AI systems and infrastructure 
-            that powered the platform's ability to match buyers with the right businesses.
+            that powered the platform&apos;s ability to match buyers with the right businesses.
           </Paragraph>
           
           <div className="grid gap-4 my-8">
@@ -222,12 +222,12 @@ export default function ActualsPage() {
         <Section>
           <SectionHeading>Personalized Matching</SectionHeading>
           <Paragraph>
-            Every match we create is personalized. We don't just connect you with businesses—we introduce 
+            Every match we create is personalized. We don&apos;t just connect you with businesses—we introduce 
             you to opportunities that make sense for your life. Our team carefully vets each match to ensure 
             it aligns with your goals, so you can move forward with confidence and clarity.
           </Paragraph>
           <Paragraph>
-            If you're ready to take the next step, we're here to guide you. Let's find the right business 
+            If you&apos;re ready to take the next step, we&apos;re here to guide you. Let&apos;s find the right business 
             for you—the one that fits your vision and sets you up for a future of freedom, purpose, and growth.
           </Paragraph>
         </Section>

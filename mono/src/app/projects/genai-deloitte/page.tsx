@@ -12,7 +12,7 @@ import {
   Paragraph,
   Divider,
   Quote,
-} from "@/components/features/projects/ProjectPageComponents";
+} from "@/features/projects";
 
 // Video embed component
 const VideoEmbed = ({
@@ -163,7 +163,7 @@ export default function GenAIDeloittePage() {
           </Paragraph>
           <Paragraph>
             <span className="text-neutral-500 italic">
-              Note: This project was developed just prior to OpenAI's release of Codex, 
+              Note: This project was developed just prior to OpenAI&apos;s release of Codex, 
               making it an early exploration into AI-assisted code generation using prompt engineering 
               techniques before dedicated code models became available.
             </span>

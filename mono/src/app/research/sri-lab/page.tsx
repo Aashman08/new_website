@@ -13,7 +13,7 @@ import {
   ImageFigure,
   Divider,
   Quote,
-} from "@/components/features/research/ResearchPageComponents";
+} from "@/features/research";
 
 export default function SRILabPage() {
   const research = {
@@ -114,7 +114,7 @@ export default function SRILabPage() {
             As an <strong className="text-white">Undergraduate Research Assistant</strong> at the{" "}
             <strong className="text-white">Sensing and Robotics for Infrastructure (SRI) Lab</strong> at UCLA 
             under <strong className="text-white">Post Doc Debashish Jana</strong>, I developed deep learning 
-            models for automated building damage classification from satellite imagery — supporting LA County's 
+            models for automated building damage classification from satellite imagery — supporting LA County&apos;s 
             emergency response and infrastructure reinforcement in earthquake-prone regions.
           </Paragraph>
         </Section>
@@ -342,7 +342,7 @@ export default function SRILabPage() {
           </Paragraph>
 
           <Quote borderColor="border-blue-500/50">
-            This research directly contributes to LA County's infrastructure safety initiatives, 
+            This research directly contributes to LA County&apos;s infrastructure safety initiatives, 
             helping identify vulnerable buildings and prioritize reinforcement of gas pipelines 
             in earthquake-prone regions.
           </Quote>

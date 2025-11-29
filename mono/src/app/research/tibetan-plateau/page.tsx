@@ -13,7 +13,7 @@ import {
   ImageFigure,
   Divider,
   Quote,
-} from "@/components/features/research/ResearchPageComponents";
+} from "@/features/research";
 
 export default function TibetanPlateauPage() {
   const research = {

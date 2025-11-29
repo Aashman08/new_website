@@ -13,7 +13,7 @@ import {
   ImageFigure,
   Divider,
   Quote,
-} from "@/components/features/projects/ProjectPageComponents";
+} from "@/features/projects";
 
 // Main Page Component
 export default function DataAnalysisDeloittePage() {

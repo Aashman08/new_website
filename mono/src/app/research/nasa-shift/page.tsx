@@ -13,7 +13,7 @@ import {
   ImageFigure,
   Divider,
   Quote,
-} from "@/components/features/research/ResearchPageComponents";
+} from "@/features/research";
 
 export default function NASAShiftPage() {
   const research = {
@@ -113,7 +113,7 @@ export default function NASAShiftPage() {
           <Paragraph>
             This research trip was a part of a project by <strong className="text-white">NASA JPL</strong> in 
             collaboration with the UCLA Department of Ecology and Evolutionary Biology under{" "}
-            <strong className="text-white">Dr. Elsa Ordway's lab</strong> to link field measurements to 
+            <strong className="text-white">Dr. Elsa Ordway&apos;s lab</strong> to link field measurements to 
             hyperspectral remote sensing data in order to understand weekly changes in plants and trees 
             such as their phenology.
           </Paragraph>

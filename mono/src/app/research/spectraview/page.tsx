@@ -13,7 +13,7 @@ import {
   ImageFigure,
   Divider,
   Quote,
-} from "@/components/features/research/ResearchPageComponents";
+} from "@/features/research";
 
 export default function SpectraViewPage() {
   const research = {
@@ -123,7 +123,7 @@ export default function SpectraViewPage() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 transition-colors text-sm font-medium"
               >
-                Prof. Gatkine's Lab
+                Prof. Gatkine&apos;s Lab
                 <IconExternalLink size={14} />
               </a>
             </motion.div>
@@ -222,7 +222,7 @@ export default function SpectraViewPage() {
           <SectionHeading>The Team</SectionHeading>
           <Paragraph>
             Working alongside brilliant researchers and engineers at the AstroPhotonics Technology Lab, 
-            pushing the boundaries of what's possible in satellite-based environmental monitoring.
+            pushing the boundaries of what&apos;s possible in satellite-based environmental monitoring.
           </Paragraph>
           <ImageFigure
             src="/img/team.png"

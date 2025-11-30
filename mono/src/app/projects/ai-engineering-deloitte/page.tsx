@@ -4,12 +4,13 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { IconArrowLeft, IconCalendar, IconExternalLink } from "@tabler/icons-react";
+import { IconArrowLeft, IconCalendar } from "@tabler/icons-react";
 import {
   handleBackToProjects,
   Section,
   SectionHeading,
   Paragraph,
+  ImageFigure,
   Divider,
   Quote,
 } from "@/features/projects";
@@ -40,17 +41,16 @@ const VideoEmbed = ({
 );
 
 // Main Page Component
-export default function GenAIDeloittePage() {
+export default function AIEngineeringDeloittePage() {
   // Project metadata
   const project = {
-    title: "Generative AI at Deloitte",
-    subtitle: "Comprehensive system for code generation, explanation, conversion, debugging, and optimization",
+    title: "Generative AI for Code & Data",
+    subtitle: "GPT-powered coding assistant and natural language data analysis platform at Deloitte",
     heroImage: "/img/deloitte.png",
-    color: "from-emerald-500 to-teal-600",
+    color: "from-emerald-500 to-blue-600",
     date: "Summer 2023",
-    tags: ["Generative AI", "GPT-3.5", "Prompt Engineering", "Python"],
+    tags: ["Generative AI", "GPT-3.5", "PandasAI", "Prompt Engineering", "Python"],
   };
-
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -93,7 +93,7 @@ export default function GenAIDeloittePage() {
               transition={{ delay: 0.1 }}
               className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4 md:mb-6"
             >
-              {project.tags.slice(0, 4).map((tag, i) => (
+              {project.tags.slice(0, 5).map((tag, i) => (
                 <span
                   key={i}
                   className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium text-white/80 bg-white/10 backdrop-blur-sm rounded-full border border-white/10"
@@ -141,7 +141,7 @@ export default function GenAIDeloittePage() {
         <Section>
           <VideoEmbed
             url="https://www.youtube.com/embed/5SxYQvWsMCw"
-            caption="A video explaining how AI is being leveraged to bring about transformation in financial institutions and businesses. Credits: Deloitte AI Institute US"
+            caption="AI transformation in financial institutions and businesses. Credits: Deloitte AI Institute US"
           />
         </Section>
 
@@ -149,8 +149,8 @@ export default function GenAIDeloittePage() {
         <Section>
           <SectionHeading>Overview</SectionHeading>
           <Paragraph>
-            This project aims to make coding accessible to everyone, including non-technical users, 
-            by leveraging the{" "}
+            During my internship at Deloitte, I developed two enterprise AI solutions that aimed to democratize 
+            technical capabilities across the organization. Both projects leveraged{" "}
             <a 
               href="https://cobusgreyling.medium.com/openai-16k-context-3-5-turbo-model-1ebd979041dc" 
               target="_blank" 
@@ -159,12 +159,12 @@ export default function GenAIDeloittePage() {
             >
               GPT-3.5 Turbo
             </a>{" "}
-            model fine-tuned with prompt engineering for specific tasks.
+            with custom prompt engineering to create intuitive, natural language interfaces.
           </Paragraph>
           <Paragraph>
             <span className="text-neutral-500 italic">
-              Note: This project was developed just prior to OpenAI&apos;s release of Codex, 
-              making it an early exploration into AI-assisted code generation using prompt engineering 
+              Note: These projects were developed just prior to OpenAI&apos;s release of Codex, 
+              making them early explorations into AI-assisted development using prompt engineering 
               techniques before dedicated code models became available.
             </span>
           </Paragraph>
@@ -172,33 +172,67 @@ export default function GenAIDeloittePage() {
 
         <Divider />
 
-        {/* Approach */}
+        {/* Project 1: AI Coding Assistant */}
         <Section>
-          <SectionHeading>Approach</SectionHeading>
+          <SectionHeading>AI Coding Assistant</SectionHeading>
           <Paragraph>
-            The system implements a <strong className="text-white">Flow Control System</strong> that 
-            ensures safety and efficiency with moderation checks and input validation. Valid inputs 
-            trigger the requested <strong className="text-white">Task Execution</strong>, followed by 
-            self-evaluation for quality and accuracy. <strong className="text-white">Error Handling</strong> is 
-            managed through robust try-except blocks for unexpected situations. The system also supports 
-            <strong className="text-white"> Conversational Capability</strong> for follow-up questions and 
-            recurrent tasks using memory storage and context understanding.
+            The first solution was a comprehensive code generation system supporting code creation, 
+            explanation, conversion, debugging, and optimization. The system implements a robust 
+            <strong className="text-white"> Flow Control System</strong> with moderation checks and 
+            input validation to ensure safe and reliable outputs.
+          </Paragraph>
+          <Paragraph>
+            Key architectural features include <strong className="text-white">Task Execution</strong> with 
+            self-evaluation for quality assurance, robust <strong className="text-white">Error Handling</strong> through 
+            comprehensive try-except blocks, and <strong className="text-white">Conversational Memory</strong> for 
+            follow-up questions and contextual understanding.
           </Paragraph>
         </Section>
 
         <Divider />
 
-        {/* Deep Learning Video */}
+        {/* Project 2: Data Analysis Platform */}
         <Section>
-          <SectionHeading>Building Systems with ChatGPT</SectionHeading>
+          <SectionHeading>Intelligent Data Analysis</SectionHeading>
           <Paragraph>
-            The architecture draws inspiration from best practices in building robust AI systems, 
-            incorporating safety mechanisms and evaluation frameworks.
+            The second solution democratized advanced DataFrame analysis using GPT and PandasAI. Users could 
+            upload datasets and ask questions in natural language, receiving comprehensive answers with 
+            textual explanations, graphical representations, and interactive data visualizations.
           </Paragraph>
-          <VideoEmbed
-            url="https://www.youtube.com/embed/BunESRhYhec"
-            caption="A video by DeepLearning.AI on building systems using ChatGPT"
-          />
+          <Paragraph>
+            A key innovation was <strong className="text-white">Smart Data Merging</strong>—prompt engineering 
+            enabled the model to automatically select relevant DataFrames and identify common columns for 
+            joining disparate data sources.
+          </Paragraph>
+        </Section>
+
+        <ImageFigure
+          src="/img/project_images/panda1.png"
+          alt="PandasAI Integration"
+          caption="PandasAI integration for natural language data queries"
+          maxWidth="max-w-3xl"
+        />
+
+        <Divider />
+
+        {/* Technical Features */}
+        <Section>
+          <SectionHeading>Technical Highlights</SectionHeading>
+          <Paragraph>
+            <strong className="text-white">Interactive Visualizations:</strong> HTML and JavaScript-powered plots 
+            that go beyond standard Python matplotlib outputs, enhancing the user experience with zoomable, 
+            filterable charts.
+          </Paragraph>
+          <Paragraph>
+            <strong className="text-white">Missing Data Handling:</strong> Intelligent interpolation and null value 
+            filling tailored to data types, using RSS (Residual Sum of Squares) minimization for numerical columns 
+            to ensure accurate data representation.
+          </Paragraph>
+          <Paragraph>
+            <strong className="text-white">Quality Assurance:</strong> Extensive testing achieved a{" "}
+            <span className="text-emerald-400">90%+ accuracy rate</span> across both tools, with multiple 
+            checkpoints and self-evaluation mechanisms to ensure output quality.
+          </Paragraph>
         </Section>
 
         <Divider />
@@ -207,9 +241,9 @@ export default function GenAIDeloittePage() {
         <Section>
           <SectionHeading>Impact</SectionHeading>
           <Quote borderColor="border-emerald-500/50">
-            The goal is to democratize coding, making it user-friendly and personalized, 
-            empowering users to engage in meaningful coding conversations and effectively 
-            apply coding concepts in their projects.
+            Both tools were designed to empower users to leverage AI without deep technical expertise, 
+            transforming how teams interact with code and data—democratizing capabilities that were 
+            previously limited to technical specialists.
           </Quote>
         </Section>
       </main>

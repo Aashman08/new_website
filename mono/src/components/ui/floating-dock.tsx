@@ -40,7 +40,7 @@ const FloatingDockMobile = ({
 
   return (
     <div className={cn("block md:hidden w-full", className)}>
-      <div className="flex flex-wrap justify-center gap-2 px-2">
+      <div className="flex flex-wrap justify-center gap-2.5 px-2">
         {items.map((item) => (
           <div
             key={item.title}
@@ -50,15 +50,16 @@ const FloatingDockMobile = ({
             <AnimatePresence>
               {activeItem === item.title && (
                 <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 5 }}
+                  initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 5, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
                   className={cn(
-                    "absolute left-1/2 -translate-x-1/2 -top-9 z-50",
-                    "px-2.5 py-1 rounded-lg",
-                    "bg-white text-black",
+                    "absolute left-1/2 -translate-x-1/2 -top-10 z-50",
+                    "px-3 py-1.5 rounded-lg",
+                    "bg-white/95 backdrop-blur-sm text-black",
                     "text-xs font-medium whitespace-nowrap",
+                    "shadow-lg shadow-white/10",
                     "pointer-events-none"
                   )}
                 >
@@ -68,9 +69,17 @@ const FloatingDockMobile = ({
             </AnimatePresence>
             <div
               className={cn(
-                "h-11 w-11 rounded-xl bg-neutral-800 border border-neutral-700 flex items-center justify-center",
-                activeItem === item.title && "bg-neutral-700 border-neutral-500"
+                "h-12 w-12 rounded-xl flex items-center justify-center",
+                "bg-white/[0.03] backdrop-blur-md",
+                "border border-white/[0.08]",
+                "transition-colors duration-150",
+                activeItem === item.title && "bg-white/[0.08] border-white/20 shadow-lg shadow-white/5"
               )}
+              style={{
+                boxShadow: activeItem === item.title 
+                  ? '0 0 15px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.1)' 
+                  : 'inset 0 1px 0 rgba(255,255,255,0.05)',
+              }}
             >
               <div className="h-5 w-5">{item.icon}</div>
             </div>
@@ -96,10 +105,13 @@ const FloatingDockDesktop = ({
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
         "mx-auto hidden md:flex h-20 gap-3 items-end rounded-2xl px-4 pb-4",
-        "bg-neutral-900/90 backdrop-blur-sm",
-        "border border-neutral-800",
+        "bg-white/[0.02] backdrop-blur-xl",
+        "border border-white/[0.08]",
         className
       )}
+      style={{
+        boxShadow: '0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+      }}
     >
       {items.map((item) => (
         <IconContainer mouseX={mouseX} key={item.title} {...item} />
@@ -145,29 +157,59 @@ function IconContainer({
     <Link href={href}>
       <motion.div
         ref={ref}
-        style={{ width, height }}
+        style={{ 
+          width, 
+          height,
+          background: 'linear-gradient(145deg, rgba(20,20,20,0.85) 0%, rgba(10,10,10,0.95) 100%)',
+          border: hovered 
+            ? '1px solid rgba(255,255,255,0.2)'
+            : '1px solid rgba(255,255,255,0.08)',
+          boxShadow: hovered 
+            ? 'inset 1px 1px 0px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,0.08)' 
+            : 'inset 1px 1px 0px rgba(255,255,255,0.05)',
+        }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className={cn(
           "aspect-square rounded-xl flex items-center justify-center relative",
-          "bg-neutral-800",
-          "border border-neutral-700",
-          "hover:bg-neutral-700 hover:border-neutral-500",
-          "transition-colors duration-150"
+          "backdrop-blur-md"
         )}
       >
+        {/* Top edge highlight - glowing light effect */}
+        <div 
+          className="absolute top-0 left-2 right-2 h-[1px] rounded-full transition-all duration-200"
+          style={{
+            background: hovered 
+              ? 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.5) 70%, transparent 100%)'
+              : 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.25) 70%, transparent 100%)',
+            boxShadow: hovered 
+              ? '0 0 8px rgba(255,255,255,0.3), 0 0 15px rgba(255,255,255,0.15)'
+              : '0 0 4px rgba(255,255,255,0.1)',
+          }}
+        />
+        {/* Left edge highlight */}
+        <div 
+          className="absolute top-2 bottom-1/2 left-0 w-[1px] rounded-full transition-all duration-200"
+          style={{
+            background: hovered 
+              ? 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.2) 70%, transparent 100%)'
+              : 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 70%, transparent 100%)',
+            boxShadow: hovered ? '0 0 6px rgba(255,255,255,0.2)' : 'none',
+          }}
+        />
         <AnimatePresence>
           {hovered && (
             <motion.div
-              initial={{ opacity: 0, y: 8, x: "-50%" }}
-              animate={{ opacity: 1, y: 0, x: "-50%" }}
-              exit={{ opacity: 0, y: 4, x: "-50%" }}
+              initial={{ opacity: 0, y: 8, x: "-50%", scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
+              exit={{ opacity: 0, y: 4, x: "-50%", scale: 0.95 }}
               transition={{ duration: 0.15 }}
               className={cn(
                 "px-3 py-1.5 whitespace-pre rounded-lg",
-                "bg-white text-black",
+                "bg-white/95 backdrop-blur-sm text-black",
                 "text-sm font-medium",
-                "absolute left-1/2 -translate-x-1/2 -top-11"
+                "shadow-lg shadow-white/10",
+                "absolute left-1/2 -translate-x-1/2 -top-12"
               )}
             >
               {title}

@@ -18,7 +18,7 @@ export interface ProjectFullDescription {
   image?: string;
 }
 
-export type ProjectIconName = 'code' | 'chart' | 'rocket' | 'credit' | 'drone' | 'satellite';
+export type ProjectIconName = 'code' | 'chart' | 'rocket' | 'credit' | 'drone' | 'satellite' | 'quantum';
 
 export interface Project {
   id: string;
@@ -36,46 +36,48 @@ export interface Project {
 
 export const projectsData: Project[] = [
   {
-    id: "genai-deloitte",
-    title: "Generative AI at Deloitte",
-    shortDescription: "Internal Development Tool for AI coding assistance",
-    iconName: "code",
+    id: "quantumviz",
+    title: "QuantumViz",
+    shortDescription: "AI-powered quantum circuit generator using natural language and 3D visualization",
+    iconName: "quantum",
     className: "md:col-span-1",
-    color: "from-emerald-500 to-teal-600",
-    headerImage: "/img/deloitte.png",
+    color: "from-pink-500 to-orange-500",
+    headerImage: "/img/quantumn.jpg",
     headerAnimation: "3d",
     fullDescription: {
-      intro: "This project aims to make coding accessible to everyone, including non-technical users, by leveraging the GPT-3.5 Turbo model fine-tuned with prompt engineering for specific tasks.",
+      intro: "QuantumViz transforms ideas into quantum circuits using natural language. Built to address a critical gap in quantum computing tools, it simplifies circuit design through AI-powered generation, interactive 3D visualization, and a RAG-powered chatbot trained on quantum documentation and research papers.",
       features: [
-        { title: "Flow Control System", desc: "Ensures safety and efficiency with moderation checks and input validation." },
-        { title: "Task Execution", desc: "Valid inputs trigger the requested tasks, followed by self-evaluation for quality and accuracy." },
-        { title: "Error Handling", desc: "Robust error management with try-except blocks for unexpected situations." },
-        { title: "Conversational Capability", desc: "Supports follow-up questions and recurrent tasks using memory storage and context understanding." },
+        { title: "Natural Language Interface", desc: "Generate circuit designs using text or speech input via OpenAI, making quantum computing accessible without extensive coding knowledge." },
+        { title: "3D Qubit Visualization", desc: "Interactive Bloch sphere visualizations powered by IBM Qiskit, allowing users to explore qubit states before writing any code." },
+        { title: "Code & LaTeX Generation", desc: "Automatically generates executable Python/Qiskit code and exports circuit diagrams to LaTeX for research documentation." },
+        { title: "RAG-Powered Chatbot", desc: "Custom conversational agent built with Groq and LlamaIndex, trained on 100s of research papers and Qiskit documentation." },
+        { title: "Research Paper Parsing", desc: "Automatically extracts quantum circuit images from arXiv using Selenium and Scrapy, converting them directly to Qiskit code." },
       ],
-      conclusion: "The goal is to democratize coding, making it user-friendly and personalized, empowering users to engage in meaningful coding conversations and effectively apply coding concepts in their projects.",
-      image: "/img/deloitte.png",
-      videoUrl: "https://www.youtube.com/embed/5SxYQvWsMCw",
+      conclusion: "Endorsed by quantum researchers at UCLA, Google Quantum AI, and AWS, QuantumViz aims to reduce barriers to entry in quantum computing and accelerate research by saving time on circuit design and documentation.",
+      image: "/img/quantumviz.png",
+      videoUrl: "https://www.youtube.com/embed/OuZSJU72B7s",
     },
   },
   {
-    id: "data-analysis-deloitte",
-    title: "AI for Data Analysis at Deloitte",
-    shortDescription: "Advanced DataFrame analysis and visualizations with GPT and PandasAI",
-    iconName: "chart",
+    id: "ai-engineering-deloitte",
+    title: "Generative AI for Code & Data",
+    shortDescription: "GPT-powered coding assistant and natural language data analysis platform at Deloitte",
+    iconName: "code",
     className: "md:col-span-1",
-    color: "from-blue-500 to-indigo-600",
-    headerImage: "/img/pandas.png",
-    headerAnimation: "parallax",
+    color: "from-emerald-500 to-blue-600",
+    headerImage: "/img/deloitte.png",
+    headerAnimation: "3d",
     fullDescription: {
-      intro: "The primary objective of this project is to democratize advanced DataFrame analysis, making it accessible to both technical and non-technical users. By allowing users to upload datasets and ask questions in natural language, the system generates comprehensive answers with textual explanations, graphical representations, and data visualizations.",
+      intro: "Developed two enterprise AI solutions at Deloitte: a GPT-powered coding assistant to democratize software development, and an intelligent data analysis platform using PandasAI to make DataFrame analysis accessible to non-technical users through natural language queries.",
       features: [
-        { title: "GPT & PandasAI Integration", desc: "Customized for specific use-cases, including prompt modifications and function edits for versatile data handling." },
-        { title: "Smart Data Merging", desc: "Prompt engineering enables the model to select relevant DataFrames and identify common columns for merging." },
-        { title: "Interactive Visualizations", desc: "Uses HTML and JavaScript for interactive plots, enhancing the user experience beyond standard Python plots." },
-        { title: "Missing Data Handling", desc: "Offers interpolation and null value filling, tailored to data types with RSS minimization for numerical columns." },
+        { title: "AI Coding Assistant", desc: "GPT-3.5 Turbo fine-tuned with prompt engineering, featuring moderation checks, self-evaluation, and conversational memory for follow-up questions." },
+        { title: "Natural Language Data Analysis", desc: "Upload datasets and ask questions in plain English—get textual explanations, interactive visualizations, and actionable insights." },
+        { title: "Smart Data Operations", desc: "Intelligent DataFrame merging, missing data interpolation, and RSS minimization for numerical columns." },
+        { title: "Interactive Visualizations", desc: "HTML/JavaScript-powered plots that go beyond standard Python visualizations for enhanced user experience." },
       ],
-      conclusion: "Extensive testing has achieved a 90% accuracy rate, with multiple checkpoints to ensure output quality. This project transforms DataFrame analysis into an intuitive and user-friendly experience.",
-      image: "/img/pandas.png",
+      conclusion: "Both tools achieved 90%+ accuracy rates and were designed to empower users to leverage AI without deep technical expertise, transforming how teams interact with code and data.",
+      image: "/img/deloitte.png",
+      videoUrl: "https://www.youtube.com/embed/5SxYQvWsMCw",
     },
   },
   {

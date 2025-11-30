@@ -9,6 +9,7 @@ import {
   IconCreditCard,
   IconDrone,
   IconSatellite,
+  IconAtom,
   IconX,
 } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,6 +27,7 @@ const iconMap = {
   credit: <IconCreditCard className="h-4 w-4 text-purple-500" />,
   drone: <IconDrone className="h-4 w-4 text-green-500" />,
   satellite: <IconSatellite className="h-4 w-4 text-rose-500" />,
+  quantum: <IconAtom className="h-4 w-4 text-pink-500" />,
 };
 
 // Map icon names to hex colors for hover border - softer tones for glassy glow
@@ -36,6 +38,7 @@ const accentColorMap: Record<string, string> = {
   credit: "#c4b5fd",    // violet-300 - soft purple glow
   drone: "#86efac",     // green-300 - soft mint glow
   satellite: "#f87171", // red-400 - soft red glow
+  quantum: "#f472b6",   // pink-400 - soft pink glow for quantum
 };
 
 // Map icon names to larger icons for headers
@@ -46,6 +49,7 @@ const headerIconMap = {
   credit: <IconCreditCard size={40} className="text-white drop-shadow-lg" strokeWidth={1.5} />,
   drone: <IconDrone size={40} className="text-white drop-shadow-lg" strokeWidth={1.5} />,
   satellite: <IconSatellite size={40} className="text-white drop-shadow-lg" strokeWidth={1.5} />,
+  quantum: <IconAtom size={40} className="text-white drop-shadow-lg" strokeWidth={1.5} />,
 };
 
 // Dynamic project header component - uses animation from headerAnimations.tsx
@@ -279,10 +283,10 @@ const ProjectDetailModal = ({
 
 // Projects with dedicated pages (maps project ID to page slug)
 const dedicatedPages: Record<string, string> = {
+  "quantumviz": "quantumviz",
   "satellite-fire": "satellite-fire",
   "actuals": "actuals",
-  "genai-deloitte": "genai-deloitte",
-  "data-analysis-deloitte": "data-analysis-deloitte",
+  "ai-engineering-deloitte": "ai-engineering-deloitte",
   "drone-ndvi": "drone-ndvi",
 };
 

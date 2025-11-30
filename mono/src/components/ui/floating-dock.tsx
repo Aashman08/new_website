@@ -177,7 +177,7 @@ function IconContainer({
       >
         {/* Top edge highlight - glowing light effect */}
         <div 
-          className="absolute top-0 left-2 right-2 h-[1px] rounded-full transition-all duration-200"
+          className="absolute top-0 left-2 right-2 h-[1px] rounded-full transition-all duration-150"
           style={{
             background: hovered 
               ? 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.5) 70%, transparent 100%)'
@@ -189,7 +189,7 @@ function IconContainer({
         />
         {/* Left edge highlight */}
         <div 
-          className="absolute top-2 bottom-1/2 left-0 w-[1px] rounded-full transition-all duration-200"
+          className="absolute top-2 bottom-1/2 left-0 w-[1px] rounded-full transition-all duration-150"
           style={{
             background: hovered 
               ? 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.2) 70%, transparent 100%)'

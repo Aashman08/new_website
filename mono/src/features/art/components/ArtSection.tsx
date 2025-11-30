@@ -60,30 +60,40 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
   return (
     <div
       ref={modalRef}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black font-sans"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 font-sans"
     >
-      <div className="relative w-full min-h-screen">
+      {/* Fixed Menubar at Top */}
+      <div className="fixed top-6 sm:top-8 left-0 right-0 z-[60] px-4 flex justify-center">
+        <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
+      </div>
+
+      {/* Modal content container */}
+      <div className="relative w-full max-w-6xl mx-auto mt-20 sm:mt-24 md:mt-28 mb-6 md:mb-10 p-4 sm:p-6 md:p-10 bg-black text-white rounded-lg shadow-lg min-h-[80vh]">
         {/* Close Button */}
         <Button
           onClick={onClose}
           variant="ghost"
           size="icon"
-          className="fixed top-4 right-4 z-50 text-white hover:bg-white/10"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white hover:bg-white/10"
         >
-          <X className="h-6 w-6" />
+          <X className="h-5 w-5 sm:h-6 sm:w-6" />
           <span className="sr-only">Close</span>
         </Button>
 
         {/* Title */}
-        <div className="flex flex-col items-center pt-12 justify-center">
-          <h2 className="text-lg md:text-4xl text-white max-w-4xl tracking-[0.3em] font-semibold">
-            ART
-          </h2>
-          <div className="w-16 h-0.5 bg-white/50 mt-4" />
+        <div className="flex flex-col items-center pt-2 justify-center mb-6 sm:mb-8 md:mb-10">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-2xl sm:text-3xl md:text-5xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase"
+          >
+            Art
+          </motion.h2>
         </div>
 
         {/* Gallery */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 px-6 py-12 lg:py-16 max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 py-6 lg:py-10">
           {/* Navigation - Left */}
           <button
             onClick={goToPrevious}
@@ -178,7 +188,7 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
         </div>
 
         {/* Thumbnail Strip */}
-        <div className="hidden lg:flex justify-center gap-3 pb-16">
+        <div className="hidden lg:flex justify-center gap-3 pt-6 pb-4">
           {artworks.map((art, index) => (
             <button
               key={art.id}
@@ -197,11 +207,6 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
               />
             </button>
           ))}
-        </div>
-
-        {/* MainMenubar */}
-        <div className="pb-12 px-6">
-          <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
         </div>
       </div>
     </div>

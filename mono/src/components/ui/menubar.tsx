@@ -27,10 +27,13 @@ const Menubar = React.forwardRef<
   <MenubarPrimitive.Root
     ref={ref}
     className={cn(
-      // Mobile: 2-column grid, Desktop: flex row
-      "grid grid-cols-2 md:flex md:flex-row",
-      "h-auto md:h-16 items-center justify-center",
-      "rounded-md border border-white bg-transparent p-0 shadow-sm text-white font-medium",
+      // Single pill container for all items
+      "inline-flex items-center justify-center",
+      "px-2 sm:px-3 py-1.5 sm:py-2",
+      "rounded-full",
+      "bg-white/10 backdrop-blur-md",
+      "border border-white/10",
+      "text-white font-medium",
       className
     )}
     {...props}
@@ -46,26 +49,15 @@ const MenubarTrigger = React.forwardRef<
   <MenubarPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center justify-center",
-      // Equal width for all items using flex-1 on desktop
-      "w-full md:flex-1 h-10 md:h-12",
-      "px-4 md:px-6 py-2 md:py-3",
-      "text-xs md:text-sm font-light text-white outline-none",
-      "focus:bg-transparent focus:text-white tracking-wider",
-      "whitespace-nowrap", // Prevent text wrapping
-      // Mobile: all items get bottom and right borders by default
-      "border-b border-r border-white",
-      // Desktop: no bottom borders, right borders except last
-      "md:border-b-0 md:border-r md:last:border-r-0",
-      // Mobile: last item has no bottom border (always last row)
-      "last:border-b-0",
-      // Mobile: even-positioned items (2nd, 4th, 6th...) are at end of row, no right border
-      "[&:nth-child(even)]:border-r-0",
-      // Desktop: restore right borders for even items
-      "md:[&:nth-child(even)]:border-r",
-      // Mobile: if last item is odd-positioned (alone in row), center it by spanning 2 columns
-      "[&:last-child:nth-child(odd)]:col-span-2 [&:last-child:nth-child(odd)]:border-r-0",
-      "hover:bg-white/10 hover:backdrop-blur-md focus:bg-white/10 focus:backdrop-blur-md transition-colors duration-300",
+      "flex cursor-pointer select-none items-center justify-center",
+      // Text buttons inside the pill - smaller padding on mobile
+      "px-2 sm:px-4 md:px-5 py-1 sm:py-2",
+      "rounded-full",
+      "text-[10px] sm:text-sm font-medium text-white outline-none",
+      "tracking-wide sm:tracking-wider whitespace-nowrap",
+      // Hover effect - subtle highlight
+      "hover:bg-white/10 focus:bg-white/10",
+      "transition-all duration-300",
       className
     )}
     {...props}

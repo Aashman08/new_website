@@ -28,14 +28,14 @@ const iconMap = {
   satellite: <IconSatellite className="h-4 w-4 text-rose-500" />,
 };
 
-// Map icon names to hex colors for hover border
+// Map icon names to hex colors for hover border - softer tones for glassy glow
 const accentColorMap: Record<string, string> = {
-  code: "#10b981",      // emerald-500
-  chart: "#3b82f6",     // blue-500
-  rocket: "#f97316",    // orange-500
-  credit: "#a855f7",    // purple-500
-  drone: "#22c55e",     // green-500
-  satellite: "#f43f5e", // rose-500
+  code: "#5eead4",      // teal-300 - soft cyan glow
+  chart: "#7dd3fc",     // sky-300 - soft sky blue glow
+  rocket: "#fdba74",    // orange-300 - soft warm glow
+  credit: "#c4b5fd",    // violet-300 - soft purple glow
+  drone: "#86efac",     // green-300 - soft mint glow
+  satellite: "#f87171", // red-400 - soft red glow
 };
 
 // Map icon names to larger icons for headers

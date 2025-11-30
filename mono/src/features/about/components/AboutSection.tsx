@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MainMenubar from "@/components/layout/MainMenubar";
@@ -40,7 +41,12 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
         ref={modalRef}
         className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-70 font-sans"
       >
-        <div className="relative w-full max-w-6xl mx-auto mt-16 sm:mt-24 md:mt-40 mb-6 md:mb-10 p-4 sm:p-6 md:p-10 bg-black text-white rounded-lg shadow-lg">
+        {/* Fixed Menubar at Top */}
+        <div className="fixed top-6 sm:top-8 left-0 right-0 z-[60] px-4 flex justify-center">
+          <MainMenubar titles={MenuTitles} onItemClick={onMenuItemClick} />
+        </div>
+
+        <div className="relative w-full max-w-6xl mx-auto mt-20 sm:mt-24 md:mt-28 mb-6 md:mb-10 p-4 sm:p-6 md:p-10 bg-black text-white rounded-lg shadow-lg">
           {/* Close Button */}
           <Button
             onClick={onClose}
@@ -53,10 +59,15 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
           </Button>
 
           {/* Title */}
-          <div className="flex flex-col items-center pt-2 justify-center">
-            <h2 className="text-xl sm:text-2xl md:text-4xl mb-4 sm:mb-6 text-white dark:text-white max-w-4xl">
-                About Me
-            </h2>
+          <div className="flex flex-col items-center pt-2 justify-center mb-6 sm:mb-8 md:mb-10">
+            <motion.h2 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-2xl sm:text-3xl md:text-5xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase"
+            >
+              About Me
+            </motion.h2>
           </div>
 
           {/* Profile Picture */}
@@ -143,10 +154,6 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
             <EducationTimeline />
           </div>
 
-          {/* MainMenubar */}
-          <div className="mt-6 sm:mt-8 px-2 sm:px-0">
-            <MainMenubar titles={MenuTitles} onItemClick={onMenuItemClick} />
-          </div>
         <br /> 
     </div>
     </div>

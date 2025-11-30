@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { X } from "lucide-react";
 import { IconBrandLinkedin, IconBrandInstagram, IconBrandGithub } from "@tabler/icons-react";
@@ -53,9 +54,14 @@ const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCli
   return (
     <div
       ref={modalRef}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-95 font-sans"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 font-sans"
     >
-      <div className="relative w-full max-w-4xl mx-auto mt-12 sm:mt-16 md:mt-20 mb-6 md:mb-10 px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-10 text-white">
+      {/* Fixed Menubar at Top */}
+      <div className="fixed top-6 sm:top-8 left-0 right-0 z-[60] px-4 flex justify-center">
+        <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
+      </div>
+
+      <div className="relative w-full max-w-4xl mx-auto mt-20 sm:mt-24 md:mt-28 mb-6 md:mb-10 px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-10 bg-black text-white rounded-lg shadow-lg">
         {/* Close Button */}
         <Button
           onClick={onClose}
@@ -68,10 +74,15 @@ const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCli
         </Button>
 
         {/* Title */}
-        <div className="flex flex-col items-center pt-2 justify-center">
-          <h2 className="text-xl sm:text-2xl md:text-4xl font-bold mb-6 sm:mb-8 md:mb-10 text-white tracking-wider">
-            CONTACT
-          </h2>
+        <div className="flex flex-col items-center pt-2 justify-center mb-6 sm:mb-8 md:mb-10">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-2xl sm:text-3xl md:text-5xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase"
+          >
+            Contact
+          </motion.h2>
         </div>
 
         {/* Moon Image */}
@@ -127,10 +138,6 @@ const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCli
           ))}
         </div>
 
-        {/* MainMenubar */}
-        <div className="mt-10 sm:mt-12 md:mt-16 mb-6 sm:mb-8 px-2 sm:px-0">
-          <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
-        </div>
       </div>
     </div>
   );

@@ -46,7 +46,7 @@ export const educationData: EducationEntry[] = [
     description: "Completed high school with the subjects - English, Mathematics, Physics, Chemistry, and Computer Science.",
     highlights: [
       "Vice President of Aerospace Club, Aeross",
-      "Served as a member of student counsil and an active part of Dance and Choir club"
+      "Served as a member of student council and an active part of Dance and Choir club"
     ],
     links: [
       { text: "Aeross", href: "https://aeross.org/" }

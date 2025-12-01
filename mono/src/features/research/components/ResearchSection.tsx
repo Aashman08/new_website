@@ -54,7 +54,7 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
       {/* Hero Banner */}
       <div className="relative w-full h-[35vh] sm:h-[40vh] md:h-[50vh] min-h-[280px] sm:min-h-[320px] md:min-h-[400px] overflow-hidden mt-14 sm:mt-16">
         <Image
-          src="/img/project_images/mars.jpeg"
+          src="/img/project_images/mars.webp"
           alt="Mars"
           fill
           className="object-cover object-center"

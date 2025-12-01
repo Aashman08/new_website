@@ -5,7 +5,7 @@ import { Text } from "@/components/common/Typography";
 import React, { useEffect, useRef, useState } from "react";
 import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 
-// Feature Section components
+// Feature Section components - direct imports for instant loading
 import { 
   AboutSection, 
   ProjectsSection, 

@@ -19,7 +19,7 @@ export default function NASAShiftPage() {
   const research = {
     title: "SHIFT Campaign",
     subtitle: "Surface Biology and Geology High-Frequency Time Series to understand land and aquatic ecosystems",
-    heroImage: "/img/project_images/field.jpeg",
+    heroImage: "/img/project_images/field.webp",
     color: "from-yellow-500 to-amber-600",
     date: "2022",
     tags: ["NASA JPL", "Remote Sensing", "Hyperspectral Imaging", "Ecology", "Field Research"],
@@ -132,7 +132,7 @@ export default function NASAShiftPage() {
             (not related to this research in any way, only an example of what hyperspectral imagery can help visualize).
           </Paragraph>
           <ImageFigure
-            src="/img/project_images/hyper.jpeg"
+            src="/img/project_images/hyper.webp"
             alt="Hyperspectral imagery example"
             caption={
               <>

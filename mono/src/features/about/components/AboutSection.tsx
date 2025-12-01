@@ -73,7 +73,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
           {/* Profile Picture */}
           <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 mb-4 sm:mb-6">
           <Avatar className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80">
-              <AvatarImage src="/img/NYC_pic.png" alt="Aashman Rastogi" />
+              <AvatarImage src="/img/NYC_pic.webp" alt="Aashman Rastogi" />
               <AvatarFallback>AR</AvatarFallback>
           </Avatar>
           </div>

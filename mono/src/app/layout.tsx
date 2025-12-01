@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils"
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap", // Faster font loading - shows fallback immediately
 })
 
 type RootLayoutProps = {
@@ -46,7 +47,12 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      <head>
+        {/* Preload critical resources for faster loading */}
+        <link rel="preload" href="/video/space.mp4" as="video" type="video/mp4" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",

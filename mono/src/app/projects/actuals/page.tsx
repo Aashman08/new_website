@@ -22,7 +22,7 @@ export default function ActualsPage() {
   const project = {
     title: "AI for SMB Acquisitions",
     subtitle: "Founding Software Engineer at Actuals, an AI startup streamlining business acquisitions for aspiring entrepreneurs",
-    heroImage: "/img/actuals.png",
+    heroImage: "/img/actuals.webp",
     color: "from-orange-500 to-amber-500",
     date: "May - October 2024",
     tags: ["AI/ML", "Full-Stack", "Startup", "FastAPI", "AWS"],
@@ -155,7 +155,7 @@ export default function ActualsPage() {
         </Section>
 
         <ImageFigure
-          src="/img/actuals_profile.png"
+          src="/img/actuals_profile.webp"
           alt="Actuals User Profile"
           caption="Personalized buyer profile with target criteria and deal team"
           maxWidth="max-w-3xl"
@@ -185,7 +185,7 @@ export default function ActualsPage() {
             ))}
           </div>
           <ImageFigure
-          src="/img/chart.png"
+          src="/img/chart.webp"
           alt="Financial Analysis"
           caption="Revenue projection and financial analysis tools"
         />
@@ -203,14 +203,14 @@ export default function ActualsPage() {
         </Section>
 
         <ImageFigure
-          src="/img/actuals_dashboard.png"
+          src="/img/actuals_dashboard.webp"
           alt="Actuals Dashboard Overview"
           caption="Dashboard showing SDE, EBITDA, profit margins, and financial visualizations"
           maxWidth="max-w-3xl"
         />
 
         <ImageFigure
-          src="/img/actuals_flags.png"
+          src="/img/actuals_flags.webp"
           alt="Financial Flags System"
           caption="AI-powered financial flags detecting discrepancies across Tax Returns, Balance Sheets, and CIM documents"
           maxWidth="max-w-3xl"

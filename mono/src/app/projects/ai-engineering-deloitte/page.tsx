@@ -46,7 +46,7 @@ export default function AIEngineeringDeloittePage() {
   const project = {
     title: "Generative AI for Code & Data",
     subtitle: "GPT-powered coding assistant and natural language data analysis platform at Deloitte",
-    heroImage: "/img/deloitte.png",
+    heroImage: "/img/deloitte.webp",
     color: "from-emerald-500 to-blue-600",
     date: "Summer 2023",
     tags: ["Generative AI", "GPT-3.5", "PandasAI", "Prompt Engineering", "Python"],
@@ -207,7 +207,7 @@ export default function AIEngineeringDeloittePage() {
         </Section>
 
         <ImageFigure
-          src="/img/project_images/panda1.png"
+          src="/img/project_images/panda1.webp"
           alt="PandasAI Integration"
           caption="PandasAI integration for natural language data queries"
           maxWidth="max-w-3xl"

@@ -19,7 +19,7 @@ export default function SRILabPage() {
   const research = {
     title: "Building Damage Detection with Deep Learning",
     subtitle: "Supporting LA County's emergency response and infrastructure reinforcement in fault-prone areas",
-    heroImage: "/img/sri-lab-hero.png",
+    heroImage: "/img/sri-lab-hero.webp",
     color: "from-blue-500 to-cyan-600",
     date: "Nov 2023 – Feb 2024",
     tags: ["Deep Learning", "PyTorch", "U-Net", "Image Segmentation", "Computer Vision"],
@@ -168,7 +168,7 @@ export default function SRILabPage() {
           <div className="grid md:grid-cols-2 gap-6 my-8">
             <figure>
               <div className="rounded-2xl overflow-hidden border border-white/10">
-                <Image src="/img/pre-disaster.png" alt="Pre-disaster satellite image" width={500} height={500} className="w-full h-auto" />
+                <Image src="/img/pre-disaster.webp" alt="Pre-disaster satellite image" width={500} height={500} className="w-full h-auto" />
               </div>
               <figcaption className="text-center text-neutral-400 text-sm mt-3">
                 <span className="text-white font-medium">Pre-disaster</span> — Before the event
@@ -176,7 +176,7 @@ export default function SRILabPage() {
             </figure>
             <figure>
               <div className="rounded-2xl overflow-hidden border border-white/10">
-                <Image src="/img/post-disaster.png" alt="Post-disaster satellite image" width={500} height={500} className="w-full h-auto" />
+                <Image src="/img/post-disaster.webp" alt="Post-disaster satellite image" width={500} height={500} className="w-full h-auto" />
               </div>
               <figcaption className="text-center text-neutral-400 text-sm mt-3">
                 <span className="text-white font-medium">Post-disaster</span> — After the event
@@ -188,7 +188,7 @@ export default function SRILabPage() {
           <div className="space-y-10 my-8 max-w-2xl mx-auto">
             <figure>
               <div className="rounded-2xl overflow-hidden border border-white/10">
-                <Image src="/img/mask.png" alt="Segmentation mask" width={600} height={600} className="w-full h-auto" />
+                <Image src="/img/mask.webp" alt="Segmentation mask" width={600} height={600} className="w-full h-auto" />
               </div>
               <figcaption className="text-center text-neutral-400 text-sm mt-3">
                 <span className="text-white font-medium">Segmentation Mask</span> — Building footprints identified
@@ -197,7 +197,7 @@ export default function SRILabPage() {
 
             <figure>
               <div className="rounded-2xl overflow-hidden border border-white/10">
-                <Image src="/img/classification.png" alt="Damage classification" width={600} height={600} className="w-full h-auto" />
+                <Image src="/img/classification.webp" alt="Damage classification" width={600} height={600} className="w-full h-auto" />
               </div>
               <figcaption className="text-center text-neutral-400 text-sm mt-3">
                 <span className="text-white font-medium">Classification Output</span> — Damage levels per building

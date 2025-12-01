@@ -132,7 +132,7 @@ export default function MarsGaleCraterPage() {
         </Section>
 
         <ImageFigure
-          src="/img/project_images/Gale_Crater2.jpeg"
+          src="/img/project_images/Gale_Crater2.webp"
           alt="Curiosity Rover journey"
           caption="Curiosity Rover journey of Gale Crater"
         />
@@ -160,7 +160,7 @@ export default function MarsGaleCraterPage() {
             of Martian history.
           </Paragraph>
           <ImageFigure
-            src="/img/project_images/Gale_Crater.jpeg"
+            src="/img/project_images/Gale_Crater.webp"
             alt="Topographic profile of Gale Crater"
             caption="Topographic profile of Gale Crater"
           />
@@ -189,7 +189,7 @@ export default function MarsGaleCraterPage() {
             aimed at identifying signs of past or present life.
           </Paragraph>
           <ImageFigure
-            src="/img/project_images/methane.png"
+            src="/img/project_images/methane.webp"
             alt="Probability of methane release"
             caption={
               <a 

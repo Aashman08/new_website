@@ -24,7 +24,7 @@ export const educationData: EducationEntry[] = [
     institutionUrl: "https://www.ucla.edu/",
     location: "Los Angeles, CA",
     period: "2021 - 2025",
-    logo: "/img/ucla-seal.jpg",
+    logo: "/img/ucla-seal.webp",
     description: "Focused on machine learning, data engineering, and deep learning. Conducted undergraduate research in the AstroPhotonics Technology Lab (Prof. Gatkine), the Sensing and Robotics for Infrastructure Lab (Post Doc DebashishJana), and the Tectonics and Structural Geology Group (PhD Abijah Simon).",
     highlights: [
       "Minor in Data Science Engineering"
@@ -42,7 +42,7 @@ export const educationData: EducationEntry[] = [
     institutionUrl: "https://dpsrkp.net/",
     location: "New Delhi, India",
     period: "2017 - 2021",
-    logo: "/img/dps.jpg",
+    logo: "/img/dps.webp",
     description: "Completed high school with the subjects - English, Mathematics, Physics, Chemistry, and Computer Science.",
     highlights: [
       "Vice President of Aerospace Club, Aeross",

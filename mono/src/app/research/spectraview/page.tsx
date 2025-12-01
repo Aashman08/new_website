@@ -19,7 +19,7 @@ export default function SpectraViewPage() {
   const research = {
     title: "AstroPhotonics Technology Lab",
     subtitle: "Revolutionizing trace gas and environmental monitoring from satellites with ultra-high precision photonic spectrograph technology",
-    heroImage: "/img/satellite.png", 
+    heroImage: "/img/satellite.webp", 
     color: "from-violet-500 to-purple-600",
     date: "Dec 2024 – June 2025",
     tags: ["Satellite Sensing", "Python", "Signal Processing", "Stanford Collaboration"],
@@ -165,7 +165,7 @@ export default function SpectraViewPage() {
           </Paragraph>
           <figure className="my-10 max-w-3xl mx-auto">
             <Image
-              src="/img/chip.png"
+              src="/img/chip.webp"
               alt="Photonic chip architecture"
               width={900}
               height={500}
@@ -225,7 +225,7 @@ export default function SpectraViewPage() {
             pushing the boundaries of what&apos;s possible in satellite-based environmental monitoring.
           </Paragraph>
           <ImageFigure
-            src="/img/team.png"
+            src="/img/team.webp"
             alt="AstroPhotonics Technology Lab team"
             caption="The AstroPhotonics Technology Lab team at UCLA"
             maxWidth="max-w-3xl"

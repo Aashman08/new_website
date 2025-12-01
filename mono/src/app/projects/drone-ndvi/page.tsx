@@ -22,7 +22,7 @@ export default function DroneNDVIPage() {
   const project = {
     title: "Drone-Mounted IR System for Vegetation Monitoring",
     subtitle: "Enhancing environmental monitoring using NDVI and near-infrared sensing technology",
-    heroImage: "/img/project_images/Drone.jpg",
+    heroImage: "/img/project_images/Drone.webp",
     color: "from-green-500 to-emerald-600",
     date: "Summer 2022",
     tags: ["Drone Technology", "NDVI", "Raspberry Pi", "Python", "Photogrammetry"],
@@ -139,7 +139,7 @@ export default function DroneNDVIPage() {
             <figure>
               <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10">
                 <Image
-                  src="/img/iowa1.jpg"
+                  src="/img/iowa1.webp"
                   alt="Team presentation at Iowa"
                   width={600}
                   height={400}
@@ -150,7 +150,7 @@ export default function DroneNDVIPage() {
             <figure>
               <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10">
                 <Image
-                  src="/img/iowa2.jpg"
+                  src="/img/iowa2.webp"
                   alt="Field work at Ashton Prairie"
                   width={600}
                   height={400}
@@ -183,7 +183,7 @@ export default function DroneNDVIPage() {
           <figure className="my-6 sm:my-8 md:my-10 max-w-2xl mx-auto">
             <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10">
               <Image
-                src="/img/project_images/NDVI.png"
+                src="/img/project_images/NDVI.webp"
                 alt="NDVI Explanation"
                 width={900}
                 height={600}
@@ -215,12 +215,12 @@ export default function DroneNDVIPage() {
         {/* RGB vs False Color Comparison */}
         <ImagePair
           first={{
-            src: "/img/project_images/RGB.jpeg",
+            src: "/img/project_images/RGB.webp",
             alt: "RGB aerial image",
             caption: "RGB",
           }}
           second={{
-            src: "/img/project_images/false_ndvi.png",
+            src: "/img/project_images/false_ndvi.webp",
             alt: "False color NDVI image",
             caption: "False Image - NDVI",
           }}
@@ -236,7 +236,7 @@ export default function DroneNDVIPage() {
             height using structure from motion photogrammetric range imaging technique.
           </Paragraph>
           <ImageFigure
-            src="/img/project_images/3D_render.png"
+            src="/img/project_images/3D_render.webp"
             alt="3D structure rendering"
             caption="Rendering of 3D structure using Agisoft"
             maxWidth="max-w-3xl"

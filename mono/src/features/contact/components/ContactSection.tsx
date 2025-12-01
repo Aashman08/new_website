@@ -88,7 +88,7 @@ const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCli
         {/* Moon Image */}
         <div className="flex justify-center mb-8 sm:mb-10 md:mb-12">
           <Image
-            src="/img/project_images/moon.jpeg"
+            src="/img/project_images/moon.webp"
             alt="Moon phases"
             width={700}
             height={200}

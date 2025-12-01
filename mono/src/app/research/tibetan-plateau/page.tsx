@@ -128,7 +128,7 @@ export default function TibetanPlateauPage() {
             revealing the hidden contours and elevations of both mountain systems.
           </Paragraph>
           <ImageFigure
-            src="/img/project_images/qgis.jpeg"
+            src="/img/project_images/qgis.webp"
             alt="DEM of Tibetan Plateau region"
             caption="DEM of Tibetan Plateau region"
           />
@@ -145,7 +145,7 @@ export default function TibetanPlateauPage() {
             to understand how the origin and geological changes map to the evident slope variations.
           </Paragraph>
           <ImageFigure
-            src="/img/project_images/profile.jpeg"
+            src="/img/project_images/profile.webp"
             alt="Topographic profiles"
             caption="Topographic profiles of the mountain systems"
           />

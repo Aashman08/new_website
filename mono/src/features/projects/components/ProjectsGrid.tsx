@@ -11,6 +11,7 @@ import {
   IconSatellite,
   IconAtom,
   IconX,
+  IconDroplet,
 } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -28,6 +29,7 @@ const iconMap = {
   drone: <IconDrone className="h-4 w-4 text-green-500" />,
   satellite: <IconSatellite className="h-4 w-4 text-rose-500" />,
   quantum: <IconAtom className="h-4 w-4 text-pink-500" />,
+  fluid: <IconDroplet className="h-4 w-4 text-cyan-500" />,
 };
 
 // Map icon names to hex colors for hover border - softer tones for glassy glow
@@ -39,6 +41,7 @@ const accentColorMap: Record<string, string> = {
   drone: "#86efac",     // green-300 - soft mint glow
   satellite: "#f87171", // red-400 - soft red glow
   quantum: "#f472b6",   // pink-400 - soft pink glow for quantum
+  fluid: "#22d3ee",     // cyan-400 - fluid blue glow
 };
 
 // Map icon names to larger icons for headers
@@ -50,6 +53,7 @@ const headerIconMap = {
   drone: <IconDrone size={40} className="text-white drop-shadow-lg" strokeWidth={1.5} />,
   satellite: <IconSatellite size={40} className="text-white drop-shadow-lg" strokeWidth={1.5} />,
   quantum: <IconAtom size={40} className="text-white drop-shadow-lg" strokeWidth={1.5} />,
+  fluid: <IconDroplet size={40} className="text-white drop-shadow-lg" strokeWidth={1.5} />,
 };
 
 // Dynamic project header component - uses animation from headerAnimations.tsx
@@ -288,6 +292,7 @@ const dedicatedPages: Record<string, string> = {
   "actuals": "actuals",
   "ai-engineering-deloitte": "ai-engineering-deloitte",
   "drone-ndvi": "drone-ndvi",
+  "lattice-boltzmann": "lattice-boltzmann",
 };
 
 export function ProjectsGrid() {

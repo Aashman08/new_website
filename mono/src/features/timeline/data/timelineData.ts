@@ -31,7 +31,7 @@ export const timelineData: TimelineEntryData[] = [
       }
     ],
     images: [
-      { src: "/img/kindo-logo2.png", alt: "AI Fundraising" },
+      { src: "/img/kindo-logo2.webp", alt: "AI Fundraising" },
       { src: "/img/kindo-logo.svg", alt: "Kindo" }
     ]
   },
@@ -45,8 +45,8 @@ export const timelineData: TimelineEntryData[] = [
       }
     ],
     images: [
-      { src: "/img/cube.png", alt: "CubeSat project" },
-      { src: "/img/tanager_1.png", alt: "Tanager satellite" }
+      { src: "/img/cube.webp", alt: "CubeSat project" },
+      { src: "/img/tanager_1.webp", alt: "Tanager satellite" }
     ]
   },
   {
@@ -59,8 +59,8 @@ export const timelineData: TimelineEntryData[] = [
       }
     ],
     images: [
-      { src: "/img/actuals.png", alt: "Actuals platform" },
-      { src: "/img/chart.png", alt: "Financial analysis chart" }
+      { src: "/img/actuals.webp", alt: "Actuals platform" },
+      { src: "/img/chart.webp", alt: "Financial analysis chart" }
     ]
   },
   {
@@ -74,8 +74,8 @@ export const timelineData: TimelineEntryData[] = [
       "During my time there, I successfully completed two projects, each focused on distinct use cases, gaining hands-on experience in applying generative AI to real-world business problems."
     ],
     images: [
-      { src: "/img/pandas.png", alt: "PandasAI project" },
-      { src: "/img/code.jpg", alt: "Code development" }
+      { src: "/img/pandas.webp", alt: "PandasAI project" },
+      { src: "/img/code.webp", alt: "Code development" }
     ]
   },
   {
@@ -89,8 +89,8 @@ export const timelineData: TimelineEntryData[] = [
       "Developed a proof-of-concept, drone-mounted dual-camera imaging system designed for Vegetation health monitoring and stress analysis caused by heat waves.",
     ],
     images: [
-      { src: "/img/drone.png", alt: "Drone imaging system" },
-      { src: "/img/3D.png", alt: "3D visualization" }
+      { src: "/img/drone.webp", alt: "Drone imaging system" },
+      { src: "/img/3D.webp", alt: "3D visualization" }
     ]
   },
   {
@@ -105,8 +105,8 @@ export const timelineData: TimelineEntryData[] = [
       "One of the most unforgettable milestones was representing **India** on an international stage at the Kennedy Space Center."
     ],
     images: [
-      { src: "/img/SSDC1.jpg", alt: "SSDC competition" },
-      { src: "/img/SSDC2.jpg", alt: "Kennedy Space Center" }
+      { src: "/img/SSDC1.webp", alt: "SSDC competition" },
+      { src: "/img/SSDC2.webp", alt: "Kennedy Space Center" }
     ]
   }
 ];

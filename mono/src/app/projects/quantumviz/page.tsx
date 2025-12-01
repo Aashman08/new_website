@@ -47,7 +47,7 @@ export default function QuantumVizPage() {
   const project = {
     title: "QuantumViz",
     subtitle: "AI-powered quantum circuit design through natural language and interactive 3D visualization",
-    heroImage: "/img/quantumn.jpg",
+    heroImage: "/img/quantumn.webp",
     color: "from-pink-500 to-orange-500",
     date: "2024",
     tags: ["Quantum Computing", "OpenAI", "IBM Qiskit", "RAG", "Next.js", "Python"],
@@ -229,7 +229,7 @@ export default function QuantumVizPage() {
 
         {/* System Architecture */}
         <ImageFigure
-          src="/img/quantum_system.png"
+          src="/img/quantum_system.webp"
           alt="QuantumViz System Architecture"
           caption="Simplifying the creation and visualization of quantum circuits through natural language"
           maxWidth="max-w-4xl"

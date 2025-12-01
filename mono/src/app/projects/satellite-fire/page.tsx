@@ -23,7 +23,7 @@ export default function SatelliteFirePage() {
   const project = {
     title: "Satellite-Based Fire Detection",
     subtitle: "Visualizing fire, water, and land cover using Copernicus data from ESA",
-    heroImage: "/img/project_images/fire.png",
+    heroImage: "/img/project_images/fire.webp",
     color: "from-rose-500 to-orange-600",
     date: "2023",
     tags: ["Remote Sensing", "Python", "GIS", "Satellite Imagery"],
@@ -195,7 +195,7 @@ export default function SatelliteFirePage() {
         <Section>
           <SectionHeading>RGB Baseline Image</SectionHeading>
           <ImageFigure
-            src="/img/project_images/Region.png"
+            src="/img/project_images/Region.webp"
             alt="RGB image of the study region"
             caption="RGB image of the study region (B4, B3, B2)"
           />
@@ -215,12 +215,12 @@ export default function SatelliteFirePage() {
           </Paragraph>
           <ImagePair
             first={{
-              src: "/img/project_images/NDVI-r.png",
+              src: "/img/project_images/NDVI-r.webp",
               alt: "NDVI visualization",
               caption: "NDVI (B8 - B4 / B8 + B4)",
             }}
             second={{
-              src: "/img/project_images/NDVI-false.png",
+              src: "/img/project_images/NDVI-false.webp",
               alt: "False color composite in Red band",
               caption: "As seen by naked eye in the Red band (B4)",
             }}
@@ -241,12 +241,12 @@ export default function SatelliteFirePage() {
           </Paragraph>
           <ImagePair
             first={{
-              src: "/img/project_images/NDWI.png",
+              src: "/img/project_images/NDWI.webp",
               alt: "NDWI visualization",
               caption: "NDWI (B3 - B8 / B3 + B8)",
             }}
             second={{
-              src: "/img/project_images/NDWI-false.png",
+              src: "/img/project_images/NDWI-false.webp",
               alt: "False color composite in Green band",
               caption: "As seen by naked eye in the Green band (B3)",
             }}
@@ -269,12 +269,12 @@ export default function SatelliteFirePage() {
           </Paragraph>
           <ImagePair
             first={{
-              src: "/img/project_images/BAI.png",
+              src: "/img/project_images/BAI.webp",
               alt: "BAI visualization",
               caption: "BAI (B11 - B8 / B11 + B8)",
             }}
             second={{
-              src: "/img/project_images/BAI-false.png",
+              src: "/img/project_images/BAI-false.webp",
               alt: "False color with NIR and SWIR",
               caption: "As seen by naked eye when Red and Green are replaced by NIR and SWIR",
             }}

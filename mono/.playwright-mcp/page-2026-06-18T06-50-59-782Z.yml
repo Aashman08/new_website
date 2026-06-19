@@ -1,0 +1,131 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - link "Back" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img [ref=e6]
+      - text: Back
+  - banner [ref=e9]:
+    - img "QuantumViz" [ref=e10]
+    - generic [ref=e12]:
+      - generic [ref=e13]: Quantum ComputingOpenAIIBM QiskitRAGNext.js
+      - heading "QuantumViz" [level=1] [ref=e14]
+      - paragraph [ref=e15]: AI-powered quantum circuit design through natural language and interactive 3D visualization
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - img [ref=e18]
+          - text: "2024"
+        - link "Devpost" [ref=e20] [cursor=pointer]:
+          - /url: https://devpost.com/software/quantumviz
+          - img [ref=e21]
+          - text: Devpost
+  - main [ref=e25]:
+    - figure "QuantumViz Demo — Transforming ideas into quantum circuits" [ref=e27]:
+      - iframe [ref=e29]:
+        - generic [active] [ref=f1e1]:
+          - generic "YouTube Video Player" [ref=f1e3]
+          - generic [ref=f1e5]:
+            - generic:
+              - generic:
+                - button "Play video" [ref=f1e10] [cursor=pointer]:
+                  - generic [ref=f1e13]:
+                    - img
+                - button "Hide player controls" [ref=f1e14] [cursor=pointer]
+                - generic [ref=f1e21]:
+                  - generic [ref=f1e22]:
+                    - link "QuantumViz" [ref=f1e23] [cursor=pointer]:
+                      - /url: https://www.youtube.com/watch?v=OuZSJU72B7s
+                    - link "Claire Li" [ref=f1e24] [cursor=pointer]:
+                      - /url: /channel/UC0uqxc_ktV7KkmrervDy9cw
+                      - generic [ref=f1e25]: Claire Li
+                  - generic [ref=f1e26]:
+                    - button "thumbnail-image" [ref=f1e27] [cursor=pointer]:
+                      - img "thumbnail-image" [ref=f1e28]
+                    - generic [ref=f1e30]:
+                      - generic: Claire Li
+                      - generic: No subscribers
+      - generic [ref=e30]: QuantumViz Demo — Transforming ideas into quantum circuits
+    - generic [ref=e31]:
+      - heading "The Problem" [level=2] [ref=e32]
+      - paragraph [ref=e33]: Quantum computing has the potential to transform technology and solve problems that classical computers can't handle. At the crux of quantum computing is building quantum circuits—they're like the ABC's of quantum computing, but unlike your usual ABC's, building quantum circuits is very complicated, time-consuming, and difficult for even skilled researchers and developers.
+    - generic [ref=e34]:
+      - heading "Expert Insights" [level=2] [ref=e35]
+      - blockquote [ref=e36]:
+        - paragraph [ref=e37]: “A more visual and intuitive method for designing quantum circuits would be a game-changer, especially if it allows us to visualize circuits in a multimodal way before even writing a line of code.”— Dr. Jens Palsberg, Quantum Computing Researcher, UCLA CS Faculty
+      - blockquote [ref=e38]:
+        - paragraph [ref=e39]: “The ability to create quantum circuits through natural language is a breakthrough that could revolutionize how we interact with these complex systems.”— Dr. Allen Ho, Google Quantum AI, Quantum Qolab Founder
+      - blockquote [ref=e40]:
+        - paragraph [ref=e41]: “One of the biggest challenges in quantum computing research is the cumbersome process of manually coding LaTeX for circuit representations. A tool that generates circuit diagrams and exports them directly to LaTeX would save time and enhance research efficiency.”— Sam McArdle, Leading Quantum Scientist at AWS
+    - generic [ref=e42]:
+      - heading "Our Solution" [level=2] [ref=e43]
+      - paragraph [ref=e44]: QuantumViz is a quantum circuit generator that simplifies and enhances the process of designing quantum circuits by text or speech using AI. It generates interactive 3D visualizations, executable code snippets, and includes a customized chatbot trained on Quantum Code Documentation and Research Papers.
+      - generic [ref=e45]:
+        - heading "Core Innovation" [level=4] [ref=e46]
+        - paragraph [ref=e47]: Natural language to quantum circuit generation — making quantum computing accessible without extensive coding knowledge.
+    - figure "Simplifying the creation and visualization of quantum circuits through natural language" [ref=e48]:
+      - img "QuantumViz System Architecture" [ref=e50]
+      - generic [ref=e51]: Simplifying the creation and visualization of quantum circuits through natural language
+    - generic [ref=e52]:
+      - heading "Key Features" [level=2] [ref=e53]
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - heading "Natural Language Interface" [level=4] [ref=e56]
+          - paragraph [ref=e57]: Generate circuit designs using text or speech input via OpenAI models. Users can describe their desired circuit in plain English and watch it come to life.
+        - generic [ref=e58]:
+          - heading "3D Qubit Visualization" [level=4] [ref=e59]
+          - paragraph [ref=e60]: Interactive Bloch sphere visualizations powered by IBM Qiskit allow users to explore qubit states in 3D before writing any code. Understand circuit design and flow intuitively.
+        - generic [ref=e61]:
+          - heading "Code & LaTeX Generation" [level=4] [ref=e62]
+          - paragraph [ref=e63]: Automatically generate executable Python/Qiskit code and export circuit diagrams directly to LaTeX format—streamlining research documentation and presentations.
+        - generic [ref=e64]:
+          - heading "RAG-Powered Chatbot" [level=4] [ref=e65]
+          - paragraph [ref=e66]: A conversational agent built with Groq and LlamaIndex, trained on hundreds of research papers and IBM Qiskit documentation. Ask any question about quantum computing and get accurate, contextual answers.
+        - generic [ref=e67]:
+          - heading "Research Paper Parsing" [level=4] [ref=e68]
+          - paragraph [ref=e69]: Automatically extract quantum circuit images from arXiv papers using Selenium and Scrapy. Convert circuit images directly to executable Qiskit code through our platform.
+    - generic [ref=e70]:
+      - heading "Technology Stack" [level=2] [ref=e71]
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - heading "OpenAI" [level=4] [ref=e74]
+          - paragraph [ref=e75]: Text generation & speech-to-text models
+        - generic [ref=e76]:
+          - heading "Groq + LlamaIndex" [level=4] [ref=e77]
+          - paragraph [ref=e78]: RAG model for code generation
+        - generic [ref=e79]:
+          - heading "IBM Qiskit" [level=4] [ref=e80]
+          - paragraph [ref=e81]: Quantum circuit simulation & visualization
+        - generic [ref=e82]:
+          - heading "Selenium + Scrapy" [level=4] [ref=e83]
+          - paragraph [ref=e84]: Research paper parsing & web scraping
+        - generic [ref=e85]:
+          - heading "Next.js + TypeScript" [level=4] [ref=e86]
+          - paragraph [ref=e87]: Full-stack web application
+        - generic [ref=e88]:
+          - heading "Quirk" [level=4] [ref=e89]
+          - paragraph [ref=e90]: Interactive circuit editor
+    - generic [ref=e91]:
+      - heading "Challenges & Accomplishments" [level=2] [ref=e92]
+      - paragraph [ref=e93]: Our primary challenge was figuring out how to generate the quantum circuit visually. We knew we wanted a 3D visual that users could interact with, but were not initially sure what software to use. After experimentation, we successfully integrated interactive Bloch sphere visualizations.
+      - paragraph [ref=e94]: We were proud of being able to correctly connect Selenium to trace paths and find research papers to train our models and chatbot—all automatically. The RAG model trained on Qiskit documentation proved highly effective for code generation.
+    - generic [ref=e95]:
+      - heading "What's Next" [level=2] [ref=e96]
+      - paragraph [ref=e97]: We hope that this tool will become a widespread quantum computing tool as many quantum researchers and students mentioned they wished it was something they had earlier. It's just the beginning in a long list of tools we plan to build to reduce barriers to entry and fast-track research.
+      - list [ref=e98]:
+        - listitem [ref=e99]:
+          - strong [ref=e100]: "Enhanced Model Training:"
+          - text: Train models using images of quantum circuits, not just text, for improved visual understanding.
+        - listitem [ref=e101]:
+          - strong [ref=e102]: "Complex Design Testing:"
+          - text: Rigorous testing with intricate circuit designs, collaborating with researchers to refine algorithms.
+        - listitem [ref=e103]:
+          - strong [ref=e104]: "Platform Integration:"
+          - text: Integration with IBM's quantum tools and other established platforms for a comprehensive experience.
+    - generic [ref=e105]:
+      - heading "Impact" [level=2] [ref=e106]
+      - blockquote [ref=e107]:
+        - paragraph [ref=e108]: QuantumViz bridges the gap between the complexities of quantum mechanics and the approaching era of quantum computing—making circuit design accessible, intuitive, and efficient for researchers and students alike.
+  - contentinfo [ref=e109]:
+    - link "Back to Projects" [ref=e111] [cursor=pointer]:
+      - /url: /
+      - img [ref=e112]
+      - text: Back to Projects

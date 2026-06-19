@@ -1,0 +1,36 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e643]:
+    - menubar [ref=e646]:
+      - menuitem "ABOUT ME" [ref=e647] [cursor=pointer]
+      - menuitem "PROJECTS" [ref=e648] [cursor=pointer]
+      - menuitem "RESEARCH" [ref=e649] [cursor=pointer]
+      - menuitem "ART" [ref=e650] [cursor=pointer]
+    - generic [ref=e651]:
+      - button "Close" [ref=e652] [cursor=pointer]:
+        - img [ref=e653]
+        - generic [ref=e656]: Close
+      - heading "Contact" [level=2] [ref=e658]
+      - img "Moon phases" [ref=e660]
+      - paragraph [ref=e661]: If you have any questions, comments or suggestions regarding my work or would like to collaborate, or want to connect, please do get in touch. I'd love to hear from you!
+      - generic [ref=e662]:
+        - heading "Email" [level=3] [ref=e663]
+        - paragraph [ref=e664]:
+          - link "aashman@kindo.ai" [ref=e665] [cursor=pointer]:
+            - /url: mailto:aashman@kindo.ai
+          - text: ","
+          - link "aashman080303@gmail.com" [ref=e666] [cursor=pointer]:
+            - /url: mailto:aashman080303@gmail.com
+      - generic [ref=e667]:
+        - heading "Location" [level=3] [ref=e668]
+        - paragraph [ref=e669]: Los Angeles, CA
+      - generic [ref=e670]:
+        - link "LinkedIn" [ref=e671] [cursor=pointer]:
+          - /url: https://www.linkedin.com/in/aashman-rastogi-7b76a1189/
+          - img [ref=e672]
+        - link "Instagram" [ref=e675] [cursor=pointer]:
+          - /url: https://www.instagram.com/aashman08/
+          - img [ref=e676]
+        - link "GitHub" [ref=e679] [cursor=pointer]:
+          - /url: https://github.com/Aashman08/
+          - img [ref=e680]
+  - alert [ref=e14]

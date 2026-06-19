@@ -1,0 +1,178 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e15]:
+    - menubar [ref=e18]:
+      - menuitem "PROJECTS" [ref=e19] [cursor=pointer]
+      - menuitem "CONTACT" [ref=e20] [cursor=pointer]
+      - menuitem "RESEARCH" [ref=e21] [cursor=pointer]
+      - menuitem "ART" [ref=e22] [cursor=pointer]
+    - generic [ref=e23]:
+      - button "Close" [ref=e24] [cursor=pointer]:
+        - img [ref=e25]
+        - generic [ref=e28]: Close
+      - heading "About Me" [level=2] [ref=e30]
+      - img "Aashman Rastogi" [ref=e33]
+      - generic [ref=e34]:
+        - paragraph [ref=e35]: Hi, I'm Aashman
+        - paragraph [ref=e37]:
+          - text: I'm an
+          - generic [ref=e38]: AI Engineer
+          - text: at
+          - link "Kindo AI" [ref=e41] [cursor=pointer]:
+            - /url: https://kindo.ai/
+          - text: ", a Series A cybersecurity AI startup focused on automating security and identity workflows. I'm passionate about building impactful products and thrive in fast-moving, collaborative"
+          - generic [ref=e42]: deep tech
+          - text: environments, where I'm constantly inspired by the pace of innovation and its real-world impact.
+        - paragraph [ref=e43]:
+          - text: I've definitely caught the entrepreneurship bug and love turning early-stage ideas into things people actually use. Since I was a kid, I've been deeply fascinated by
+          - generic [ref=e44]: space and space tech
+          - text: ", and I'm exploring how emerging technologies can drive the next wave of innovation that ultimately benefits life on Earth."
+        - paragraph [ref=e45]:
+          - text: I graduated from
+          - link "UCLA" [ref=e48] [cursor=pointer]:
+            - /url: https://www.ucla.edu/
+          - text: with a degree in
+          - generic [ref=e49]: Statistics and Data Science
+          - text: and a minor in
+          - generic [ref=e50]: Data Science Engineering
+          - text: . If you're building something ambitious—or just want to talk AI, startups, or space—I'd love to connect.
+      - button "Scroll to timeline" [ref=e51] [cursor=pointer]:
+        - img "Scroll down" [ref=e52]
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - heading "Present" [level=3] [ref=e61]
+            - paragraph [ref=e62]: Software Engineer at Kindo AI (July 2025 – Current)
+          - generic [ref=e64]:
+            - paragraph [ref=e65]:
+              - text: Currently working as a Software Engineer at
+              - link "Kindo" [ref=e68] [cursor=pointer]:
+                - /url: https://kindo.ai
+              - text: ", a Series A cybersecurity AI startup focused on automating security and identity workflows."
+            - generic [ref=e69]:
+              - img "AI Fundraising" [ref=e70]
+              - img "Kindo" [ref=e71]
+        - generic [ref=e72]:
+          - generic [ref=e73]:
+            - heading "Early 2025" [level=3] [ref=e76]
+            - paragraph [ref=e77]: Founding Software Engineer at Spectraview (Jan – June 2025)
+          - generic [ref=e79]:
+            - paragraph [ref=e80]:
+              - text: Joined
+              - link "Spectraview" [ref=e83] [cursor=pointer]:
+                - /url: https://gatkine.astro.ucla.edu/research.html
+              - text: ", a pre-seed space tech startup, as a Founding Software Engineer to build software for ultra-high-precision satellite sensing and atmospheric trace-gas detection."
+            - generic [ref=e84]:
+              - img "CubeSat project" [ref=e85]
+              - img "Tanager satellite" [ref=e86]
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - heading "2024" [level=3] [ref=e91]
+            - paragraph [ref=e92]: Founding Software Engineer at Actuals (May – Oct 2024)
+          - generic [ref=e94]:
+            - paragraph [ref=e95]:
+              - text: Ventured into entrepreneurship, joined
+              - link "Actuals" [ref=e98] [cursor=pointer]:
+                - /url: https://useactuals.com
+              - text: as a Founding Software Engineer, an AI startup backed by
+              - link "F7 Ventures" [ref=e101] [cursor=pointer]:
+                - /url: https://www.f7ventures.com
+              - text: ", aimed at streamlining the acquisition process for Small and Medium Businesses (SMBs) across the United States."
+            - generic [ref=e102]:
+              - img "Actuals platform" [ref=e103]
+              - img "Financial analysis chart" [ref=e104]
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - heading "2023" [level=3] [ref=e109]
+            - paragraph [ref=e110]: Harnessing AI to Redefine Business Solutions
+          - generic [ref=e112]:
+            - paragraph [ref=e113]:
+              - text: My first formal internship experience was at Deloitte, where I joined the newly established
+              - link "Semantics, Analytics, and Mergers & Acquisitions Gen AI" [ref=e116] [cursor=pointer]:
+                - /url: https://www.deloitte.com/global/en/services/consulting/services/strategy-analytics-manda.html
+              - text: Team.
+            - paragraph [ref=e117]: During my time there, I successfully completed two projects, each focused on distinct use cases, gaining hands-on experience in applying generative AI to real-world business problems.
+            - generic [ref=e118]:
+              - img "PandasAI project" [ref=e119]
+              - img "Code development" [ref=e120]
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - heading "2022" [level=3] [ref=e125]
+            - paragraph [ref=e126]: "Exploring Earth from Above: Innovation Through Aerial Imaging"
+          - generic [ref=e128]:
+            - paragraph [ref=e129]:
+              - text: Visited Iowa as an Undergraduate Researcher selected for the
+              - 'link "Edge of Space Academy: Spaceflight Instrumentation and Mission Design" [ref=e132] [cursor=pointer]':
+                - /url: https://edgeofspace.sites.uiowa.edu
+              - text: program.
+            - paragraph [ref=e133]: Developed a proof-of-concept, drone-mounted dual-camera imaging system designed for Vegetation health monitoring and stress analysis caused by heat waves.
+            - generic [ref=e134]:
+              - img "Drone imaging system" [ref=e135]
+              - img "3D visualization" [ref=e136]
+        - generic [ref=e137]:
+          - generic [ref=e138]:
+            - heading "Where It All Started" [level=3] [ref=e141]
+            - paragraph [ref=e142]: A Childhood Dream of Space, Nurtured by Curiosity and Exploration
+          - generic [ref=e144]:
+            - paragraph [ref=e145]: My fascination with space and nature began during my childhood, fueled by captivating documentaries that sparked my curiosity about the universe.
+            - paragraph [ref=e146]:
+              - text: This passion deepened during my ninth grade when I joined
+              - link "Aeross" [ref=e149] [cursor=pointer]:
+                - /url: https://aeross.org
+              - text: ", an aerospace club that became a defining part of my high school experience."
+            - paragraph [ref=e150]:
+              - text: One of the most unforgettable milestones was representing
+              - generic [ref=e151]: India
+              - text: on an international stage at the Kennedy Space Center.
+            - generic [ref=e152]:
+              - img "SSDC competition" [ref=e153]
+              - img "Kennedy Space Center" [ref=e154]
+      - generic [ref=e157]:
+        - generic [ref=e158]:
+          - img [ref=e159]
+          - heading "Education" [level=2] [ref=e162]
+        - generic [ref=e163]:
+          - generic [ref=e165]:
+            - img "University of California, Los Angeles" [ref=e167]
+            - generic [ref=e168]:
+              - generic [ref=e169]:
+                - generic [ref=e170]:
+                  - heading "Bachelor of Science in Statistics and Data Science" [level=3] [ref=e171]
+                  - link "University of California, Los Angeles" [ref=e172] [cursor=pointer]:
+                    - /url: https://www.ucla.edu/
+                - generic [ref=e173]: 2021 - 2025
+              - paragraph [ref=e174]:
+                - text: Focused on machine learning, data engineering, and deep learning. Conducted undergraduate research in the
+                - link "AstroPhotonics Technology Lab" [ref=e175] [cursor=pointer]:
+                  - /url: https://gatkine.astro.ucla.edu/
+                - text: (Prof. Gatkine), the
+                - link "Sensing and Robotics for Infrastructure Lab" [ref=e176] [cursor=pointer]:
+                  - /url: https://sri-lab.seas.ucla.edu/
+                - text: (Post Doc DebashishJana), and the
+                - link "Tectonics and Structural Geology Group" [ref=e177] [cursor=pointer]:
+                  - /url: https://faculty.epss.ucla.edu/~yin/
+                - text: (PhD Abijah Simon).
+              - list [ref=e178]:
+                - listitem [ref=e179]:
+                  - generic [ref=e180]: •
+                  - generic [ref=e181]: Minor in Data Science Engineering
+          - generic [ref=e185]:
+            - img "Delhi Public School, RK Puram" [ref=e187]
+            - generic [ref=e188]:
+              - generic [ref=e189]:
+                - generic [ref=e190]:
+                  - heading "High School - Science with Computer Science" [level=3] [ref=e191]
+                  - link "Delhi Public School, RK Puram" [ref=e192] [cursor=pointer]:
+                    - /url: https://dpsrkp.net/
+                - generic [ref=e193]: 2017 - 2021
+              - paragraph [ref=e194]: Completed high school with the subjects - English, Mathematics, Physics, Chemistry, and Computer Science.
+              - list [ref=e195]:
+                - listitem [ref=e196]:
+                  - generic [ref=e197]: •
+                  - generic [ref=e198]:
+                    - text: Vice President of Aerospace Club,
+                    - link "Aeross" [ref=e199] [cursor=pointer]:
+                      - /url: https://aeross.org/
+                - listitem [ref=e200]:
+                  - generic [ref=e201]: •
+                  - generic [ref=e202]: Served as a member of student council and an active part of Dance and Choir club
+  - alert [ref=e14]

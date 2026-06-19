@@ -1,0 +1,87 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e525]:
+    - menubar [ref=e528]:
+      - menuitem "ABOUT ME" [ref=e529] [cursor=pointer]
+      - menuitem "PROJECTS" [ref=e530] [cursor=pointer]
+      - menuitem "CONTACT" [ref=e531] [cursor=pointer]
+      - menuitem "ART" [ref=e532] [cursor=pointer]
+    - button "Close" [ref=e533] [cursor=pointer]:
+      - img [ref=e534]
+      - generic [ref=e537]: Close
+    - generic [ref=e538]:
+      - img "Mars" [ref=e539]
+      - heading "Research" [level=2] [ref=e543]
+    - generic [ref=e545]:
+      - paragraph [ref=e546]: Throughout my academic journey at UCLA, I've been privileged to embark on an eclectic range of research projects and expeditions that have expanded the horizons of my understanding and experience.
+      - generic [ref=e547]:
+        - link "AstroPhotonics Technology Lab Satellite Sensing Algorithm Development Hyperspectral Imaging AstroPhotonics Technology Lab Satellite-based trace gas detection with ultra-high precision photonic spectrograph technology Explore" [ref=e549] [cursor=pointer]:
+          - /url: /research/spectraview
+          - generic [ref=e551]:
+            - img "AstroPhotonics Technology Lab" [ref=e554]
+            - generic [ref=e556]:
+              - generic [ref=e557]:
+                - generic [ref=e558]: Satellite Sensing
+                - generic [ref=e559]: Algorithm Development
+                - generic [ref=e560]: Hyperspectral Imaging
+              - heading "AstroPhotonics Technology Lab" [level=3] [ref=e561]
+              - paragraph [ref=e562]: Satellite-based trace gas detection with ultra-high precision photonic spectrograph technology
+              - generic [ref=e563]:
+                - generic [ref=e564]: Explore
+                - img [ref=e565]
+        - link "Building Damage Detection Deep Learning PyTorch U-Net Building Damage Detection Deep learning for LA County emergency response and infrastructure reinforcement Explore" [ref=e568] [cursor=pointer]:
+          - /url: /research/sri-lab
+          - generic [ref=e570]:
+            - img "Building Damage Detection" [ref=e573]
+            - generic [ref=e575]:
+              - generic [ref=e576]:
+                - generic [ref=e577]: Deep Learning
+                - generic [ref=e578]: PyTorch
+                - generic [ref=e579]: U-Net
+              - heading "Building Damage Detection" [level=3] [ref=e580]
+              - paragraph [ref=e581]: Deep learning for LA County emergency response and infrastructure reinforcement
+              - generic [ref=e582]:
+                - generic [ref=e583]: Explore
+                - img [ref=e584]
+        - link "Origins and Slope Variations Geology QGIS Python Origins and Slope Variations A study of Longmen Shan and Min Shan Mountain Systems of the Tibetan Plateau and Sichuan Basin Explore" [ref=e587] [cursor=pointer]:
+          - /url: /research/tibetan-plateau
+          - generic [ref=e589]:
+            - img "Origins and Slope Variations" [ref=e592]
+            - generic [ref=e594]:
+              - generic [ref=e595]:
+                - generic [ref=e596]: Geology
+                - generic [ref=e597]: QGIS
+                - generic [ref=e598]: Python
+              - heading "Origins and Slope Variations" [level=3] [ref=e599]
+              - paragraph [ref=e600]: A study of Longmen Shan and Min Shan Mountain Systems of the Tibetan Plateau and Sichuan Basin
+              - generic [ref=e601]:
+                - generic [ref=e602]: Explore
+                - img [ref=e603]
+        - link "Exploring Life on Mars Astrobiology Mars Review Paper Exploring Life on Mars An In-depth Review of Gale Crater Explore" [ref=e606] [cursor=pointer]:
+          - /url: /research/mars-gale-crater
+          - generic [ref=e608]:
+            - img "Exploring Life on Mars" [ref=e611]
+            - generic [ref=e613]:
+              - generic [ref=e614]:
+                - generic [ref=e615]: Astrobiology
+                - generic [ref=e616]: Mars
+                - generic [ref=e617]: Review Paper
+              - heading "Exploring Life on Mars" [level=3] [ref=e618]
+              - paragraph [ref=e619]: An In-depth Review of Gale Crater
+              - generic [ref=e620]:
+                - generic [ref=e621]: Explore
+                - img [ref=e622]
+        - link "SHIFT Campaign NASA JPL Remote Sensing Field Research SHIFT Campaign NASA JPL collaboration to understand land and aquatic ecosystems Explore" [ref=e625] [cursor=pointer]:
+          - /url: /research/nasa-shift
+          - generic [ref=e627]:
+            - img "SHIFT Campaign" [ref=e630]
+            - generic [ref=e632]:
+              - generic [ref=e633]:
+                - generic [ref=e634]: NASA JPL
+                - generic [ref=e635]: Remote Sensing
+                - generic [ref=e636]: Field Research
+              - heading "SHIFT Campaign" [level=3] [ref=e637]
+              - paragraph [ref=e638]: NASA JPL collaboration to understand land and aquatic ecosystems
+              - generic [ref=e639]:
+                - generic [ref=e640]: Explore
+                - img [ref=e641]
+  - alert [ref=e14]

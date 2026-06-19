@@ -1,0 +1,55 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e682]:
+    - menubar [ref=e685]:
+      - menuitem "ABOUT ME" [ref=e686] [cursor=pointer]
+      - menuitem "PROJECTS" [ref=e687] [cursor=pointer]
+      - menuitem "CONTACT" [ref=e688] [cursor=pointer]
+      - menuitem "RESEARCH" [ref=e689] [cursor=pointer]
+    - generic [ref=e690]:
+      - button "Close" [ref=e691] [cursor=pointer]:
+        - img [ref=e692]
+        - generic [ref=e695]: Close
+      - heading "Art" [level=2] [ref=e697]
+      - generic [ref=e698]:
+        - button [ref=e699] [cursor=pointer]:
+          - img [ref=e700]
+        - img "Wolf" [ref=e704]
+        - generic [ref=e705]:
+          - generic [ref=e706]:
+            - heading "Wolf" [level=3] [ref=e707]
+            - paragraph [ref=e708]: "Medium: Color Pencils"
+          - generic [ref=e709]:
+            - button [ref=e710] [cursor=pointer]
+            - button [ref=e711] [cursor=pointer]
+            - button [ref=e712] [cursor=pointer]
+            - button [ref=e713] [cursor=pointer]
+            - button [ref=e714] [cursor=pointer]
+            - button [ref=e715] [cursor=pointer]
+            - button [ref=e716] [cursor=pointer]
+            - button [ref=e717] [cursor=pointer]
+            - button [ref=e718] [cursor=pointer]
+            - button [ref=e719] [cursor=pointer]
+        - button [ref=e720] [cursor=pointer]:
+          - img [ref=e721]
+      - generic [ref=e723]:
+        - button "Wolf" [ref=e724] [cursor=pointer]:
+          - img "Wolf" [ref=e725]
+        - button "Leopard" [ref=e726] [cursor=pointer]:
+          - img "Leopard" [ref=e727]
+        - button "Tiger" [ref=e728] [cursor=pointer]:
+          - img "Tiger" [ref=e729]
+        - button "Lion" [ref=e730] [cursor=pointer]:
+          - img "Lion" [ref=e731]
+        - button "Wolf" [ref=e732] [cursor=pointer]:
+          - img "Wolf" [ref=e733]
+        - button "Just a Bird" [ref=e734] [cursor=pointer]:
+          - img "Just a Bird" [ref=e735]
+        - button "Misty Mountains" [ref=e736] [cursor=pointer]:
+          - img "Misty Mountains" [ref=e737]
+        - button "Duomo" [ref=e738] [cursor=pointer]:
+          - img "Duomo" [ref=e739]
+        - button "Jaipur" [ref=e740] [cursor=pointer]:
+          - img "Jaipur" [ref=e741]
+        - button "Temple" [ref=e742] [cursor=pointer]:
+          - img "Temple" [ref=e743]
+  - alert [ref=e14]

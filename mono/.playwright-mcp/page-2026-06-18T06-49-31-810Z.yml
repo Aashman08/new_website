@@ -1,0 +1,135 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e203]:
+    - menubar [ref=e206]:
+      - menuitem "ABOUT ME" [ref=e207] [cursor=pointer]
+      - menuitem "CONTACT" [ref=e208] [cursor=pointer]
+      - menuitem "RESEARCH" [ref=e209] [cursor=pointer]
+      - menuitem "ART" [ref=e210] [cursor=pointer]
+    - generic [ref=e211]:
+      - button "Close" [ref=e212] [cursor=pointer]:
+        - img [ref=e213]
+        - generic [ref=e216]: Close
+      - heading "Projects" [level=2] [ref=e218]
+      - generic [ref=e219]:
+        - generic [ref=e221] [cursor=pointer]:
+          - img "QuantumViz" [ref=e227]
+          - generic [ref=e229]:
+            - img [ref=e230]
+            - generic [ref=e233]: QuantumViz
+            - generic [ref=e234]: AI-powered quantum circuit generator using natural language and 3D visualization
+        - generic [ref=e236] [cursor=pointer]:
+          - img "Generative AI for Code & Data" [ref=e242]
+          - generic [ref=e244]:
+            - img [ref=e245]
+            - generic [ref=e249]: Generative AI for Code & Data
+            - generic [ref=e250]: GPT-powered coding assistant and natural language data analysis platform at Deloitte
+        - generic [ref=e252] [cursor=pointer]:
+          - img "AI for SMB Acquisitions" [ref=e258]
+          - generic [ref=e260]:
+            - img [ref=e261]
+            - generic [ref=e265]: AI for SMB Acquisitions
+            - generic [ref=e266]: Founding Engineer at an AI startup streamlining business acquisitions
+        - generic [ref=e268] [cursor=pointer]:
+          - img "Drone-Mounted IR System for Vegetation Monitoring" [ref=e274]
+          - generic [ref=e276]:
+            - img [ref=e277]
+            - generic [ref=e287]: Drone-Mounted IR System for Vegetation Monitoring
+            - generic [ref=e288]: Enhancing environmental monitoring using drone technology
+        - generic [ref=e290] [cursor=pointer]:
+          - img "Satellite-Based Fire Detection" [ref=e296]
+          - generic [ref=e298]:
+            - img [ref=e299]
+            - generic [ref=e306]: Satellite-Based Fire Detection
+            - generic [ref=e307]: Visualizing fire, water, and land cover using Copernicus data from ESA
+        - generic [ref=e309] [cursor=pointer]:
+          - img "Lattice Boltzmann Fluid Simulation" [ref=e315]
+          - generic [ref=e317]:
+            - img [ref=e318]
+            - generic [ref=e320]: Lattice Boltzmann Fluid Simulation
+            - generic [ref=e321]: Computational fluid dynamics simulation of flow past a cylinder using the LBM method
+      - heading "Skills" [level=2] [ref=e323]
+      - generic [ref=e324]:
+        - generic [ref=e325]: LANGUAGES
+        - generic [ref=e327]:
+          - link [ref=e328] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e333]
+          - link [ref=e337] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e342]
+          - link [ref=e344] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e349]
+          - link [ref=e351] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e356]
+          - link [ref=e358] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e363]
+          - link [ref=e365] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e370]
+          - link [ref=e372] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e377]
+          - link [ref=e379] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e384]
+      - generic [ref=e386]:
+        - generic [ref=e387]: BACKEND & INFRASTRUCTURE
+        - generic [ref=e389]:
+          - link [ref=e390] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e395]
+          - link [ref=e397] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e402]
+          - link [ref=e404] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e409]
+          - link [ref=e411] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e416]
+          - link "LangChain" [ref=e418] [cursor=pointer]:
+            - /url: "#"
+            - img "LangChain" [ref=e423]
+          - link [ref=e425] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e430]
+          - link [ref=e432] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e437]
+          - link [ref=e439] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e444]
+          - link [ref=e453] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e458]
+          - link [ref=e460] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e465]
+      - generic [ref=e467]:
+        - generic [ref=e468]: ML & LLM TOOLING
+        - generic [ref=e470]:
+          - link [ref=e471] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e476]
+          - link [ref=e478] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e483]
+          - link [ref=e485] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e490]
+          - link [ref=e492] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e497]
+          - link [ref=e499] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e504]
+          - link [ref=e506] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e511]
+          - link [ref=e513] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e518]
+  - alert [ref=e14]

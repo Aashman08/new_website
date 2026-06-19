@@ -1,0 +1,12 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - heading "AASHMAN RASTOGI" [level=1] [ref=e5]
+      - paragraph [ref=e6]: ENTREPRENEURSHIP, AI AND SPACE
+    - menubar [ref=e8]:
+      - menuitem "ABOUT ME" [ref=e9] [cursor=pointer]
+      - menuitem "PROJECTS" [ref=e10] [cursor=pointer]
+      - menuitem "CONTACT" [ref=e11] [cursor=pointer]
+      - menuitem "RESEARCH" [ref=e12] [cursor=pointer]
+      - menuitem "ART" [ref=e13] [cursor=pointer]
+  - alert [ref=e14]

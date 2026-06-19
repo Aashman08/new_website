@@ -1,0 +1,4 @@
+[     201ms] [WARNING] <link rel=preload> uses an unsupported `as` value @ http://localhost:3000/projects/quantumviz:0
+[     297ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/css/app/layout.css?v=1781765491982:0
+[     331ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/chunks/main-app.js?v=1781765491982:0
+[     332ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/chunks/app-pages-internals.js:0

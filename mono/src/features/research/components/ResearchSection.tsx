@@ -1,45 +1,23 @@
 "use client"
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { X, ArrowRight } from "lucide-react";
-import MainMenubar from "@/components/layout/MainMenubar";
+import { SectionModal } from "@/components/layout/SectionModal";
+import { SECTIONS } from "@/config";
 import { researchProjects } from "../data/researchData";
 import type { SectionProps } from "@/types";
 
 const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      if (modalRef.current) {
-        modalRef.current.scrollTop = 0;
-      }
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  const MenuTitles = ["ABOUT ME", "PROJECTS", "CONTACT", "ART"];
-
-  if (!isOpen) return null;
-
   return (
-    <div
-      ref={modalRef}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black font-sans"
+    <SectionModal
+      section={SECTIONS.RESEARCH}
+      isOpen={isOpen}
+      onMenuItemClick={onMenuItemClick}
+      className="bg-black"
     >
-      {/* Fixed Menubar at Top */}
-      <div className="fixed top-6 sm:top-8 left-0 right-0 z-[60] px-4 flex justify-center">
-        <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
-      </div>
-
       {/* Close Button */}
       <motion.button
         initial={{ opacity: 0, y: -20 }}
@@ -61,8 +39,8 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
           priority
         />
         {/* Gradient overlays for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/5 to-black/72" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_32%,rgba(251,146,60,0.18),transparent_34%),linear-gradient(90deg,rgba(0,0,0,0.28),transparent,rgba(0,0,0,0.28))]" />
         
         {/* Title */}
         <motion.div
@@ -119,8 +97,8 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
                     <div 
                       className="absolute top-0 left-8 right-8 h-[1px] rounded-full z-10 transition-all duration-300"
                       style={{
-                        background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0.4) 70%, transparent 100%)",
-                        boxShadow: "0 0 8px rgba(255,255,255,0.2), 0 0 15px rgba(255,255,255,0.1)",
+                        background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.28) 30%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.28) 70%, transparent 100%)",
+                        boxShadow: "0 0 8px rgba(255,255,255,0.12), 0 0 15px rgba(255,255,255,0.06)",
                       }}
                     />
                     
@@ -133,7 +111,7 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
                         className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                       />
                       {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/48 to-transparent" />
                     </div>
                     
                     {/* Content */}
@@ -176,7 +154,7 @@ const ResearchSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
         </div>
 
       </div>
-    </div>
+    </SectionModal>
   );
 };
 

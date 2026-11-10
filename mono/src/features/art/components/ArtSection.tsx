@@ -1,31 +1,16 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import MainMenubar from "@/components/layout/MainMenubar";
-import { Button } from "@/components/ui/button";
+import { SectionModal, SectionPanel, SectionTitle } from "@/components/layout/SectionModal";
+import { SECTIONS } from "@/config";
 import { motion, AnimatePresence } from "framer-motion";
 import { artworks } from "../data/artData";
 import type { SectionProps } from "@/types";
 
 const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      if (modalRef.current) {
-        modalRef.current.scrollTop = 0;
-      }
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -43,8 +28,6 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const MenuTitles = ["ABOUT ME", "PROJECTS", "CONTACT", "RESEARCH"];
-
   const goToPrevious = () => {
     setCurrentIndex((prev) => (prev === 0 ? artworks.length - 1 : prev - 1));
   };
@@ -53,51 +36,19 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
     setCurrentIndex((prev) => (prev === artworks.length - 1 ? 0 : prev + 1));
   };
 
-  if (!isOpen) return null;
-
   const currentArt = artworks[currentIndex];
 
   return (
-    <div
-      ref={modalRef}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 font-sans"
-    >
-      {/* Fixed Menubar at Top */}
-      <div className="fixed top-6 sm:top-8 left-0 right-0 z-[60] px-4 flex justify-center">
-        <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
-      </div>
-
-      {/* Modal content container */}
-      <div className="relative w-full max-w-6xl mx-auto mt-20 sm:mt-24 md:mt-28 mb-6 md:mb-10 p-4 sm:p-6 md:p-10 bg-black text-white rounded-lg shadow-lg min-h-[80vh]">
-        {/* Close Button */}
-        <Button
-          onClick={onClose}
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white hover:bg-white/10"
-        >
-          <X className="h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="sr-only">Close</span>
-        </Button>
-
-        {/* Title */}
-        <div className="flex flex-col items-center pt-2 justify-center mb-6 sm:mb-8 md:mb-10">
-          <motion.h2 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl sm:text-3xl md:text-5xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase"
-          >
-            Art
-          </motion.h2>
-        </div>
+    <SectionModal section={SECTIONS.ART} isOpen={isOpen} onMenuItemClick={onMenuItemClick}>
+      <SectionPanel onClose={onClose} className="min-h-[80vh]">
+        <SectionTitle>Art</SectionTitle>
 
         {/* Gallery */}
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 py-6 lg:py-10">
           {/* Navigation - Left */}
           <button
             onClick={goToPrevious}
-            className="hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+            className="hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-white/[0.04] hover:bg-cyan-100/10 border border-white/10 hover:border-cyan-100/25 transition-all"
           >
             <ChevronLeft className="w-6 h-6 text-white" />
           </button>
@@ -111,7 +62,7 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
-                className="relative aspect-[4/5] lg:aspect-[3/4] w-full overflow-hidden rounded-lg"
+                className="relative aspect-[4/5] lg:aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 bg-black/30 shadow-[0_20px_80px_rgba(0,0,0,0.35)]"
               >
                 <Image
                   src={currentArt.image}
@@ -181,7 +132,7 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
           {/* Navigation - Right */}
           <button
             onClick={goToNext}
-            className="hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+            className="hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-white/[0.04] hover:bg-cyan-100/10 border border-white/10 hover:border-cyan-100/25 transition-all"
           >
             <ChevronRight className="w-6 h-6 text-white" />
           </button>
@@ -208,8 +159,8 @@ const ArtSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }
             </button>
           ))}
         </div>
-      </div>
-    </div>
+      </SectionPanel>
+    </SectionModal>
   );
 };
 

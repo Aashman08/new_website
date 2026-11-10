@@ -1,74 +1,27 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
-import { motion } from "framer-motion";
+import React, { useRef } from 'react';
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import MainMenubar from "@/components/layout/MainMenubar";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { SectionModal, SectionPanel, SectionTitle } from "@/components/layout/SectionModal";
+import { SECTIONS } from "@/config";
 import { CareerTimeline } from "@/features/timeline";
 import { EducationTimeline } from "@/features/education";
 import type { SectionProps } from "@/types";
 
-interface AboutSectionProps extends SectionProps {
-    onMenuItemClick: (title: string) => void; 
-}
-
-const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItemClick }) => {
+const AboutSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }) => {
     const modalRef = useRef<HTMLDivElement>(null);
   
-    useEffect(() => {
-      if (isOpen) {
-        document.body.style.overflow = 'hidden';
-        if (modalRef.current) {
-          modalRef.current.scrollTop = 0;
-        }
-      } else {
-        document.body.style.overflow = '';
-      }
-      return () => {
-        document.body.style.overflow = '';
-      };
-    }, [isOpen]);
-  
-    const MenuTitles = ["PROJECTS", "CONTACT", "RESEARCH", "ART"];
-  
-    if (!isOpen) return null;
-  
     return (
-      <div
+      <SectionModal
         ref={modalRef}
-        className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-70 font-sans"
+        section={SECTIONS.ABOUT}
+        isOpen={isOpen}
+        onMenuItemClick={onMenuItemClick}
+        className="bg-black/70"
       >
-        {/* Fixed Menubar at Top */}
-        <div className="fixed top-6 sm:top-8 left-0 right-0 z-[60] px-4 flex justify-center">
-          <MainMenubar titles={MenuTitles} onItemClick={onMenuItemClick} />
-        </div>
-
-        <div className="relative w-full max-w-6xl mx-auto mt-20 sm:mt-24 md:mt-28 mb-6 md:mb-10 p-4 sm:p-6 md:p-10 bg-black text-white rounded-lg shadow-lg">
-          {/* Close Button */}
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white hover:bg-white/10"
-          >
-            <X className="h-5 w-5 sm:h-6 sm:w-6" />
-            <span className="sr-only">Close</span>
-          </Button>
-
-          {/* Title */}
-          <div className="flex flex-col items-center pt-2 justify-center mb-6 sm:mb-8 md:mb-10">
-            <motion.h2 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-2xl sm:text-3xl md:text-5xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase"
-            >
-              About Me
-            </motion.h2>
-          </div>
+        <SectionPanel onClose={onClose}>
+          <SectionTitle>About Me</SectionTitle>
 
           {/* Profile Picture */}
           <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 mb-4 sm:mb-6">
@@ -83,7 +36,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
               <p className="text-lg sm:text-xl md:text-4xl mb-3 sm:mb-4 text-white dark:text-white max-w-5xl text-justify">
               Hi, I&apos;m Aashman
               </p>
-              <div className="w-full border-b border-white mb-3 sm:mb-4 mx-auto"></div>
+              <div className="w-full border-b border-cyan-100/25 mb-3 sm:mb-4 mx-auto"></div>
               <p className="w-full text-neutral-300 dark:text-neutral-300 text-sm sm:text-base md:text-lg text-justify mt-4 sm:mt-6">
               I&apos;m an <i><b>AI Engineer</b></i> at{" "}
               <i><b>
@@ -155,9 +108,9 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isOpen, onClose, onMenuItem
           </div>
 
         <br /> 
-    </div>
-    </div>
-);
+        </SectionPanel>
+      </SectionModal>
+    );
 };
 
 export default AboutSection;

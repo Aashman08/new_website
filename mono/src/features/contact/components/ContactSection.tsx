@@ -1,33 +1,13 @@
 "use client"
 
-import React, { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import React from "react";
 import Image from "next/image";
-import { X } from "lucide-react";
 import { IconBrandLinkedin, IconBrandInstagram, IconBrandGithub } from "@tabler/icons-react";
-import MainMenubar from "@/components/layout/MainMenubar";
-import { Button } from "@/components/ui/button";
+import { SectionModal, SectionPanel, SectionTitle } from "@/components/layout/SectionModal";
+import { SECTIONS } from "@/config";
 import type { SectionProps } from "@/types";
 
 const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      if (modalRef.current) {
-        modalRef.current.scrollTop = 0;
-      }
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  const MenuTitles = ["ABOUT ME", "PROJECTS", "RESEARCH", "ART"];
-
   const socialLinks = [
     {
       href: "https://www.linkedin.com/in/aashman-rastogi-7b76a1189/",
@@ -49,41 +29,10 @@ const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCli
     }
   ];
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      ref={modalRef}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 font-sans"
-    >
-      {/* Fixed Menubar at Top */}
-      <div className="fixed top-6 sm:top-8 left-0 right-0 z-[60] px-4 flex justify-center">
-        <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
-      </div>
-
-      <div className="relative w-full max-w-4xl mx-auto mt-20 sm:mt-24 md:mt-28 mb-6 md:mb-10 px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-10 bg-black text-white rounded-lg shadow-lg">
-        {/* Close Button */}
-        <Button
-          onClick={onClose}
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white hover:bg-white/10"
-        >
-          <X className="h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="sr-only">Close</span>
-        </Button>
-
-        {/* Title */}
-        <div className="flex flex-col items-center pt-2 justify-center mb-6 sm:mb-8 md:mb-10">
-          <motion.h2 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl sm:text-3xl md:text-5xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase"
-          >
-            Contact
-          </motion.h2>
-        </div>
+    <SectionModal section={SECTIONS.CONTACT} isOpen={isOpen} onMenuItemClick={onMenuItemClick}>
+      <SectionPanel onClose={onClose} className="max-w-4xl py-6 sm:py-8 md:py-10">
+        <SectionTitle>Contact</SectionTitle>
 
         {/* Moon Image */}
         <div className="flex justify-center mb-8 sm:mb-10 md:mb-12">
@@ -92,7 +41,7 @@ const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCli
             alt="Moon phases"
             width={700}
             height={200}
-            className="rounded-lg w-full max-w-[700px] h-auto"
+            className="rounded-2xl w-full max-w-[700px] h-auto border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.35)]"
           />
         </div>
 
@@ -130,16 +79,15 @@ const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCli
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-2.5 sm:p-3 rounded-full border border-white/20 ${social.color} hover:border-white/40 hover:scale-110 transition-all duration-300`}
+              className={`p-2.5 sm:p-3 rounded-full border border-white/15 bg-white/[0.03] ${social.color} hover:border-cyan-100/30 hover:bg-cyan-100/10 hover:scale-110 transition-all duration-300`}
               aria-label={social.label}
             >
               <social.icon size={20} className="sm:w-6 sm:h-6" />
             </a>
           ))}
         </div>
-
-      </div>
-    </div>
+      </SectionPanel>
+    </SectionModal>
   );
 };
 

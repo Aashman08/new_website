@@ -99,7 +99,7 @@ html.done #after{display:block}
 .eyebrow{color:var(--amber);display:flex;gap:14px;align-items:center}
 .eyebrow::before{content:"";width:34px;height:1px;background:var(--amber)}
 
-#s-hero{flex-direction:column;justify-content:flex-start;padding-top:30px!important;background:linear-gradient(180deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,.3) 14%,rgba(0,0,0,0) 30%)}
+#s-hero{flex-direction:column;justify-content:flex-start;padding-top:30px!important;background:radial-gradient(ellipse 52% 34% at 0% 0%,rgba(0,0,0,.62) 0%,rgba(0,0,0,.3) 45%,rgba(0,0,0,0) 72%)}
 #s-hero .row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-right:clamp(0px,12vw,170px)}
 #s-hero p{margin:14px 0 0;max-width:34ch;font-family:var(--display);font-weight:600;font-size:clamp(17px,1.7vw,24px);line-height:1.25;letter-spacing:-.01em}
 .scrollhint{display:flex;align-items:center;gap:12px;color:var(--dim);white-space:nowrap}
@@ -438,7 +438,8 @@ function boot() {
 
   const GAL = /* glsl */`
     uniform float uW, uPat, uArms;
-    float omega(float r){ return uW/pow(r+0.16,1.5)*mix(1.0,0.38,smoothstep(0.28,1.0,r)); }                 // near-Keplerian: the inner disk whips round, the outer layers turn slowly
+    float gRing=1.0;                                                  // set to 0 while shading the central swell, so it keeps its own speed
+    float omega(float r){ return uW/pow(r+0.16,1.5)*mix(1.0,0.38,smoothstep(0.28,1.0,r))*(1.0+0.8*gRing*smoothstep(0.10,0.20,r)*(1.0-smoothstep(0.30,0.44,r))); }   // +80% in the flat ring from the edge of the white out into the gold                 // near-Keplerian: the inner disk whips round, the outer layers turn slowly
     float armPhase(float r,float th){ return th - uPat - 3.3*log(r+0.05); }
     float armF(float r,float th){ float c=0.5+0.5*cos(2.0*armPhase(r,th)); return c*c*smoothstep(0.10,0.26,r); }
     float laneF(float r,float th){ float c=0.5+0.5*cos(2.0*(armPhase(r,th)+0.62)); return pow(c,5.0)*smoothstep(0.12,0.3,r); }
@@ -457,7 +458,7 @@ function boot() {
   const volU = {
     uN: { value: noiseTex }, uCam: { value: new THREE.Vector3() }, uRot: { value: new THREE.Matrix3() },
     uTan: { value: 0.3 }, uAspect: { value: 1 }, uGT: { value: 0 }, uT: { value: 0 }, uW: { value: 0.09 }, uPat: { value: 0 },
-    uArms: { value: 0.4 }, uBlue: { value: 0 }, uGain: { value: 1 }, uHaze: { value: 1 }, uSteps: { value: STEPS },
+    uArms: { value: 0.4 }, uBlue: { value: 0 }, uGain: { value: 1 }, uHaze: { value: 1 }, uSteps: { value: STEPS }, uSwell: { value: Q.get('noswell') === '1' ? 0 : 1 },
   };
   const volMat = new THREE.ShaderMaterial({
     uniforms: volU, depthTest: false, depthWrite: false,
@@ -465,7 +466,7 @@ function boot() {
     fragmentShader: /* glsl */`
       precision highp float; precision highp sampler3D;
       #define STEPS 30
-      uniform sampler3D uN; uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uGT,uT,uBlue,uGain,uHaze,uSteps;
+      uniform sampler3D uN; uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uGT,uT,uBlue,uGain,uHaze,uSteps,uSwell;
       varying vec2 vUv;
       ${GAL}
       vec4 tx(vec3 p){ vec3 c=p*32.0; vec3 i=floor(c), f=fract(c); f=f*f*(3.0-2.0*f); return texture(uN,(i+f+0.5)/32.0); }
@@ -481,12 +482,11 @@ function boot() {
         c=ramp(c, vec3(0.96,0.96,1.0), 0.06,0.16,r);                             // cooling through blue-white to white
         c=ramp(c, vec3(1.0,0.82,0.46), 0.13,0.27,r);                             // white into gold
         c=ramp(c, vec3(1.0,0.52,0.14), 0.23,0.46,r);                             // gold into deep orange
-        c=ramp(c, vec3(0.93,0.25,0.08), 0.42,0.64,r);                            // orange into red
-        c=ramp(c, vec3(0.74,0.13,0.13), 0.60,0.76,r);                            // red into deep crimson
-        c=ramp(c, vec3(0.52,0.10,0.13), 0.72,0.90,r);                            // the outer quarter leans toward magenta
-        c=ramp(c, vec3(0.28,0.13,0.50), 0.93,1.06,r);                            // then violet
-        c=ramp(c, vec3(0.16,0.13,0.50), 1.02,1.14,r);                            // and indigo at the very edge
-        return c*(1.0+0.6*smoothstep(0.62,1.0,r)); }                             // lift the faint outer gas a little so its colour reads
+        c=ramp(c, vec3(0.95,0.22,0.05), 0.42,0.64,r);                            // orange into red
+        c=ramp(c, vec3(0.84,0.10,0.03), 0.60,0.78,r);                            // a full, saturated red through the outer disk
+        c=ramp(c, vec3(0.60,0.05,0.02), 0.76,0.96,r);                            // deepening to dark red at the rim
+        c=ramp(c, vec3(0.50,0.07,0.13), 1.00,1.14,r);                            // only the faintest hint of pink at the very last edge
+        return c*(1.0+0.35*smoothstep(0.62,1.0,r)); }                            // a small lift so the outer red reads without washing toward pink
       float ign(vec2 p){ return fract(52.9829189*fract(dot(p,vec2(0.06711056,0.00583715)))); }
       float wn(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
       // one phase of orbit-stretched gas: ridged filaments (x) and dust (y)
@@ -506,6 +506,7 @@ function boot() {
         float nw=sqrt(w1*w1+w2*w2);                                      // keep contrast through the cross-fade
         float g=(P1.x*w1+P2.x*w2-0.5)/nw+0.5;
         float d=(P1.y*w1+P2.y*w2-0.5)/nw+0.5;
+        { float cz=smoothstep(0.004,0.05,r); g=mix(0.62,g,cz); d=mix(0.45,d,cz); }       // the pattern dissolves at the very centre instead of pinching to a point
         float arm=armF(r,th), lane=laneF(r,th);
         float gas=smoothstep(0.40,0.72,g); gas=0.02+2.6*gas*gas;
         gas*=mix(1.0, 0.18+1.8*arm, uArms);
@@ -525,9 +526,10 @@ function boot() {
           float h=hgt(min(r0,1.25)); float vcam=ro.y/h;
           float vS=sy<0.0?min(VM,vcam):max(-VM,vcam); float vE=sy<0.0?-VM:VM;
           if((vE-vS)*sy>0.0){
-            float dv=(vE-vS)/uSteps; float fr=floor(mod(uT*60.0,64.0)); float v=vS+dv*fract(ign(gl_FragCoord.xy+5.588238*fr)+0.45*wn(gl_FragCoord.xy+fr*17.0));   // per-frame jitter: even coverage without a visible hatch
+            float dv=(vE-vS)/uSteps; float fr=floor(mod(uT*60.0,64.0)); float v=vS+dv*wn(gl_FragCoord.xy+fr*17.3);   // per-frame jitter: even coverage without a visible hatch
             float ds=abs(dv)*hgt(min(r0,1.25))/ay;                          // spacing between samples along the ray
             float sfine=smoothstep(0.022,0.004,ds); float sfade=smoothstep(0.12,0.035,ds);
+            vec2 fHold=vec2(0.0); bool fHave=false;
             if(sfade>0.004) for(int i=0;i<STEPS;i++){
               if(float(i)>=uSteps) break;
               float t=(v*h-ro.y)/ry;
@@ -536,7 +538,8 @@ function boot() {
                 if(r<RMX){
                   float g=exp(-v*v); float th=atan(p.z,p.x);
                   float fine=sfine*(1.0-0.8*smoothstep(1.2,2.6,t)*uHaze);
-                  vec2 f=field(p,r,th,v,fine);
+                  if(!fHave||(i-(i/2)*2)==0){ fHold=field(p,r,th,v,fine); fHave=true; }      // evaluated every other step, held in between
+                  vec2 f=fHold;
                   float prof=smoothstep(1.10,0.80,r);
                   float dens=f.x*g*prof;
                   float dust=f.y*exp(-v*v*4.0)*prof*smoothstep(0.06,0.18,r);
@@ -548,7 +551,7 @@ function boot() {
                   float young=aw*smoothstep(2.2,4.2,f.x);                                                      // young blue-white clusters in the densest gas
                   tc3=mix(tc3, vec3(0.56,0.72,1.0), 0.22*young);
                   float inten=1.0/(pow(r,1.55)*12.0+0.05); inten*=1.0+0.35*knot+0.08*young;
-                  { float cu=1.0-uBlue; vec3 cc=closeC(r); cc=mix(cc, vec3(0.12,0.72,0.82)*2.2, 0.20*smoothstep(0.50,0.80,f.y)*smoothstep(0.78,1.0,r));   // a few teal wisps in the outer gas
+                  { float cu=1.0-uBlue; vec3 cc=closeC(r); cc=mix(cc, vec3(0.12,0.72,0.82)*2.2, 0.05*smoothstep(0.50,0.80,f.y)*smoothstep(0.78,1.0,r));   // a few teal wisps in the outer gas
                     tc3=mix(tc3, cc, cu); inten*=1.0-0.62*cu*(1.0-smoothstep(0.03,0.18,r)); }   // ease the inner gas off pure white so its blue survives
                   float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=(1.0-uBlue)*0.75;
                   inten*=mix(1.0,dop*dop*dop,beam); tc3=mix(tc3, tc3*vec3(0.84,0.97,1.22), clamp((dop-1.0)*1.6,0.0,1.0)*beam);
@@ -565,27 +568,30 @@ function boot() {
         }
         // Central swell (opening disk only): a low dome of fast inner gas over the core, so the middle has height.
         // The gas inside it turns with the inner disk and leans upward as it goes, so some of it travels over the centre, not only around it.
-        float cuB=1.0-uBlue;
+        float cuB=(1.0-uBlue)*uSwell;
         if(cuB>0.01){
-          const float BA=0.24; const float BC=0.072; float sc=BA/BC;
+          const float BA=0.40; const float BC=0.080; const float HB=0.044; float sc=BA/BC;   // BA, BC: outer bounds only · HB: height of the swell at the centre
           vec3 ro2=vec3(ro.x,ro.y*sc,ro.z), rd2=vec3(rd.x,rd.y*sc,rd.z);
           float qa=dot(rd2,rd2), qb=dot(ro2,rd2), qc=dot(ro2,ro2)-BA*BA; float disc=qb*qb-qa*qc;
           if(disc>0.0){
             float sq=sqrt(disc); float t0=max((-qb-sq)/qa,0.0), t1=(-qb+sq)/qa;
             if(t1>t0){
-              vec3 colB=vec3(0.0); float TrB=1.0; float dtb=(t1-t0)/8.0;
-              float tt=t0+dtb*fract(ign(gl_FragCoord.xy+5.588238*floor(mod(uT*60.0,64.0)))+0.37);
-              for(int i=0;i<8;i++){
+              gRing=0.0;
+              // The swell is a smooth glow with no pattern of its own: any pattern here has no variation with height, so it shows as vertical threads.
+              // The streaks you see through it are the disk's own, lying flat in the plane beneath.
+              vec3 colB=vec3(0.0); float TrB=1.0; float dtb=(t1-t0)/6.0;
+              float tt=t0+dtb*0.5;
+              for(int i=0;i<6;i++){
                 vec3 p=ro+rd*tt; float r=length(p.xz); float m2=(r*r)/(BA*BA)+(p.y*p.y)/(BC*BC);
                 if(m2<1.0){
-                  float fall=1.0-m2; fall*=fall;
-                  float th=atan(p.z,p.x)+1.1*p.y/BC;                              // structure leans with height: gas arcing up and over
-                  vec2 f=field(p,max(r,0.02),th,p.y/0.014,1.0);
-                  float gs=clamp(f.x/2.6,0.0,1.0); float dens=fall*(0.06+0.94*smoothstep(0.10,0.62,gs))*cuB;
-                  float re=BA*sqrt(m2); vec3 cc=closeC(0.09+re*0.75);                    // white-hot at its heart, cooling to gold toward its skin
+                  // a gradual rise rather than a ball: the height of the gas tapers smoothly with distance from the centre and merges into the flat disk
+                  float hl=HB*(0.26+0.74*exp(-r*r/0.040));
+                  float fall=exp(-(p.y*p.y)/(hl*hl)*1.5)*(1.0-smoothstep(0.50,1.0,r/BA))*(1.0-smoothstep(0.70,1.0,m2));
+                  float dens=fall*0.40*cuB;
+                  float re=sqrt(r*r+p.y*p.y*9.0); vec3 cc=closeC(0.09+re*0.75);                    // white-hot at its heart, cooling to gold toward its skin
                   float inten=1.0/(pow(re,1.55)*12.0+0.05); inten*=1.0-0.45*(1.0-smoothstep(0.03,0.18,re));
-                  colB+=TrB*cc*inten*dens*dtb*10.0*(1.0-0.75*clamp(f.y,0.0,1.0));
-                  TrB*=exp(-(dens*7.0+clamp(f.y,0.0,1.0)*fall*16.0)*dtb);
+                  colB+=TrB*cc*inten*dens*dtb*7.0;
+                  TrB*=exp(-dens*3.0*dtb);
                 }
                 tt+=dtb;
               }
@@ -617,7 +623,7 @@ function boot() {
   // the far-off galaxy costs far less per pixel than the close-up, so it gets more resolution: some while the camera is still moving, more once it has come to rest
   let wideOn = 0, moveMul = 1, restMul = 1, accFresh = true, gasTick = 0;      // wideOn: 0 opening (still) · 3 dive (moving, close) · 1 pull-back (moving, wide) · 2 settled (still)
   const accRT = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
-  const sizeVol = () => { const k = Math.min(1, wideOn === 2 || wideOn === 0 ? restMul : (wideOn === 1 ? K_WIDE : K_DIVE) * moveMul); sharpU.value = wideOn === 2 ? 0.3 : wideOn === 0 ? 0.35 : 0.75; texelU.value.set(1 / Math.max(2, Math.round(innerWidth * DPR * k)), 1 / Math.max(2, Math.round(innerHeight * DPR * k)));
+  const sizeVol = () => { const k = Math.min(1, wideOn === 2 || wideOn === 0 ? restMul : (wideOn === 1 ? K_WIDE : K_DIVE) * moveMul); sharpU.value = wideOn === 2 ? 0.3 : wideOn === 0 ? 0.35 : 0.4; texelU.value.set(1 / Math.max(2, Math.round(innerWidth * DPR * k)), 1 / Math.max(2, Math.round(innerHeight * DPR * k)));
     accRT.setSize(Math.max(2, Math.round(innerWidth * DPR * k)), Math.max(2, Math.round(innerHeight * DPR * k))); accFresh = true; volRT.setSize(Math.max(2, Math.round(innerWidth * DPR * k)), Math.max(2, Math.round(innerHeight * DPR * k))); };
   const sharpU = { value: 0.3 }, texelU = { value: new THREE.Vector2(1, 1) };
   const accU = { tGas: { value: volRT.texture }, uA: { value: 1 } };
@@ -630,7 +636,14 @@ function boot() {
       vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
       // unsharp mask on the way to the screen: restores edge contrast in the gas, clamped so it cannot ring
       fragmentShader: `uniform sampler2D tGas; uniform float uSharp; uniform vec2 uTexel; varying vec2 vUv;
-        void main(){ vec3 c=texture2D(tGas,vUv).rgb;
+        vec3 cr(vec2 uv){ vec2 ts=1.0/uTexel; vec2 sp=uv*ts; vec2 tc=floor(sp-0.5)+0.5; vec2 f=sp-tc;
+          vec2 w0=f*(-0.5+f*(1.0-0.5*f)), w1=1.0+f*f*(-2.5+1.5*f), w2=f*(0.5+f*(2.0-1.5*f)), w3=f*f*(-0.5+0.5*f);
+          vec2 w12=w1+w2; vec2 t0=(tc-1.0)*uTexel, t3=(tc+2.0)*uTexel, t12=(tc+w2/w12)*uTexel;
+          vec3 r=texture2D(tGas,vec2(t0.x,t0.y)).rgb*w0.x*w0.y+texture2D(tGas,vec2(t12.x,t0.y)).rgb*w12.x*w0.y+texture2D(tGas,vec2(t3.x,t0.y)).rgb*w3.x*w0.y
+                +texture2D(tGas,vec2(t0.x,t12.y)).rgb*w0.x*w12.y+texture2D(tGas,vec2(t12.x,t12.y)).rgb*w12.x*w12.y+texture2D(tGas,vec2(t3.x,t12.y)).rgb*w3.x*w12.y
+                +texture2D(tGas,vec2(t0.x,t3.y)).rgb*w0.x*w3.y+texture2D(tGas,vec2(t12.x,t3.y)).rgb*w12.x*w3.y+texture2D(tGas,vec2(t3.x,t3.y)).rgb*w3.x*w3.y;
+          return max(r,0.0); }
+        void main(){ vec3 c=cr(vUv);
           vec3 n=texture2D(tGas,vUv+vec2(uTexel.x,0.0)).rgb, s=texture2D(tGas,vUv-vec2(uTexel.x,0.0)).rgb, e=texture2D(tGas,vUv+vec2(0.0,uTexel.y)).rgb, w=texture2D(tGas,vUv-vec2(0.0,uTexel.y)).rgb;
           vec3 lo=min(c,min(min(n,s),min(e,w))), hi=max(c,max(max(n,s),max(e,w)));
           vec3 o=c+(c-(n+s+e+w)*0.25)*uSharp; gl_FragColor=vec4(clamp(o,lo*0.6,hi*1.25),1.0); }` });
@@ -730,20 +743,20 @@ function boot() {
     for (let i = 0; i < n; i++) {
       const u = Math.random() * 2 - 1, t = Math.random() * 6.2831853, s = Math.sqrt(1 - u * u);
       pos.set([s * Math.cos(t) * rad, u * rad, s * Math.sin(t) * rad], i * 3);
-      a.set([Math.pow(Math.random(), 7) * 2.2 + 1.0, Math.random()], i * 2);
+      a.set([Math.pow(Math.random(), 4.5) * 2.4 + 1.15, Math.random()], i * 2);
     }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(a, 2));
     const u = { uT: { value: 0 }, uGain: { value: 1 }, uDpr: { value: DPR } };
     const m = new THREE.ShaderMaterial({ uniforms: u, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
       vertexShader: `attribute vec2 aA; uniform float uT,uDpr; varying float vA; varying float vS;
-        void main(){ vS=aA.y; vA=(0.35+0.65*aA.y)*(0.8+0.2*sin(uT*(0.6+aA.y*2.0)+aA.y*80.0)); gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+        void main(){ vS=aA.y; vA=(0.5+0.5*aA.y)*(0.8+0.2*sin(uT*(0.6+aA.y*2.0)+aA.y*80.0)); gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
       fragmentShader: `uniform float uGain; varying float vA; varying float vS;
         ${GAL}
         void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f;
           gl_FragColor=vec4(starCol(fract(vS*7.3)),vA*f*uGain); }` });
     const p = new THREE.Points(g, m); p.frustumCulled = false; p.userData.u = u; return p;
   }
-  const gStars = makeStars(SMALL ? 2600 : 6000, 4000); gStars.renderOrder = -5; gScene.add(gStars);
+  const gStars = makeStars(SMALL ? 3200 : 8000, 4000); gStars.renderOrder = -5; gScene.add(gStars);
 
   /* ── post : restrained bloom → lens (anamorphic streak, halation, fringe, vignette) → filmic output ── */
   const rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, depthBuffer: false });   // no multisampling: the scene is a full-screen gas layer plus point stars, so it bought nothing and cost a lot at retina sizes
@@ -840,7 +853,7 @@ function boot() {
       look.addScaledVector(rt3, (pr ? 0.02 : 0.235) * fw * wT).addScaledVector(up3, (pr ? -0.215 : 0.035) * fh * wT); gCam.lookAt(look); }
     gCam.rotateZ(-0.085 * (1 - sst(0.05, 0.14, p)) + (pr ? 0.16 : 0.30) * wT);
     gCam.updateProjectionMatrix(); gCam.updateMatrixWorld(true);
-    gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = 0.95;
+    gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = mix(1.7, 1.15, kw);
     volU.uCam.value.copy(pos).multiplyScalar(1 / R); volU.uRot.value.setFromMatrix4(gCam.matrixWorld); volU.uTan.value = Math.tan(gCam.fov * Math.PI / 360);
     volU.uArms.value = spU.uArms.value = mix(0.42, 1, kw); volU.uBlue.value = kw; volU.uHaze.value = 1 - kw;
     { const w = kw > 0.5 ? (p >= 1 && glideT >= GLIDE ? 2 : 1) : (mode === 'idle' ? 0 : 3); if (w !== wideOn) { wideOn = w; sizeVol(); } }
@@ -869,7 +882,7 @@ function boot() {
     const rest = wideOn === 2; gasTick++;
     if (!rest || accFresh || (gasTick & 1) === 0) {
       renderer.setRenderTarget(volRT); renderer.render(volScene, gCam);
-      accU.uA.value = accFresh ? 1 : rest ? 0.16 : wideOn === 0 ? 0.5 : 1; accFresh = false;
+      accU.uA.value = accFresh ? 1 : rest ? 0.16 : wideOn === 0 ? 0.28 : 0.62; accFresh = false;
       const ac = renderer.autoClear; renderer.autoClear = false; renderer.setRenderTarget(accRT); renderer.render(accScene, gCam); renderer.autoClear = ac;
       renderer.setRenderTarget(null);
     }
@@ -886,7 +899,7 @@ function boot() {
     // hold the frame rate: if frames keep missing 60 fps, lower the gas layer's resolution a notch (stars and type stay sharp)
     warm += dt;
     if (warm > 3 && raw < 0.1) { ftE += (raw - ftE) * 0.12; const still = wideOn === 2 || wideOn === 0;
-      slow = ftE > (still ? 0.075 : 0.036) ? slow + raw : Math.max(0, slow - raw);              // only step in when the page is genuinely struggling
+      slow = ftE > (still ? 0.075 : 0.06) ? slow + raw : Math.max(0, slow - raw);              // only step in when the page is genuinely struggling
       if (slow > 0.5) { if (still) restMul = Math.max(0.5, restMul * 0.87); else moveMul = Math.max(0.6, moveMul * 0.9); sizeVol(); slow = 0; ftE = 0.0167; } }
     if (mode === 'playing') { advance(dt); if (prog >= 0.86) setMode('done'); }           // control passes as the frame settles; the move eases out underneath
     else if (mode === 'done' && prog < 1) advance(dt);

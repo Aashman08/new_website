@@ -658,13 +658,13 @@ function boot() {
   const ARC_T = arcL[ARC_N];
   const pAtArc = (L) => { let lo = 0, hi = ARC_N; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (arcL[m] < L) lo = m; else hi = m; } const d = arcL[hi] - arcL[lo]; return mix(arcP[lo], arcP[hi], d > 1e-6 ? (L - arcL[lo]) / d : 1); };
   const arcAtP = (pp) => { const f = clamp((pp - 0.05) / 0.95, 0, 1) * ARC_N, i = Math.min(ARC_N - 1, Math.floor(f)); return mix(arcL[i], arcL[i + 1], f - i); };
-  // Speed along the path, in three parts that blend into each other with no stop:
-  //   approach  — one steady speed all the way in to the centre (as it was originally)
-  //   exit      — a smooth step up to a faster speed through the light and out the far side
-  //   settle    — a single late ease-out into the final frame
-  const V_IN = 16, V_OUT = 90, CORE_ARC = 97, SLOW_FROM = 285;
-  const speedAt = (L) => { let v = V_IN * sst(-2, 5, L);                                          // gentle start from rest
-    v = mix(v, V_OUT, sst(CORE_ARC - 7, CORE_ARC + 36, L));                                          // pick up speed through the core
+  // Speed along the path: one continuous build and one release, with no stop in between.
+  //   approach — starts slowly at the outer disk and keeps gathering speed the closer it gets to the centre, like falling in
+  //   exit     — that same acceleration carries straight through the light and out the far side at full speed
+  //   settle   — a single late ease-out into the final frame
+  const V_START = 10, V_OUT = 90, CORE_ARC = 97, SLOW_FROM = 285;
+  const speedAt = (L) => { const f = Math.pow(clamp(L / (CORE_ARC + 36), 0, 1), 2.4);
+    let v = mix(V_START, V_OUT, f) * sst(-2, 5, L);                                                   // gentle start from rest
     const rem = clamp((ARC_T - L) / (ARC_T - SLOW_FROM), 0, 1); return v * Math.max(0.012, Math.pow(rem, 0.75)); };   // quartic ease-out, starting late
   let arcS = 0, progSeen = -1;
   const advance = (dt) => { if (prog !== progSeen) arcS = arcAtP(Math.max(prog, 0.05));              // position was set from outside (click, skip, test hook)

@@ -441,9 +441,12 @@ function boot() {
     uniform float uW, uPat, uArms;
     float gRing=1.0;                                                  // set to 0 while shading the central swell, so it keeps its own speed
     float omega(float r){ return uW/pow(r+0.16,1.5)*mix(1.0,0.38,smoothstep(0.28,1.0,r))*(1.0+0.8*gRing*smoothstep(0.10,0.20,r)*(1.0-smoothstep(0.30,0.44,r))); }   // +80% in the flat ring from the edge of the white out into the gold                 // near-Keplerian: the inner disk whips round, the outer layers turn slowly
-    float armPhase(float r,float th){ return th - uPat - 3.3*log(r+0.05); }
-    float armF(float r,float th){ float c=0.5+0.5*cos(2.0*armPhase(r,th)); return c*c*smoothstep(0.10,0.26,r); }
-    float laneF(float r,float th){ float c=0.5+0.5*cos(2.0*(armPhase(r,th)+0.62)); return pow(c,5.0)*smoothstep(0.12,0.3,r); }
+    float kMW(){ return clamp((uArms-0.42)/0.58,0.0,1.0); }           // 0 in the opening disk, 1 in the Milky Way
+    float armPhase(float r,float th){ float k=kMW(); return th - uPat - mix(3.3,2.25,k)*log(r+0.05) - 0.53*k; }   // Milky Way: looser arms that leave from the ends of the bar
+    float armF(float r,float th){ float k=kMW(); float c=0.5+0.5*cos(2.0*armPhase(r,th));
+      return mix(c*c*smoothstep(0.10,0.26,r), pow(c,1.7)*smoothstep(0.15,0.26,r), k); }
+    float laneF(float r,float th){ float k=kMW(); float ph=2.0*armPhase(r,th);
+      return mix(pow(0.5+0.5*cos(ph+1.24),5.0)*smoothstep(0.12,0.3,r), pow(0.5+0.5*cos(ph-0.95),16.0)*smoothstep(0.15,0.28,r), k); }   // Milky Way: a thin lane along the inner edge of each arm
     // star colour by temperature, coolest to hottest: red, orange, yellow, white, blue-white, blue
     vec3 starCol(float k){
       vec3 c=mix(vec3(1.0,0.42,0.26), vec3(1.0,0.64,0.36), smoothstep(0.00,0.24,k));
@@ -492,7 +495,8 @@ function boot() {
       float wn(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
       // Milky Way pattern (unchanged): orbit-stretched gas
       vec2 phase(vec3 c,float fine){
-        vec4 A=tx(c), B=tx(c*vec3(3.0,2.9,2.0)+0.31); vec4 C=vec4(0.5); if(fine>0.02) C=tx(c*vec3(9.0,8.3,4.0)+0.67);
+        // scaled so the clouds are about as wide as they are long (they were thin streaks along the orbit before)
+        vec4 A=tx(c*vec3(1.0,0.36,1.0)), B=tx(c*vec3(3.0,0.62,2.0)+0.31); vec4 C=vec4(0.5); if(fine>0.02) C=tx(c*vec3(9.0,1.85,4.0)+0.67);
         float f2=0.35+0.65*fine;
         float n=A.r*0.56+(B.g*0.30*f2+0.15*(1.0-f2))+C.b*0.14*fine+0.07*(1.0-fine);
         float rid=1.0-abs(2.0*(B.r*0.6*f2+0.3*(1.0-f2)+C.g*0.4*fine+0.2*(1.0-fine))-1.0);
@@ -510,7 +514,7 @@ function boot() {
         float n=A.r*0.54+B.r*0.34+mix(0.5,C.r,fine)*0.12;
         float rid=1.0-abs(2.0*(B.a*0.55+mix(0.5,C.a,fine)*0.45)-1.0);
         return vec3(n*0.86+rid*0.14, A.a*0.60+B.b*0.40, B.r-Bin); }
-      vec3 field(vec3 p,float r,float th,float v,float fine){
+      vec4 field(vec3 p,float r,float th,float v,float fine){
         float om=omega(r); const float T=18.0;
         float f1=fract(uGT/T), f2=fract(uGT/T+0.5);
         float w1=1.0-abs(2.0*f1-1.0), w2=1.0-w1;
@@ -518,14 +522,15 @@ function boot() {
         float yy=v*0.045; float nw=sqrt(w1*w1+w2*w2);                      // keep contrast through the cross-fade
         float kc=1.0-uBlue; float g=0.5, d=0.5, rel=0.0;
         if(kc<0.98){ float rr=pow(r,0.72)*2.0;
-          vec2 P1=phase(vec3(a1,rr,yy),fine), P2=phase(vec3(a2,rr+0.43,yy+0.2),fine);
+          float fM=max(fine,0.6*uBlue);                                    // Milky Way: keep the finest detail even from far away
+          vec2 P1=phase(vec3(a1,rr,yy),fM), P2=phase(vec3(a2,rr+0.43,yy+0.2),fM);
           g=(P1.x*w1+P2.x*w2-0.5)/nw+0.5; d=(P1.y*w1+P2.y*w2-0.5)/nw+0.5; }
         if(kc>0.02){ float lr=log(r+0.03);
           vec3 Q1=phaseT(a1,lr,yy,fine), Q2=phaseT(a2,lr,yy+0.37,fine);
           float gT=(Q1.x*w1+Q2.x*w2-0.5)/nw+0.5, dT=(Q1.y*w1+Q2.y*w2-0.5)/nw+0.5;
           g=mix(g,gT,kc); d=mix(d,dT,kc); rel=(Q1.z*w1+Q2.z*w2)*kc; }
         { float cz=smoothstep(0.004,0.05,r); g=mix(0.62,g,cz); d=mix(0.45,d,cz); rel*=cz; }       // the pattern dissolves at the very centre instead of pinching to a point
-        float arm=armF(r,th), lane=laneF(r,th);
+        float arm=armF(r,th+(0.50*(g-0.5)+0.28*(d-0.5))*uBlue), lane=laneF(r,th+0.42*(d-0.5)*uBlue);   // Milky Way: the turbulence makes the arms and lanes ragged
         // opening disk: two broad spiral waves sweep through the gas, so there are big bright bands and dark gaps as well as small detail
         float lrb=log(r+0.03), thp=th-uGT*0.012;
         float big=0.6*sin(2.0*(thp+2.2*lrb)+5.0*(g-0.5))+0.4*sin(3.0*(thp+3.1*lrb)+1.7+3.0*(d-0.5));
@@ -537,19 +542,23 @@ function boot() {
           float rs=(r0-0.5)*0.55+(rc-0.5)*0.42+(rf-0.5)*0.14+0.085*sr*(0.5+rc);
           gg+=(rs*2.0+0.17*(smoothstep(-0.028,0.028,rs)*2.0-1.0))*ringW; gap=clamp(-rs*2.6,0.0,1.0)*ringW;
           lineR=(0.45*pow(1.0-abs(2.0*rf-1.0),5.0)+pow(0.5+0.5*sin(ph+1.1),9.0)*(0.35+1.3*rf))*ringW; }
-        float gasM=smoothstep(0.40,0.72,gg); gasM=0.02+2.6*gasM*gasM;        // Milky Way: gas with real gaps (as before)
+        // Milky Way: continuous glowing arms on a faint disk of old stars, short spurs between them, and a ragged outer edge
+        float tex=smoothstep(0.37,0.64,gg);
+        float gasM=0.10+0.10*tex+arm*(0.50+2.0*tex);
+        float spur=pow(0.5+0.5*cos(4.0*(th-uPat-2.9*lrb)+1.3+2.2*(d-0.5)),4.0)*smoothstep(0.30,0.50,r); gasM+=0.20*spur*tex;
+        gasM*=1.0-smoothstep(0.78,1.02, r+0.26*(g-0.5)+0.12*(d-0.5)-0.15*arm);
         // opening disk: one continuous glowing surface. The pattern changes how hot the gas is, not whether it is there,
         // so the disk never opens into black holes; only the outer rim thins and breaks into ragged cloud.
         float sT=smoothstep(0.35,0.67,gg); float flo=mix(0.80,0.05,smoothstep(0.78,1.03,r));
         float gasT=mix(flo,1.85,sT)*(1.0+1.0*lineR);                          // thin bright threads along the rings
         float gas=mix(gasM,gasT,kc);
-        gas*=mix(1.0, 0.18+1.8*arm, uArms);
-        float bar=exp(-r*r/0.030)*pow(abs(cos(th-0.55)),5.0); gas+=1.5*bar*smoothstep(0.5,1.0,uArms);
+        gas*=mix(1.0, 0.18+1.8*arm, 0.42*kc);
+        { float ub=r*cos(th-0.55), wb=r*sin(th-0.55); float bar=exp(-(ub*ub/0.055+wb*wb/0.0034)); gas+=2.3*bar*uBlue; }   // Milky Way: a short bright bar through the core
         float dust=smoothstep(0.50,0.64,d); dust*=mix(1.0, 0.30+1.5*smoothstep(0.22,0.90,r), kc); dust=max(dust, 0.55*gap*smoothstep(0.30,0.75,r));    // dark features grow as the disk gets bigger
-        dust=mix(dust, clamp(dust*0.55+lane*1.25,0.0,1.6), uArms);
-        // opening disk: the gold layer is filled in — few dark gaps there. The white centre inside it and the cooler layers outside it are left as they were.
-        { float fillK=(1.0-uBlue)*smoothstep(0.13,0.24,r)*(1.0-smoothstep(0.36,0.60,r)); gas=mix(gas, 0.85+0.65*gas, 0.10*fillK); dust*=1.0-0.70*fillK; }
-        return vec3(gas,dust,rel);
+        { float dOpen=mix(dust, clamp(dust*0.55+lane*1.25,0.0,1.6), uArms);
+          float dMW=lane*(0.55+1.0*smoothstep(0.34,0.62,d))*1.7+0.45*arm*smoothstep(0.58,0.74,d);   // thin broken lanes, plus a little mottling inside the arms
+          dust=mix(dOpen,dMW,uBlue); }
+        return vec4(gas,dust,rel,arm);
       }
       void main(){
         vec2 ndc=vUv*2.0-1.0;
@@ -562,10 +571,10 @@ function boot() {
           float h=hgt(min(r0,1.25)); float vcam=ro.y/h;
           float vS=sy<0.0?min(VM,vcam):max(-VM,vcam); float vE=sy<0.0?-VM:VM;
           if((vE-vS)*sy>0.0){
-            float dv=(vE-vS)/uSteps; float fr=floor(mod(uT*60.0,64.0)); float v=vS+dv*(0.38+0.24*wn(gl_FragCoord.xy+fr*17.3));   // per-frame jitter: even coverage without a visible hatch
+            float dv=(vE-vS)/uSteps; float fr=floor(mod(uT*60.0,64.0)); float jA=mix(0.24,0.8,uBlue); float v=vS+dv*(0.5-0.5*jA+jA*wn(gl_FragCoord.xy+fr*17.3));   // Milky Way: wider jitter, so the thin slab does not show its sample layers   // per-frame jitter: even coverage without a visible hatch
             float ds=abs(dv)*hgt(min(r0,1.25))/ay;                          // spacing between samples along the ray
             float sfine=smoothstep(0.022,0.004,ds); float sfade=smoothstep(0.12,0.035,ds);
-            vec3 fHold=vec3(0.0); bool fHave=false;
+            vec4 fHold=vec4(0.0); bool fHave=false;
             if(sfade>0.004) for(int i=0;i<STEPS;i++){
               if(float(i)>=uSteps) break;
               float t=(v*h-ro.y)/ry;
@@ -575,17 +584,15 @@ function boot() {
                   float g=exp(-v*v); float th=atan(p.z,p.x);
                   float fine=sfine*(1.0-0.8*smoothstep(1.2,2.6,t)*uHaze);
                   if(!fHave||(i-(i/3)*3)==0){ fHold=field(p,r,th,v,fine); fHave=true; }      // evaluated every third step, held in between
-                  vec3 f=fHold;
+                  vec4 f=fHold;
                   float prof=smoothstep(1.12,mix(0.94,0.80,uBlue),r);                 // the opening disk holds its brightness nearly to the edge
                   float dens=f.x*g*prof;
                   float dust=f.y*exp(-v*v*4.0)*prof*smoothstep(0.06,0.18,r);
-                  vec3 tc3=tempC(r);
-                  float aw=uBlue*armF(r,th);
-                  tc3=mix(tc3, vec3(0.46,0.33,0.25), 0.40*uBlue*(1.0-armF(r,th))*smoothstep(0.26,0.6,r));      // between the arms: old stars and dust, a calmer umber
-                  tc3=mix(tc3, vec3(0.34,0.55,1.0), aw*smoothstep(0.22,0.6,r)*0.95);
-                  float knot=aw*smoothstep(0.24,0.5,r)*smoothstep(0.30,0.46,f.y)*(1.0-smoothstep(0.60,0.85,f.y));   // glowing hydrogen beside the dust lanes
-                  float young=aw*smoothstep(2.2,4.2,f.x);                                                      // young blue-white clusters in the densest gas
-                  tc3=mix(tc3, vec3(0.56,0.72,1.0), 0.22*young);
+                  vec3 tc3=mix(vec3(1.0,0.95,0.84), vec3(1.0,0.83,0.56), smoothstep(0.02,0.16,r));             // Milky Way: cream core and bar
+                  tc3=mix(tc3, vec3(0.90,0.68,0.47), smoothstep(0.14,0.36,r));                                   // warm inner disk
+                  tc3=mix(tc3, vec3(0.62,0.50,0.46), smoothstep(0.34,0.75,r));                                   // muted old stars further out
+                  tc3=mix(tc3, vec3(0.30,0.54,1.0), 0.95*f.w*smoothstep(0.17,0.46,r));                           // blue arms
+                  float knot=0.0, young=0.0;                                                                     // (young clusters are drawn as crisp star points, not in the gas)
                   float iOld=1.0/(pow(r,1.55)*12.0+0.05); float inten=mix(max(iOld, 1.0/(r*3.9+0.14)), iOld, uBlue); inten*=1.0+0.35*knot+0.08*young;   // opening disk: centre as bright as before, outer disk lifted so the whole surface glows
                   { float cu=1.0-uBlue; float sN=clamp((f.x-0.55)/1.3,0.0,1.0); vec3 cc=closeC(r+(0.24*(1.0-sN)-0.07*sN+0.08*clamp(f.y,0.0,1.0))*smoothstep(0.20,0.32,r));    // a few teal wisps in the outer gas
                     tc3=mix(tc3, cc, cu); inten*=1.0-0.62*cu*(1.0-smoothstep(0.03,0.18,r)); }   // ease the inner gas off pure white so its blue survives
@@ -686,21 +693,51 @@ function boot() {
   const volRT = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
   // Gas resolution by state, as a fraction of full screen resolution. Full when the picture is holding still (opening and settled frames);
   // a little lower only while the camera is travelling, on high-density screens, with a sharpening pass to keep the detail crisp.
-  const HI = DPR >= 1.5, K_DIVE = HI ? 0.72 : 1, K_WIDE = HI ? 0.9 : 1;
+  const HI = DPR >= 1.5 || Q.get('hi') === '1', K_DIVE = HI ? 0.72 : 1, K_WIDE = HI ? 0.9 : 1;
 
   // the far-off galaxy costs far less per pixel than the close-up, so it gets more resolution: some while the camera is still moving, more once it has come to rest
-  let wideOn = 0, moveMul = 1, restMul = 1, accFresh = true, gasTick = 0;      // wideOn: 0 opening (still) · 3 dive (moving, close) · 1 pull-back (moving, wide) · 2 settled (still)
-  const accRT = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
-  const sizeVol = () => { const k = Math.min(1, wideOn === 2 || wideOn === 0 ? restMul : (wideOn === 1 ? K_WIDE : K_DIVE) * moveMul); sharpU.value = wideOn === 2 ? 0.3 : wideOn === 0 ? 0.35 : 0.4; texelU.value.set(1 / Math.max(2, Math.round(innerWidth * DPR * k)), 1 / Math.max(2, Math.round(innerHeight * DPR * k)));
-    accRT.setSize(Math.max(2, Math.round(innerWidth * DPR * k)), Math.max(2, Math.round(innerHeight * DPR * k))); accFresh = true; volRT.setSize(Math.max(2, Math.round(innerWidth * DPR * k)), Math.max(2, Math.round(innerHeight * DPR * k))); };
+  let wideOn = 0, moveMul = 1, restMul = 1, accFresh = true, gasTick = 0, gasW = 2, gasH = 2, resStep = 0, stillK = 0, lastR = 0, pOx = 0, pOy = 0;      // wideOn: 0 opening (still) · 3 dive (moving, close) · 1 pull-back (moving, wide) · 2 settled (still)
+  const mkAcc = () => new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
+  const accA = mkAcc(), accB = mkAcc(); let accCur = accA, accPrev = accB, pGT = 0;
+  const sizeVol = () => { const k = Math.min(1, wideOn === 2 || wideOn === 0 ? restMul : (wideOn === 1 ? mix(K_WIDE, restMul, resStep / 4) : K_DIVE) * moveMul); sharpU.value = wideOn === 2 ? 0.3 : wideOn === 0 ? 0.35 : 0.4; texelU.value.set(1 / Math.max(2, Math.round(innerWidth * DPR * k)), 1 / Math.max(2, Math.round(innerHeight * DPR * k)));
+    gasW = Math.max(2, Math.round(innerWidth * DPR * k)); gasH = Math.max(2, Math.round(innerHeight * DPR * k)); volRT.setSize(gasW, gasH); };   // the running average is NOT reset here: it is looked up by position, so it carries across a change of resolution
   const sharpU = { value: 0.3 }, texelU = { value: new THREE.Vector2(1, 1) };
-  const accU = { tGas: { value: volRT.texture }, uA: { value: 1 } };
+  // Averaging the gas over several frames is what removes the grain. To do that while the camera is moving, each pixel looks up
+  // where the gas it now shows was on screen one frame earlier (camera motion and the disk's own rotation both accounted for),
+  // so the average follows the picture instead of smearing it.
+  const accU = { tGas: { value: volRT.texture }, tHist: { value: accB.texture }, uA: { value: 1 }, uDg: { value: 0 },
+    uCam: { value: new THREE.Vector3() }, pCam: { value: new THREE.Vector3() }, uRot: { value: new THREE.Matrix3() }, pRot: { value: new THREE.Matrix3() },
+    uTan: { value: 0.3 }, pTan: { value: 0.3 }, uAspect: { value: 1 }, uHTexel: { value: new THREE.Vector2(1, 1) }, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms };
+  const blitU = { tGas: { value: accA.texture }, uSharp: sharpU, uTexel: texelU };
   const accScene = new THREE.Scene();
-  { const m = new THREE.ShaderMaterial({ uniforms: accU, depthTest: false, depthWrite: false, transparent: true,
+  { const m = new THREE.ShaderMaterial({ uniforms: accU, depthTest: false, depthWrite: false,
       vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
-      fragmentShader: `uniform sampler2D tGas; uniform float uA; varying vec2 vUv; void main(){ gl_FragColor=vec4(texture2D(tGas,vUv).rgb,uA); }` });
+      fragmentShader: /* glsl */`
+        uniform sampler2D tGas,tHist; uniform float uA,uDg,uTan,pTan,uAspect; uniform vec3 uCam,pCam; uniform mat3 uRot,pRot; uniform vec2 uHTexel; varying vec2 vUv;
+        ${GAL}
+        // The running average is read with a sharp (Catmull-Rom) filter. A plain bilinear read softens the picture a little every
+        // frame, and by a different amount depending on how often it is read, which showed as a change in sharpness when the camera settled.
+        vec3 histCR(vec2 uv){ vec2 sp=uv/uHTexel; vec2 tc=floor(sp-0.5)+0.5; vec2 f=sp-tc;
+          vec2 w0=f*(-0.5+f*(1.0-0.5*f)), w1=1.0+f*f*(-2.5+1.5*f), w2=f*(0.5+f*(2.0-1.5*f)), w3=f*f*(-0.5+0.5*f);
+          vec2 w12=w1+w2; vec2 t0=(tc-1.0)*uHTexel, t3=(tc+2.0)*uHTexel, t12=(tc+w2/w12)*uHTexel;
+          vec3 r=texture2D(tHist,vec2(t0.x,t0.y)).rgb*w0.x*w0.y+texture2D(tHist,vec2(t12.x,t0.y)).rgb*w12.x*w0.y+texture2D(tHist,vec2(t3.x,t0.y)).rgb*w3.x*w0.y
+                +texture2D(tHist,vec2(t0.x,t12.y)).rgb*w0.x*w12.y+texture2D(tHist,vec2(t12.x,t12.y)).rgb*w12.x*w12.y+texture2D(tHist,vec2(t3.x,t12.y)).rgb*w3.x*w12.y
+                +texture2D(tHist,vec2(t0.x,t3.y)).rgb*w0.x*w3.y+texture2D(tHist,vec2(t12.x,t3.y)).rgb*w12.x*w3.y+texture2D(tHist,vec2(t3.x,t3.y)).rgb*w3.x*w3.y;
+          return max(r,0.0); }
+        void main(){
+          vec3 cur=texture2D(tGas,vUv).rgb; float a=uA; vec3 hist=cur;
+          if(a<0.999){
+            vec2 ndc=vUv*2.0-1.0; vec3 rd=normalize(uRot*vec3(ndc.x*uTan*uAspect, ndc.y*uTan, -1.0));
+            float t=-uCam.y/rd.y; vec3 P=uCam+rd*60.0;                        // sky and anything off the disk: treated as far away
+            if(t>0.0){ vec3 H=uCam+rd*t; float r=length(H.xz);
+              if(r<1.3){ float d=-uDg*omega(r); float c=cos(d), s=sin(d); P=vec3(c*H.x-s*H.z, 0.0, s*H.x+c*H.z); } }   // where this gas was a frame ago
+            vec3 q=(P-pCam)*pRot;
+            if(q.z<-1e-4){ vec2 puv=vec2(q.x/(-q.z*pTan*uAspect), q.y/(-q.z*pTan))*0.5+0.5;
+              if(puv.x>=0.0&&puv.x<=1.0&&puv.y>=0.0&&puv.y<=1.0) hist=histCR(puv); else a=1.0; } else a=1.0;
+          }
+          gl_FragColor=vec4(mix(hist,cur,a),1.0); }` });
     const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), m); q.frustumCulled = false; accScene.add(q); }
-  { const m = new THREE.ShaderMaterial({ uniforms: { tGas: { value: accRT.texture }, uSharp: sharpU, uTexel: texelU }, depthTest: false, depthWrite: false,
+  { const m = new THREE.ShaderMaterial({ uniforms: blitU, depthTest: false, depthWrite: false,
       vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
       // unsharp mask on the way to the screen: restores edge contrast in the gas, clamped so it cannot ring
       fragmentShader: `uniform sampler2D tGas; uniform float uSharp; uniform vec2 uTexel; varying vec2 vUv;
@@ -743,12 +780,13 @@ function boot() {
           vec4 mv=modelViewMatrix*vec4(P,1.0);
           float a=armF(r,th);
           vCol=starCol(clamp(fract(seed*7.3)*0.86+0.34*a*uArms-0.10*(1.0-a)*uArms+0.06,0.0,1.0));
+          float clus=aS.y*a*kMW(); vCol=mix(vCol, vec3(0.70,0.85,1.0), 0.8*clus);                 // Milky Way: the larger stars in the arms are young blue-white clusters
           float alpha=(0.35+0.65*fract(seed*13.7))*mix(1.0,0.35+0.65*a,uArms);
           alpha*=smoothstep(0.14,0.5,r)*smoothstep(1.09,0.9,r);                 // few inside the bright gas
           alpha*=0.82+0.18*sin(uT*(0.8+seed*2.0)+seed*90.0);
           alpha*=smoothstep(0.5,6.0,-mv.z);
           float graze=smoothstep(0.05,0.34,abs(normalize(cameraPosition-P).y)); alpha*=graze;
-          vBig=aS.y; gl_PointSize=aS.x*uDpr*mix(0.75,1.0,graze); vA=alpha*uGain; gl_Position=projectionMatrix*mv;
+          vBig=aS.y; gl_PointSize=aS.x*uDpr*mix(0.75,1.0,graze)*(1.0+0.35*clus); vA=alpha*uGain*(1.0+1.3*clus); gl_Position=projectionMatrix*mv;
         }`,
       fragmentShader: /* glsl */`
         varying vec3 vCol; varying float vA; varying float vBig;
@@ -872,8 +910,12 @@ function boot() {
   let gt = 0, coreVis = 0, coreHot = 0;
   const setOp = (el, o) => { el.style.opacity = o.toFixed(3); el.style.visibility = o < 0.004 ? 'hidden' : 'visible'; el.classList.toggle('on', o > 0.5); };
   // one camera move: in over the disk, skimming past the core, straight on out the far side and away, turning to look back as the galaxy recedes
-  const gPath = new THREE.CatmullRomCurve3([V(60, 17, 85), V(30, 7, 42), V(5, 1.6, 6), V(-16, 10, -30), V(-58, 72, -118), V(-102, 152, -192)], false, 'centripetal');
-  const GK = [0.05, 0.115, 0.175, 0.215, 0.33, 1.0];
+  // the path starts far enough back to see the whole disk (on portrait screens it starts closer, where the opening view already is)
+  const WIDE0 = innerWidth >= innerHeight;
+  const hdFor = (asp) => Math.sqrt(105 * 105 + Math.pow(105 / (0.955 * 0.3057 * clamp(asp, 1.25, 2.6)), 2)) / 1.0199;   // distance at which the disk fills about 95% of the width
+  const HD0 = hdFor(innerWidth / innerHeight);
+  const gPath = new THREE.CatmullRomCurve3((WIDE0 ? [V(Math.sin(0.62) * HD0, HD0 * 0.2004, Math.cos(0.62) * HD0)] : []).concat([V(60, 17, 85), V(30, 7, 42), V(5, 1.6, 6), V(-16, 10, -30), V(-58, 72, -118), V(-102, 152, -192)]), false, 'centripetal');
+  const GK = WIDE0 ? [0.05, 0.088, 0.115, 0.175, 0.215, 0.33, 1.0] : [0.05, 0.115, 0.175, 0.215, 0.33, 1.0];
   const PATH_A = gPath.getPoint(0);
   const gUat = (p) => { if (p <= GK[0]) return 0; const n = GK.length - 1; for (let i = 0; i < n; i++) if (p < GK[i + 1]) { let f = (p - GK[i]) / (GK[i + 1] - GK[i]); return (i + f) / n; } return 1; };
 
@@ -887,9 +929,11 @@ function boot() {
   //   approach — starts slowly at the outer disk and keeps gathering speed the closer it gets to the centre, like falling in
   //   exit     — that same acceleration carries straight through the light and out the far side at full speed
   //   settle   — a single late ease-out into the final frame
-  const V_START = 12, V_OUT = 90, CORE_ARC = 97, SLOW_FROM = 285;
-  const speedAt = (L) => { const f = Math.pow(clamp(L / (CORE_ARC + 36), 0, 1), 2.2);
-    let v = mix(V_START, V_OUT, f) * sst(-2, 5, L);                                                   // gentle start from rest
+  // the approach now covers a much longer distance in about the same time, so it starts faster in absolute terms; relative to how far away the disk is, it starts just as gently
+  const ARC0 = WIDE0 ? arcAtP(0.088) : 0; const sFof = (pp) => (arcAtP(pp) - ARC0) / (ARC_T - ARC0);   // fraction of the original path travelled: the long run-in from the wide opening view is not counted
+  const CORE_ARC = arcAtP(0.175), SLOW_FROM = CORE_ARC + 188, V_START = WIDE0 ? 38 : 12, V_OUT = 90, V_EXP = WIDE0 ? 1.0 : 2.2;
+  const speedAt = (L) => { const f = Math.pow(clamp(L / (CORE_ARC + 36), 0, 1), V_EXP);
+    let v = mix(V_START, V_OUT, f) * (WIDE0 ? sst(-4, 18, L) : sst(-2, 5, L));                                                   // gentle start from rest
     const rem = clamp((ARC_T - L) / (ARC_T - SLOW_FROM), 0, 1); return v * Math.max(0.012, Math.pow(rem, 0.75)); };   // quartic ease-out, starting late
   let arcS = 0, progSeen = -1;
   const advance = (dt) => { if (prog !== progSeen) arcS = arcAtP(Math.max(prog, 0.05));              // position was set from outside (click, skip, test hook)
@@ -903,7 +947,7 @@ function boot() {
     // only the opening fades up from black; everything after is one shot
     if (!(mode === 'done' && fadeEl.style.transition)) { fadeEl.style.transition = ''; fadeEl.style.background = '#000'; fadeEl.style.opacity = ((1 - sst(0.0, 0.7, e)) * (p < 0.04 ? 1 : 0)).toFixed(3); }
 
-    const sF = arcAtP(p) / ARC_T, kw = ease(sst(0.19, 0.31, sF)),                                      // the switch to the galaxy's own colours happens inside the glare of the core, so the camera comes out of the light already looking at the Milky Way
+    const sF = sFof(p), kw = ease(sst(0.19, 0.31, sF)),                                      // the switch to the galaxy's own colours happens inside the glare of the core, so the camera comes out of the light already looking at the Milky Way
           glare = vis(p, 0.095, 0.17, 0.185, 0.25), settle = sst(0.62, 1, p);
     // the drift to the left is timed, not tied to distance: it begins as the camera leaves the light and spreads over the whole pull-back,
     // so it is part of the same glide rather than a second move at the end
@@ -914,14 +958,15 @@ function boot() {
     volU.uGT.value = spU.uGT.value = gt; volU.uT.value = spU.uT.value = time; volU.uPat.value = 0;
     // idle hold: a slow, heavy drift — never static
     const az = 0.62 + 0.045 * Math.sin(time * 0.045), back = (1 + 0.22 * (1 - ee)) * (1 + 0.02 * Math.sin(time * 0.07));
-    const hd = pr ? 122 : 121;
-    tmp.set(Math.sin(az) * hd * back, (pr ? 36 : 24.4) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
-    gPath.getPoint(gUat(p), pos); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));   // carry the idle drift's offset into the move and let it fade, so the approach holds one speed
+    const hd = pr ? 122 : hdFor(W / H);                                                             // desktop: just far enough back to see the whole disk, edge to edge
+    tmp.set(Math.sin(az) * hd * back, (pr ? 36 : hd * 0.2004) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
+    // carry the idle drift's offset into the move and let it fade
+    gPath.getPoint(gUat(p), pos); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));
     // the settled frame keeps breathing: a very slow orbit and dolly
     if (settle > 0) { pos.applyAxisAngle(up, settle * (0.035 * Math.sin(time * 0.05) + psx * 0.012)); pos.multiplyScalar(1 + settle * (0.012 * Math.sin(time * 0.071) - psy * 0.008)); }
-    tmp.set(Math.cos(az), 0, -Math.sin(az)).multiplyScalar(pr ? 2 : 22); tmp.y = pr ? -4 : -6.5;        // hero: aim off the core so it sits on a third
+    tmp.set(Math.cos(az), 0, -Math.sin(az)).multiplyScalar(pr ? 2 : 4); tmp.y = pr ? -4 : 3;            // hero: the whole disk, centred, sitting a little below the middle
     look.set(0, 0.4, 0).lerp(tmp, 1 - sst(0.05, 0.13, p));
-    const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = mix(f1, pr ? 50 : 38, sst(0.35, 0.72, arcAtP(p) / ARC_T));
+    const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = mix(f1, pr ? 50 : 38, sst(0.35, 0.72, sFof(p)));
     gCam.position.copy(pos); gCam.up.set(0, 1, 0); gCam.lookAt(look); gCam.updateMatrixWorld(true);
     // truck: the galaxy glides to the left of frame (to the top on portrait) and settles there
     if (wT > 0) { const D = pos.length(), fh = 2 * D * Math.tan(gCam.fov * Math.PI / 360), fw = fh * gCam.aspect;
@@ -933,10 +978,10 @@ function boot() {
     volU.uCam.value.copy(pos).multiplyScalar(1 / R); volU.uRot.value.setFromMatrix4(gCam.matrixWorld); volU.uTan.value = Math.tan(gCam.fov * Math.PI / 360);
     volU.uArms.value = spU.uArms.value = mix(0.42, 1, kw); volU.uBlue.value = kw; volU.uHaze.value = 1 - kw;
     { const w = kw > 0.5 ? (p >= 1 && glideT >= GLIDE ? 2 : 1) : (mode === 'idle' ? 0 : 3); if (w !== wideOn) { wideOn = w; sizeVol(); } }
-    volU.uSteps.value = wideOn === 2 ? STEPS : Math.round(mix(STEPS, SMALL ? 8 : 10, kw));                                    // the far-off galaxy is a thin slab on screen: fewer samples through it while moving
+    volU.uSteps.value = wideOn === 2 ? STEPS : Math.round(mix(STEPS, mix(SMALL ? 8 : 10, STEPS, stillK), kw));                                    // the far-off galaxy is a thin slab on screen: fewer samples through it while moving
     const ae = mix(0.10, 1, sst(0.04, 0.62, pos.length() / R));                                   // the iris closes as we skim the core, so the gas stays readable
     coreHot += (((enterBtn.matches(':hover') || document.activeElement === enterBtn) && mode === 'idle' ? 1 : 0) - coreHot) * (1 - Math.exp(-dt * 5));
-    volU.uGain.value = (ae * (1 + 0.35 * glare) + 0.55 * kw) * (1 + 0.14 * coreHot); spU.uGain.value = (0.9 + 0.3 * kw) * kw; nbU.uVis.value = (1 - 0.8 * kw) * sst(0.55, 1, e);
+    volU.uGain.value = (ae * (1 + 0.35 * glare) + 0.55 * kw) * (1 + 0.14 * coreHot); spU.uGain.value = (0.9 + 0.7 * kw) * kw; nbU.uVis.value = (1 - 0.8 * kw) * sst(0.55, 1, e);
     tmp.set(0, 0, 0).project(gCam); coreVis = tmp.z < 1 ? 1 : 0;
     enterBtn.style.transform = 'translate(' + ((tmp.x * 0.5 + 0.5) * W).toFixed(1) + 'px,' + ((-tmp.y * 0.5 + 0.5) * H).toFixed(1) + 'px)';
     enterBtn.style.opacity = (mode === 'idle' ? sst(0.75, 1, e) : 0).toFixed(3);
@@ -953,14 +998,32 @@ function boot() {
   let shown = false;
   function render() {
     if (!shown) { shown = true; requestAnimationFrame(() => root.classList.add('ready')); }
-    // gas: when the camera is at rest it is redrawn every other frame at full resolution and averaged over time (no shimmer);
-    // while the camera moves it is redrawn every frame with no averaging (no ghosting)
+    // gas: averaged over time in every state, so it is as clean in motion as it is at rest.
+    // At rest it is redrawn every other frame at full resolution; while the camera moves it is redrawn every frame.
     const rest = wideOn === 2; gasTick++;
     if (!rest || accFresh || (gasTick & 1) === 0) {
       renderer.setRenderTarget(volRT); renderer.render(volScene, gCam);
-      accU.uA.value = accFresh ? 1 : rest ? 0.16 : wideOn === 0 ? 0.13 : 0.62; accFresh = false;
-      const ac = renderer.autoClear; renderer.autoClear = false; renderer.setRenderTarget(accRT); renderer.render(accScene, gCam); renderer.autoClear = ac;
+      { const t = accCur; accCur = accPrev; accPrev = t; }                                              // write the new average into one target, read the last one from the other
+      if (accCur.width !== gasW || accCur.height !== gasH) accCur.setSize(gasW, gasH);
+      accU.tHist.value = accPrev.texture; accU.uHTexel.value.set(1 / accPrev.width, 1 / accPrev.height);
+      accU.uCam.value.copy(volU.uCam.value); accU.uRot.value.copy(volU.uRot.value); accU.uTan.value = volU.uTan.value; accU.uAspect.value = volU.uAspect.value;
+      accU.uDg.value = gt - pGT;
+      const inGas = 1 - sst(0.03, 0.09, Math.abs(volU.uCam.value.y));                                  // flying through the gas itself: the look-up is unreliable there, so average less
+      // how still is the picture? As the camera eases to a stop, the moving state converges on the settled state (same averaging,
+      // same sharpening, same sample count), so the hand-over between them has nothing left to change.
+      const nowR = performance.now(), dtR = clamp((nowR - lastR) / 1000, 0.004, 0.1); lastR = nowR;
+      tmp.set(0, 0, 0).project(gCam); const dCam = accU.uCam.value.distanceTo(accU.pCam.value);
+      const mov = Math.max(Math.hypot(tmp.x - pOx, tmp.y - pOy), dCam * 0.3) / dtR; pOx = tmp.x; pOy = tmp.y;
+      if (dCam > 0.2) accFresh = true;                                                                 // a jump (skip, replay): start the average again
+      stillK += ((1 - sst(0.012, 0.16, mov)) - stillK) * 0.2;
+      if (wideOn === 1) { sharpU.value = mix(0.4, 0.3, stillK);
+        const rs = Math.min(4, Math.floor(stillK * 5)); if (rs > resStep) { resStep = rs; sizeVol(); } }   // four small steps up to full resolution while the picture is still easing
+      else if (wideOn !== 2 && resStep) resStep = 0;
+      accU.uA.value = accFresh ? 1 : rest ? 0.16 : wideOn === 0 ? 0.13 : mix(mix(wideOn === 1 ? 0.28 : 0.2, 0.125, stillK), 0.75, inGas); accFresh = false;
+      renderer.setRenderTarget(accCur); renderer.render(accScene, gCam);
       renderer.setRenderTarget(null);
+      accU.pCam.value.copy(accU.uCam.value); accU.pRot.value.copy(accU.uRot.value); accU.pTan.value = accU.uTan.value; pGT = gt;
+      blitU.tGas.value = accCur.texture;
     }
     composer.render();
   }

@@ -438,10 +438,18 @@ function boot() {
 
   const GAL = /* glsl */`
     uniform float uW, uPat, uArms;
-    float omega(float r){ return uW/pow(r+0.16,1.5); }                 // near-Keplerian: the inner disk whips round, the outer layers turn slowly
+    float omega(float r){ return uW/pow(r+0.16,1.5)*mix(1.0,0.38,smoothstep(0.28,1.0,r)); }                 // near-Keplerian: the inner disk whips round, the outer layers turn slowly
     float armPhase(float r,float th){ return th - uPat - 3.3*log(r+0.05); }
     float armF(float r,float th){ float c=0.5+0.5*cos(2.0*armPhase(r,th)); return c*c*smoothstep(0.10,0.26,r); }
     float laneF(float r,float th){ float c=0.5+0.5*cos(2.0*(armPhase(r,th)+0.62)); return pow(c,5.0)*smoothstep(0.12,0.3,r); }
+    // star colour by temperature, coolest to hottest: red, orange, yellow, white, blue-white, blue
+    vec3 starCol(float k){
+      vec3 c=mix(vec3(1.0,0.42,0.26), vec3(1.0,0.64,0.36), smoothstep(0.00,0.24,k));
+      c=mix(c, vec3(1.0,0.86,0.56), smoothstep(0.22,0.46,k));
+      c=mix(c, vec3(1.0,0.97,0.92), smoothstep(0.44,0.62,k));
+      c=mix(c, vec3(0.70,0.83,1.0), smoothstep(0.62,0.80,k));
+      c=mix(c, vec3(0.46,0.64,1.0), smoothstep(0.82,1.00,k));
+      return c; }
   `;
 
   /* ══════════ GALAXY : raymarched volumetric disk (reduced internal resolution) ══════════ */
@@ -475,10 +483,10 @@ function boot() {
         c=ramp(c, vec3(1.0,0.52,0.14), 0.23,0.46,r);                             // gold into deep orange
         c=ramp(c, vec3(0.93,0.25,0.08), 0.42,0.64,r);                            // orange into red
         c=ramp(c, vec3(0.74,0.13,0.13), 0.60,0.76,r);                            // red into deep crimson
-        c=ramp(c, vec3(0.60,0.13,0.36), 0.72,0.88,r);                            // the outer quarter leans toward magenta
-        c=ramp(c, vec3(0.36,0.15,0.64), 0.84,1.00,r);                            // then violet
-        c=ramp(c, vec3(0.16,0.13,0.52), 0.96,1.12,r);                            // and indigo at the very edge
-        return c*(1.0+1.0*smoothstep(0.62,1.0,r)); }                             // lift the faint outer gas a little so its colour reads
+        c=ramp(c, vec3(0.52,0.10,0.13), 0.72,0.90,r);                            // the outer quarter leans toward magenta
+        c=ramp(c, vec3(0.28,0.13,0.50), 0.93,1.06,r);                            // then violet
+        c=ramp(c, vec3(0.16,0.13,0.50), 1.02,1.14,r);                            // and indigo at the very edge
+        return c*(1.0+0.6*smoothstep(0.62,1.0,r)); }                             // lift the faint outer gas a little so its colour reads
       float ign(vec2 p){ return fract(52.9829189*fract(dot(p,vec2(0.06711056,0.00583715)))); }
       float wn(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
       // one phase of orbit-stretched gas: ridged filaments (x) and dust (y)
@@ -534,12 +542,12 @@ function boot() {
                   float dust=f.y*exp(-v*v*4.0)*prof*smoothstep(0.06,0.18,r);
                   vec3 tc3=tempC(r);
                   float aw=uBlue*armF(r,th);
-                  tc3=mix(tc3, vec3(0.50,0.33,0.24), 0.22*uBlue*(1.0-armF(r,th))*smoothstep(0.26,0.6,r));      // between the arms: old stars and dust, a calmer umber
-                  tc3=mix(tc3, vec3(0.38,0.56,1.0), aw*smoothstep(0.22,0.6,r)*0.86);
+                  tc3=mix(tc3, vec3(0.46,0.33,0.25), 0.40*uBlue*(1.0-armF(r,th))*smoothstep(0.26,0.6,r));      // between the arms: old stars and dust, a calmer umber
+                  tc3=mix(tc3, vec3(0.34,0.55,1.0), aw*smoothstep(0.22,0.6,r)*0.95);
                   float knot=aw*smoothstep(0.24,0.5,r)*smoothstep(0.30,0.46,f.y)*(1.0-smoothstep(0.60,0.85,f.y));   // glowing hydrogen beside the dust lanes
                   float young=aw*smoothstep(2.2,4.2,f.x);                                                      // young blue-white clusters in the densest gas
-                  tc3=mix(tc3, vec3(1.0,0.30,0.46), 0.45*knot); tc3=mix(tc3, vec3(0.56,0.72,1.0), 0.22*young);
-                  float inten=1.0/(pow(r,1.55)*12.0+0.05); inten*=1.0+0.5*knot+0.08*young;
+                  tc3=mix(tc3, vec3(0.56,0.72,1.0), 0.22*young);
+                  float inten=1.0/(pow(r,1.55)*12.0+0.05); inten*=1.0+0.35*knot+0.08*young;
                   { float cu=1.0-uBlue; vec3 cc=closeC(r); cc=mix(cc, vec3(0.12,0.72,0.82)*2.2, 0.20*smoothstep(0.50,0.80,f.y)*smoothstep(0.78,1.0,r));   // a few teal wisps in the outer gas
                     tc3=mix(tc3, cc, cu); inten*=1.0-0.62*cu*(1.0-smoothstep(0.03,0.18,r)); }   // ease the inner gas off pure white so its blue survives
                   float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=(1.0-uBlue)*0.75;
@@ -605,8 +613,8 @@ function boot() {
     const gs = () => { let u = 0, v = 0; while (u === 0) u = Math.random(); while (v === 0) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2831853 * v); };
     for (let i = 0; i < NP; i++) {
       const r = Math.min(1.08, 0.16 + Math.pow(Math.random(), 0.7) * 0.92), th = Math.random() * 6.2831853, h = gs() * (0.004 + 0.012 * r * r);
-      const big = Math.random() < 0.012;
-      aP.set([r, th, h, Math.random()], i * 4); aS.set([big ? 4.6 + Math.random() * 2 : 1.0 + Math.pow(Math.random(), 3) * 1.2, big ? 1 : 0], i * 2);
+      const big = Math.random() < 0.035;
+      aP.set([r, th, h, Math.random()], i * 4); aS.set([big ? 3.2 + Math.random() * 3.2 : 1.0 + Math.pow(Math.random(), 3) * 1.2, big ? 1 : 0], i * 2);
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -623,7 +631,7 @@ function boot() {
           vec3 P=vec3(cos(th)*r,aP.z,sin(th)*r)*${R.toFixed(1)};
           vec4 mv=modelViewMatrix*vec4(P,1.0);
           float a=armF(r,th);
-          vCol=mix(vec3(1.0,0.86,0.70),vec3(0.80,0.88,1.0),step(0.55,fract(seed*7.3)));
+          vCol=starCol(clamp(fract(seed*7.3)*0.86+0.34*a*uArms-0.10*(1.0-a)*uArms+0.06,0.0,1.0));
           float alpha=(0.35+0.65*fract(seed*13.7))*mix(1.0,0.35+0.65*a,uArms);
           alpha*=smoothstep(0.14,0.5,r)*smoothstep(1.09,0.9,r);                 // few inside the bright gas
           alpha*=0.82+0.18*sin(uT*(0.8+seed*2.0)+seed*90.0);
@@ -637,6 +645,52 @@ function boot() {
           float core=smoothstep(1.0,0.25,d); core*=core;
           float f=mix(core, smoothstep(0.34,0.10,d)+0.16*pow(max(1.0-d,0.0),2.5), vBig);
           gl_FragColor=vec4(vCol,vA*f); }`,
+    });
+    const pts = new THREE.Points(g, m); pts.frustumCulled = false; gScene.add(pts);
+  }
+  // newborn stars: they ignite inside the gas, shine, and fade, carried round by the same rotation as the disk
+  const NB = SMALL ? 320 : 900;
+  const nbU = { uGT: spU.uGT, uT: spU.uT, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms, uVis: { value: 1 }, uDpr: { value: DPR } };
+  {
+    const aP = new Float32Array(NB * 4), aS = new Float32Array(NB * 3), pos = new Float32Array(NB * 3);
+    for (let i = 0; i < NB; i++) {
+      const r = 0.13 + Math.pow(Math.random(), 0.85) * 0.82, th = Math.random() * 6.2831853, h = (Math.random() - 0.5) * (0.006 + 0.016 * r * r);
+      aP.set([r, th, h, Math.random()], i * 4);
+      aS.set([8 + Math.random() * 12, 2.6 + Math.pow(Math.random(), 2.2) * 5.5, Math.random()], i * 3);       // life cycle (s), size (px), colour pick
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('aP', new THREE.BufferAttribute(aP, 4)); g.setAttribute('aS', new THREE.BufferAttribute(aS, 3));
+    const m = new THREE.ShaderMaterial({
+      uniforms: nbU, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: /* glsl */`
+        attribute vec4 aP; attribute vec3 aS;
+        uniform float uGT,uT,uVis,uDpr;
+        varying vec3 vCol; varying float vA; varying float vFlash;
+        ${GAL}
+        void main(){
+          float r=aP.x, seed=aP.w; float th=aP.y+uGT*omega(r);
+          vec3 P=vec3(cos(th)*r,aP.z,sin(th)*r)*${R.toFixed(1)};
+          vec4 mv=modelViewMatrix*vec4(P,1.0); float dist=max(-mv.z,0.001);
+          float ph=fract(uT/aS.x+seed);                                             // where this star is in its life
+          float env=smoothstep(0.0,0.11,ph)*(1.0-smoothstep(0.55,1.0,ph));                 // eases in over about a second (no flash), shines, fades slowly
+          float flash=0.0;
+          vCol=mix(vec3(0.72,0.84,1.0), vec3(1.0,0.93,0.78), step(0.72,aS.z));      // mostly hot blue-white, some warm white
+          vCol=mix(vec3(1.0,0.72,0.42), vCol, smoothstep(0.02,0.11,ph));            // a touch warm as it first shows, whitening as it comes up
+          float near=smoothstep(0.6,7.0,dist);                                      // do not smear across the lens when the camera flies through
+          float graze=mix(0.35,1.0,smoothstep(0.03,0.22,abs(normalize(cameraPosition-P).y)));   // thin out where the disk is seen edge-on
+          vA=(0.55+0.45*fract(seed*9.7))*(env+1.3*flash)*near*graze*uVis;
+          vFlash=flash;
+          gl_PointSize=aS.y*(0.65+0.6*env)*uDpr*clamp(78.0/dist,0.22,1.9);
+          gl_Position=projectionMatrix*mv;
+        }`,
+      fragmentShader: /* glsl */`
+        varying vec3 vCol; varying float vA; varying float vFlash;
+        void main(){ vec2 q=gl_PointCoord*2.0-1.0; float d=length(q);
+          float core=smoothstep(0.30,0.02,d);                                       // tight bright point
+          float halo=pow(max(1.0-d,0.0),3.2)*0.42;                                  // soft glow in the surrounding gas
+          float spike=(exp(-abs(q.y)*26.0)*exp(-abs(q.x)*3.2)+exp(-abs(q.x)*26.0)*exp(-abs(q.y)*3.2))*0.22*vFlash;   // a brief glint as it ignites
+          gl_FragColor=vec4(vCol*(1.5*core+halo+spike), vA); }`,
     });
     const pts = new THREE.Points(g, m); pts.frustumCulled = false; gScene.add(pts);
   }
@@ -654,8 +708,9 @@ function boot() {
       vertexShader: `attribute vec2 aA; uniform float uT,uDpr; varying float vA; varying float vS;
         void main(){ vS=aA.y; vA=(0.35+0.65*aA.y)*(0.8+0.2*sin(uT*(0.6+aA.y*2.0)+aA.y*80.0)); gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
       fragmentShader: `uniform float uGain; varying float vA; varying float vS;
+        ${GAL}
         void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f;
-          vec3 c=mix(vec3(1.0,0.86,0.72),vec3(0.78,0.87,1.0),step(0.45,fract(vS*7.3))); gl_FragColor=vec4(c,vA*f*uGain); }` });
+          gl_FragColor=vec4(starCol(fract(vS*7.3)),vA*f*uGain); }` });
     const p = new THREE.Points(g, m); p.frustumCulled = false; p.userData.u = u; return p;
   }
   const gStars = makeStars(SMALL ? 2600 : 6000, 4000); gStars.renderOrder = -5; gScene.add(gStars);
@@ -740,8 +795,8 @@ function boot() {
     volU.uGT.value = spU.uGT.value = gt; volU.uT.value = spU.uT.value = time; volU.uPat.value = 0;
     // idle hold: a slow, heavy drift — never static
     const az = 0.62 + 0.045 * Math.sin(time * 0.045), back = (1 + 0.22 * (1 - ee)) * (1 + 0.02 * Math.sin(time * 0.07));
-    const hd = pr ? 122 : 104;
-    tmp.set(Math.sin(az) * hd * back, (pr ? 36 : 21) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
+    const hd = pr ? 122 : 121;
+    tmp.set(Math.sin(az) * hd * back, (pr ? 36 : 24.4) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
     gPath.getPoint(gUat(p), pos); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));   // carry the idle drift's offset into the move and let it fade, so the approach holds one speed
     // the settled frame keeps breathing: a very slow orbit and dolly
     if (settle > 0) { pos.applyAxisAngle(up, settle * (0.035 * Math.sin(time * 0.05) + psx * 0.012)); pos.multiplyScalar(1 + settle * (0.012 * Math.sin(time * 0.071) - psy * 0.008)); }
@@ -762,7 +817,7 @@ function boot() {
     volU.uSteps.value = wideOn === 2 ? STEPS : Math.round(mix(STEPS, SMALL ? 8 : 10, kw));                                    // the far-off galaxy is a thin slab on screen: fewer samples through it while moving
     const ae = mix(0.10, 1, sst(0.04, 0.62, pos.length() / R));                                   // the iris closes as we skim the core, so the gas stays readable
     coreHot += (((enterBtn.matches(':hover') || document.activeElement === enterBtn) && mode === 'idle' ? 1 : 0) - coreHot) * (1 - Math.exp(-dt * 5));
-    volU.uGain.value = (ae * (1 + 0.35 * glare) + 0.55 * kw) * (1 + 0.14 * coreHot); spU.uGain.value = 0.9 + 0.3 * kw;
+    volU.uGain.value = (ae * (1 + 0.35 * glare) + 0.55 * kw) * (1 + 0.14 * coreHot); spU.uGain.value = 0.9 + 0.3 * kw; nbU.uVis.value = (1 - 0.8 * kw) * sst(0.55, 1, e);
     tmp.set(0, 0, 0).project(gCam); coreVis = tmp.z < 1 ? 1 : 0;
     enterBtn.style.transform = 'translate(' + ((tmp.x * 0.5 + 0.5) * W).toFixed(1) + 'px,' + ((-tmp.y * 0.5 + 0.5) * H).toFixed(1) + 'px)';
     enterBtn.style.opacity = (mode === 'idle' ? sst(0.75, 1, e) : 0).toFixed(3);

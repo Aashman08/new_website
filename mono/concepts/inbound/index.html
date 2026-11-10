@@ -483,10 +483,10 @@ function boot() {
         c=ramp(c, vec3(0.96,0.96,1.0), 0.06,0.16,r);                             // into a ring of white gas
         c=ramp(c, vec3(1.0,0.95,0.68), 0.15,0.24,r);                             // white into pale yellow
         c=ramp(c, vec3(1.0,0.74,0.15), 0.21,0.31,r);                             // bright yellow
-        c=ramp(c, vec3(1.0,0.48,0.05), 0.28,0.43,r);                             // yellow into orange
-        c=ramp(c, vec3(1.0,0.27,0.02), 0.41,0.58,r);                             // deep orange
-        c=ramp(c, vec3(0.92,0.17,0.02), 0.56,0.78,r);                            // orange into red
-        c=ramp(c, vec3(0.62,0.08,0.012), 0.84,1.06,r);                           // deep red at the rim
+        c=ramp(c, vec3(1.0,0.45,0.04), 0.30,0.50,r);                             // yellow into orange
+        c=ramp(c, vec3(1.0,0.23,0.015), 0.50,0.72,r);                            // deep red-orange
+        c=ramp(c, vec3(0.90,0.12,0.015), 0.70,0.90,r);                           // into red
+        c=ramp(c, vec3(0.62,0.08,0.012), 0.90,1.08,r);                           // deep red at the rim
         return c*(1.0+0.5*smoothstep(0.60,1.0,r)); }
       float ign(vec2 p){ return fract(52.9829189*fract(dot(p,vec2(0.06711056,0.00583715)))); }
       float wn(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
@@ -530,22 +530,25 @@ function boot() {
         float lrb=log(r+0.03), thp=th-uGT*0.012;
         float big=0.6*sin(2.0*(thp+2.2*lrb)+5.0*(g-0.5))+0.4*sin(3.0*(thp+3.1*lrb)+1.7+3.0*(d-0.5));
         float gg=mix(g, 0.5+(g-0.5)*0.72, kc)+0.075*big*kc*smoothstep(0.16,0.34,r);
-        float ringW=kc*smoothstep(0.10,0.22,r)*(1.0+0.35*smoothstep(0.42,0.9,r)); float lineR=0.0; float gap=0.0;
+        float ringW=kc*smoothstep(0.19,0.33,r)*(1.15-0.5*smoothstep(0.58,0.98,r)); float lineR=0.0; float gap=0.0;
         if(ringW>0.01){ float wq=(d-0.5)*0.045+(g-0.5)*0.03;                 // the turbulence pushes the rings in and out, so their edges curl
           float r0=tx(vec3(0.13, lrb*0.17+wq*0.4, 0.77)).b, rc=tx(vec3(0.37, lrb*0.45+wq, 0.11)).r, rf=tx(vec3(0.71, lrb*1.7+wq*3.0, 0.53)).g;   // broad rings, medium rings, fine rings
-          float rs=(r0-0.5)*0.62+(rc-0.5)*0.50+(rf-0.5)*0.18; gg+=(rs*2.0+0.11*(smoothstep(-0.035,0.035,rs)*2.0-1.0))*ringW; gap=clamp(-rs*2.6,0.0,1.0)*ringW; lineR=pow(1.0-abs(2.0*rf-1.0),5.0)*ringW; }
+          float ph=lrb*46.0+wq*70.0; float sr=sin(ph);                       // evenly spaced rings; the turbulence bends them by up to about half a ring
+          float rs=(r0-0.5)*0.55+(rc-0.5)*0.42+(rf-0.5)*0.14+0.085*sr*(0.5+rc);
+          gg+=(rs*2.0+0.17*(smoothstep(-0.028,0.028,rs)*2.0-1.0))*ringW; gap=clamp(-rs*2.6,0.0,1.0)*ringW;
+          lineR=(0.45*pow(1.0-abs(2.0*rf-1.0),5.0)+pow(0.5+0.5*sin(ph+1.1),9.0)*(0.35+1.3*rf))*ringW; }
         float gasM=smoothstep(0.40,0.72,gg); gasM=0.02+2.6*gasM*gasM;        // Milky Way: gas with real gaps (as before)
         // opening disk: one continuous glowing surface. The pattern changes how hot the gas is, not whether it is there,
         // so the disk never opens into black holes; only the outer rim thins and breaks into ragged cloud.
-        float sT=smoothstep(0.35,0.67,gg); float flo=mix(0.62,0.05,smoothstep(0.76,1.03,r));
-        float gasT=mix(flo,1.85,sT)*(1.0+0.7*lineR);                          // thin bright threads along the rings
+        float sT=smoothstep(0.35,0.67,gg); float flo=mix(0.80,0.05,smoothstep(0.78,1.03,r));
+        float gasT=mix(flo,1.85,sT)*(1.0+1.0*lineR);                          // thin bright threads along the rings
         float gas=mix(gasM,gasT,kc);
         gas*=mix(1.0, 0.18+1.8*arm, uArms);
         float bar=exp(-r*r/0.030)*pow(abs(cos(th-0.55)),5.0); gas+=1.5*bar*smoothstep(0.5,1.0,uArms);
         float dust=smoothstep(0.50,0.64,d); dust*=mix(1.0, 0.30+1.5*smoothstep(0.22,0.90,r), kc); dust=max(dust, 0.55*gap*smoothstep(0.30,0.75,r));    // dark features grow as the disk gets bigger
         dust=mix(dust, clamp(dust*0.55+lane*1.25,0.0,1.6), uArms);
         // opening disk: the gold layer is filled in — few dark gaps there. The white centre inside it and the cooler layers outside it are left as they were.
-        { float fillK=(1.0-uBlue)*smoothstep(0.13,0.24,r)*(1.0-smoothstep(0.36,0.60,r)); gas=mix(gas, 0.85+0.65*gas, 0.42*fillK); dust*=1.0-0.70*fillK; }
+        { float fillK=(1.0-uBlue)*smoothstep(0.13,0.24,r)*(1.0-smoothstep(0.36,0.60,r)); gas=mix(gas, 0.85+0.65*gas, 0.10*fillK); dust*=1.0-0.70*fillK; }
         return vec3(gas,dust,rel);
       }
       void main(){
@@ -583,8 +586,8 @@ function boot() {
                   float knot=aw*smoothstep(0.24,0.5,r)*smoothstep(0.30,0.46,f.y)*(1.0-smoothstep(0.60,0.85,f.y));   // glowing hydrogen beside the dust lanes
                   float young=aw*smoothstep(2.2,4.2,f.x);                                                      // young blue-white clusters in the densest gas
                   tc3=mix(tc3, vec3(0.56,0.72,1.0), 0.22*young);
-                  float iOld=1.0/(pow(r,1.55)*12.0+0.05); float inten=mix(max(iOld, 1.0/(r*4.3+0.07)), iOld, uBlue); inten*=1.0+0.35*knot+0.08*young;   // opening disk: centre as bright as before, outer disk lifted so the whole surface glows
-                  { float cu=1.0-uBlue; float sN=clamp((f.x-0.55)/1.3,0.0,1.0); vec3 cc=closeC(r+(0.34*(1.0-sN)-0.13*sN+0.12*clamp(f.y,0.0,1.0))*smoothstep(0.20,0.36,r));    // a few teal wisps in the outer gas
+                  float iOld=1.0/(pow(r,1.55)*12.0+0.05); float inten=mix(max(iOld, 1.0/(r*3.9+0.14)), iOld, uBlue); inten*=1.0+0.35*knot+0.08*young;   // opening disk: centre as bright as before, outer disk lifted so the whole surface glows
+                  { float cu=1.0-uBlue; float sN=clamp((f.x-0.55)/1.3,0.0,1.0); vec3 cc=closeC(r+(0.24*(1.0-sN)-0.07*sN+0.08*clamp(f.y,0.0,1.0))*smoothstep(0.20,0.32,r));    // a few teal wisps in the outer gas
                     tc3=mix(tc3, cc, cu); inten*=1.0-0.62*cu*(1.0-smoothstep(0.03,0.18,r)); }   // ease the inner gas off pure white so its blue survives
                   float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=(1.0-uBlue)*0.75*(1.0-smoothstep(0.45,0.85,r));   // the brighter/dimmer sides apply to the fast inner gas, not the slow outer rim
                   inten*=mix(1.0,dop*dop*dop,beam); tc3=mix(tc3, tc3*vec3(0.84,0.97,1.22), clamp((dop-1.0)*1.6,0.0,1.0)*beam);
@@ -658,9 +661,10 @@ function boot() {
         // The star lights the gas around it. Nothing is painted over the gas: its own swirls stay visible and simply turn blue,
         // strongest beside the star and falling away with distance the way light does. Most of the pool lies in the disk's plane,
         // so it is foreshortened into an ellipse like everything else on the disk.
-        { float pool=1.0/(1.0+(r0*r0)/(0.085*0.085)); float near=exp(-bb*bb/0.0022);
-          float w=cu2*front*clamp(0.85*pool+0.45*near,0.0,0.95);
-          col=mix(col, col*vec3(0.035,0.27,1.0)*0.85, w); }
+        { float pool=1.0/(1.0+(r0*r0)/(0.115*0.115)); pool*=sqrt(pool); float near=exp(-bb*bb/0.0020);
+          float w=cu2*front*clamp(0.80*pool+0.40*near,0.0,0.94);
+          vec3 tint=mix(vec3(0.34,0.66,1.0)*1.12, vec3(0.06,0.34,1.0)*1.0, clamp(pool*pool*0.9+0.5*near,0.0,1.0));
+          col=mix(col, col*tint, w); }
         // the dwarf star at the exact centre: a small neon-blue sphere, white-hot face-on and deep blue at its limb, with a mottled surface
         if(cu2>0.01){ const float RS=0.012; float bq=dot(ro,rd), cq=dot(ro,ro)-RS*RS, hq=bq*bq-cq;
           if(hq>0.0){ float ts=-bq-sqrt(hq);

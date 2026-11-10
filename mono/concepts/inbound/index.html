@@ -563,6 +563,36 @@ function boot() {
             }
           }
         }
+        // Central swell (opening disk only): a low dome of fast inner gas over the core, so the middle has height.
+        // The gas inside it turns with the inner disk and leans upward as it goes, so some of it travels over the centre, not only around it.
+        float cuB=1.0-uBlue;
+        if(cuB>0.01){
+          const float BA=0.24; const float BC=0.072; float sc=BA/BC;
+          vec3 ro2=vec3(ro.x,ro.y*sc,ro.z), rd2=vec3(rd.x,rd.y*sc,rd.z);
+          float qa=dot(rd2,rd2), qb=dot(ro2,rd2), qc=dot(ro2,ro2)-BA*BA; float disc=qb*qb-qa*qc;
+          if(disc>0.0){
+            float sq=sqrt(disc); float t0=max((-qb-sq)/qa,0.0), t1=(-qb+sq)/qa;
+            if(t1>t0){
+              vec3 colB=vec3(0.0); float TrB=1.0; float dtb=(t1-t0)/8.0;
+              float tt=t0+dtb*fract(ign(gl_FragCoord.xy+5.588238*floor(mod(uT*60.0,64.0)))+0.37);
+              for(int i=0;i<8;i++){
+                vec3 p=ro+rd*tt; float r=length(p.xz); float m2=(r*r)/(BA*BA)+(p.y*p.y)/(BC*BC);
+                if(m2<1.0){
+                  float fall=1.0-m2; fall*=fall;
+                  float th=atan(p.z,p.x)+1.1*p.y/BC;                              // structure leans with height: gas arcing up and over
+                  vec2 f=field(p,max(r,0.02),th,p.y/0.014,1.0);
+                  float gs=clamp(f.x/2.6,0.0,1.0); float dens=fall*(0.06+0.94*smoothstep(0.10,0.62,gs))*cuB;
+                  float re=BA*sqrt(m2); vec3 cc=closeC(0.09+re*0.75);                    // white-hot at its heart, cooling to gold toward its skin
+                  float inten=1.0/(pow(re,1.55)*12.0+0.05); inten*=1.0-0.45*(1.0-smoothstep(0.03,0.18,re));
+                  colB+=TrB*cc*inten*dens*dtb*10.0*(1.0-0.75*clamp(f.y,0.0,1.0));
+                  TrB*=exp(-(dens*7.0+clamp(f.y,0.0,1.0)*fall*16.0)*dtb);
+                }
+                tt+=dtb;
+              }
+              if(tp<0.0||t0<tp){ col=colB+TrB*col; Tc*=TrB; } else { col+=Tr*colB; }   // in front of the far disk, behind the near disk
+            }
+          }
+        }
         float tcl=max(tc,0.0); float bb=length(ro+rd*tcl);
         float front=smoothstep(-0.02,0.02,tc);
         float cu2=1.0-uBlue;

@@ -3,10 +3,11 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { SECTIONS, STORAGE_KEYS } from "@/config";
 
 // Helper to navigate back to projects section
 export const handleBackToProjects = () => {
-  sessionStorage.setItem("currentSection", "PROJECTS");
+  sessionStorage.setItem(STORAGE_KEYS.CURRENT_SECTION, SECTIONS.PROJECTS);
 };
 
 // Animated Section wrapper

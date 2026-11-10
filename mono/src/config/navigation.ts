@@ -37,9 +37,7 @@ export const MAIN_MENU_ITEMS: SectionValue[] = [
 ];
 
 // Menu items excluding specific sections (used for navigation within sections)
-export const getMenuItemsExcluding = (exclude: SectionValue[]): string[] => {
-  return MAIN_MENU_ITEMS.filter((item) => !exclude.includes(item)).map(
-    (item) => item.replace('ABOUT ME', 'About Me') // Format for display
-  );
+export const getMenuItemsExcluding = (exclude: SectionValue[]): SectionValue[] => {
+  return MAIN_MENU_ITEMS.filter((item) => !exclude.includes(item));
 };
 

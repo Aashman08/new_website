@@ -1,12 +1,10 @@
 "use client"
 
-import React, { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import React from "react";
 import { ProjectsGrid } from "./ProjectsGrid";
-import MainMenubar from "@/components/layout/MainMenubar";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { SectionModal, SectionPanel, SectionTitle } from "@/components/layout/SectionModal";
 import { FloatingDock } from "@/components/ui/floating-dock";
+import { SECTIONS } from "@/config";
 import type { SectionProps } from "@/types";
 
 import {
@@ -75,80 +73,21 @@ const mlTooling = [
   { title: "CNN", icon: <IconBrain className="h-full w-full text-white" />, href: "#" },
 ];
 
+const skillCategories = {
+  "LANGUAGES": languages,
+  "BACKEND & INFRASTRUCTURE": backendInfra,
+  "ML & LLM TOOLING": mlTooling,
+};
+
 const ProjectsSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemClick }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      if (modalRef.current) {
-        modalRef.current.scrollTop = 0;
-      }
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  const MenuTitles = ['About Me', 'Contact', 'Research', 'Art'];
-
-  const skillCategories = {
-    "LANGUAGES": languages,
-    "BACKEND & INFRASTRUCTURE": backendInfra,
-    "ML & LLM TOOLING": mlTooling,
-  };
-
-  if (!isOpen) return null;
-
   return (
-    <div
-      ref={modalRef}
-      className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-80 font-sans"
-    >
-      {/* Fixed Menubar at Top */}
-      <div className="fixed top-6 sm:top-8 left-0 right-0 z-[60] px-4 flex justify-center">
-        <MainMenubar titles={MenuTitles} onItemClick={(title) => onMenuItemClick?.(title)} />
-      </div>
-
-      {/* Modal content container */}
-      <div className="relative w-full max-w-6xl mx-auto mt-20 sm:mt-24 md:mt-28 mb-6 md:mb-10 p-4 sm:p-6 md:p-10 bg-black text-white rounded-lg shadow-lg">
-        {/* Close button */}
-        <Button
-          onClick={onClose}
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white hover:bg-white/10"
-        >
-          <X className="h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="sr-only">Close</span>
-        </Button>
-
-        <div className="flex flex-col items-center pt-2 justify-center mb-6 sm:mb-8 md:mb-10">
-          <motion.h2 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl sm:text-3xl md:text-5xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase"
-          >
-            Projects
-          </motion.h2>
-        </div>
+    <SectionModal section={SECTIONS.PROJECTS} isOpen={isOpen} onMenuItemClick={onMenuItemClick}>
+      <SectionPanel onClose={onClose}>
+        <SectionTitle>Projects</SectionTitle>
 
         <ProjectsGrid />
 
-        {/* Skills Section */}
-        <div className="flex flex-col items-center pt-10 sm:pt-12 md:pt-16 justify-center mb-6 sm:mb-8 md:mb-10">
-          <motion.h2 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl sm:text-3xl md:text-5xl font-light text-white tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase"
-          >
-            Skills
-          </motion.h2>
-        </div>
+        <SectionTitle className="pt-10 sm:pt-12 md:pt-16">Skills</SectionTitle>
 
         {Object.entries(skillCategories).map(([category, items]) => (
           <div key={category} className="flex flex-col items-center mt-4 sm:mt-6 md:mt-8">
@@ -160,9 +99,8 @@ const ProjectsSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCl
             </div>
           </div>
         ))}
-
-      </div>
-    </div>
+      </SectionPanel>
+    </SectionModal>
   );
 };
 

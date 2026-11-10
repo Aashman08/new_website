@@ -64,11 +64,11 @@ export const BentoGridItem = ({
       <div 
         className="relative h-full w-full rounded-3xl p-4 flex flex-col space-y-4 justify-between overflow-hidden transition-all duration-300"
         style={{
-          background: "linear-gradient(145deg, rgba(20,20,20,0.85) 0%, rgba(10,10,10,0.95) 100%)",
-          border: `1px solid ${isHovered && accentColor ? hexToRgba(accentColor, 0.3) : "rgba(255,255,255,0.08)"}`,
+          background: "linear-gradient(145deg, rgba(18,18,18,0.9) 0%, rgba(6,6,6,0.97) 100%)",
+          border: `1px solid ${isHovered && accentColor ? hexToRgba(accentColor, 0.24) : "rgba(255,255,255,0.10)"}`,
           boxShadow: isHovered && accentColor 
-            ? `inset 1px 1px 0px ${hexToRgba(accentColor, 0.15)}, 0 0 30px ${hexToRgba(accentColor, 0.1)}`
-            : "inset 1px 1px 0px rgba(255,255,255,0.08), 0 0 40px rgba(255,255,255,0.01)",
+            ? `inset 1px 1px 0px ${hexToRgba(accentColor, 0.12)}, 0 18px 60px rgba(0,0,0,0.35), 0 0 28px ${hexToRgba(accentColor, 0.08)}`
+            : "inset 1px 1px 0px rgba(255,255,255,0.08), 0 18px 60px rgba(0,0,0,0.24)",
         }}
       >
         {/* Top edge highlight - glowing light effect */}

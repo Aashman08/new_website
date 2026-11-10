@@ -3,10 +3,11 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { SECTIONS, STORAGE_KEYS } from "@/config";
 
 // Helper to navigate back to research section
 export const handleBackToResearch = () => {
-  sessionStorage.setItem("currentSection", "RESEARCH");
+  sessionStorage.setItem(STORAGE_KEYS.CURRENT_SECTION, SECTIONS.RESEARCH);
 };
 
 // Reusable Components for Research Pages

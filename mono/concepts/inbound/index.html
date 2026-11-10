@@ -37,8 +37,7 @@ html.ready #boot{opacity:0;pointer-events:none}
 @keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-22px,14px)}40%{transform:translate(18px,-30px)}60%{transform:translate(-36px,-12px)}80%{transform:translate(30px,26px)}100%{transform:translate(0,0)}}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:18px;padding:22px var(--pad);
-  background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.32) 55%,rgba(0,0,0,0))}
+nav{position:fixed;top:0;right:0;z-index:20;display:flex;align-items:center;justify-content:flex-end;padding:22px var(--pad)}
 .mark{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;white-space:nowrap}
 .mark i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:10px;box-shadow:0 0 12px var(--amber);vertical-align:1px}
 .links{margin-left:auto;display:flex;gap:clamp(14px,2.2vw,30px)}
@@ -100,7 +99,7 @@ html.done #after{display:block}
 .eyebrow{color:var(--amber);display:flex;gap:14px;align-items:center}
 .eyebrow::before{content:"";width:34px;height:1px;background:var(--amber)}
 
-#s-hero{flex-direction:column;justify-content:flex-end;background:linear-gradient(0deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.36) 16%,rgba(0,0,0,0) 34%)}
+#s-hero{flex-direction:column;justify-content:flex-start;padding-top:30px!important;background:linear-gradient(180deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,.3) 14%,rgba(0,0,0,0) 30%)}
 #s-hero .row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-right:clamp(0px,12vw,170px)}
 #s-hero p{margin:14px 0 0;max-width:34ch;font-family:var(--display);font-weight:600;font-size:clamp(17px,1.7vw,24px);line-height:1.25;letter-spacing:-.01em}
 .scrollhint{display:flex;align-items:center;gap:12px;color:var(--dim);white-space:nowrap}
@@ -173,14 +172,14 @@ body.panel-open #panel{transform:none;visibility:visible}
 /* MOBILE */
 @media (max-width:820px){
   #rail{display:none}
-  nav{flex-wrap:wrap;gap:8px 12px;padding:14px var(--pad) 18px}
+  nav{padding:14px var(--pad)}
   #sound{margin-left:auto;padding:7px 11px;font-size:10px}
   .links{order:3;width:100%;margin:0;justify-content:space-between;gap:8px}
   .links a,.links button{font-size:10px;letter-spacing:.16em;padding:6px 0}
   #stage section{padding-top:112px;padding-bottom:30px}
   #s-hero .row{padding-right:0;flex-direction:column;align-items:flex-start;gap:16px}
   .scrollhint::after{height:22px}
-  #s-hero{padding-bottom:84px}
+  #s-hero{padding-top:18px!important;padding-right:120px}
   h1{font-size:calc((100vw - 2*var(--pad))/8.6);margin-top:12px}
   #stage #s-name{justify-content:flex-end;padding:0 var(--pad) 34px;background:linear-gradient(0deg,rgba(0,0,0,.86) 0%,rgba(0,0,0,.6) 34%,rgba(0,0,0,0) 56%)}
   .tagline{margin-top:16px}
@@ -204,14 +203,7 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
 <div id="boot" role="status"><i></i>Loading</div>
 <div id="grain" aria-hidden="true"></div>
 
-<nav aria-label="Primary">
-  <a class="mark" href="#top" id="home"><i></i>Aashman Rastogi</a>
-  <div class="links">
-    <a href="#work" id="nav-work">Work</a>
-    <button type="button" data-open="about">About</button>
-    <button type="button" data-open="experiments">Experiments</button>
-    <button type="button" data-open="contact">Contact</button>
-  </div>
+<nav aria-label="Sound">
   <button type="button" id="sound" aria-pressed="false" aria-label="Toggle ambient sound"><span class="eq"><b></b><b></b><b></b></span><span id="sound-t">Sound off</span></button>
 </nav>
 
@@ -232,6 +224,7 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
     <div class="cta-row pe">
       <a class="cta" href="#work" id="cta-work">Work <span aria-hidden="true">&rarr;</span></a>
       <button type="button" class="cta ghost" data-open="about">About</button>
+      <button type="button" class="cta ghost" data-open="experiments">Experiments</button>
       <button type="button" class="cta ghost" data-open="contact">Contact</button>
     </div>
     <a href="#top" id="replay" class="pe">&#8634; Replay intro</a>
@@ -402,9 +395,7 @@ addEventListener('keydown', (e) => { if (e.key === 'Escape' && !document.body.cl
 $('#replay').addEventListener('click', (e) => { e.preventDefault(); replay(); });
 const workMsg = 'Projects continue from here';
 const ensureLanded = () => { if (mode !== 'done') land(true); };
-$('#nav-work').addEventListener('click', (e) => { e.preventDefault(); closePanel(); ensureLanded(); const a = $('#after'); if (a) a.scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); });
 $('#cta-work').addEventListener('click', (e) => { e.preventDefault(); const a = $('#after'); if (a) a.scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); toast(workMsg); });
-$('#home').addEventListener('click', (e) => { e.preventDefault(); closePanel(); scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }); });
 document.querySelectorAll('nav [data-open]').forEach((b) => b.addEventListener('click', ensureLanded));
 setMode(Q.get('skip') === '1' ? 'done' : 'idle'); if (mode === 'done') prog = 1;
 if (P_PARAM !== null) { prog = P_PARAM; introT = 1; setMode(prog >= 1 ? 'done' : prog <= 0 ? 'idle' : 'paused'); }
@@ -447,7 +438,7 @@ function boot() {
 
   const GAL = /* glsl */`
     uniform float uW, uPat, uArms;
-    float omega(float r){ return 0.004 + uW*pow(r,1.7); }
+    float omega(float r){ return uW/pow(r+0.16,1.5); }                 // near-Keplerian: the inner disk whips round, the outer layers turn slowly
     float armPhase(float r,float th){ return th - uPat - 3.3*log(r+0.05); }
     float armF(float r,float th){ float c=0.5+0.5*cos(2.0*armPhase(r,th)); return c*c*smoothstep(0.10,0.26,r); }
     float laneF(float r,float th){ float c=0.5+0.5*cos(2.0*(armPhase(r,th)+0.62)); return pow(c,5.0)*smoothstep(0.12,0.3,r); }
@@ -457,7 +448,7 @@ function boot() {
   const STEPS = SMALL ? 12 : 20;
   const volU = {
     uN: { value: noiseTex }, uCam: { value: new THREE.Vector3() }, uRot: { value: new THREE.Matrix3() },
-    uTan: { value: 0.3 }, uAspect: { value: 1 }, uGT: { value: 0 }, uT: { value: 0 }, uW: { value: 0.34 }, uPat: { value: 0 },
+    uTan: { value: 0.3 }, uAspect: { value: 1 }, uGT: { value: 0 }, uT: { value: 0 }, uW: { value: 0.09 }, uPat: { value: 0 },
     uArms: { value: 0.4 }, uBlue: { value: 0 }, uGain: { value: 1 }, uHaze: { value: 1 }, uSteps: { value: STEPS },
   };
   const volMat = new THREE.ShaderMaterial({
@@ -486,7 +477,7 @@ function boot() {
         float rid=1.0-abs(2.0*(B.r*0.6*f2+0.3*(1.0-f2)+C.g*0.4*fine+0.2*(1.0-fine))-1.0);
         return vec2(n*0.72+rid*0.28, A.a*0.62+B.a*0.38); }
       vec2 field(vec3 p,float r,float th,float v,float fine){
-        float om=omega(r); const float T=24.0;
+        float om=omega(r); const float T=18.0;
         float f1=fract(uGT/T), f2=fract(uGT/T+0.5);
         float w1=1.0-abs(2.0*f1-1.0), w2=1.0-w1;
         float a1=(th-om*(f1-0.5)*T)/6.2831853, a2=(th-om*(f2-0.5)*T)/6.2831853+0.371;
@@ -514,7 +505,7 @@ function boot() {
           float h=hgt(min(r0,1.25)); float vcam=ro.y/h;
           float vS=sy<0.0?min(VM,vcam):max(-VM,vcam); float vE=sy<0.0?-VM:VM;
           if((vE-vS)*sy>0.0){
-            float dv=(vE-vS)/uSteps; float v=vS+dv*fract(wn(gl_FragCoord.xy+fract(uT*3.7)*91.0));
+            float dv=(vE-vS)/uSteps; float fr=floor(mod(uT*60.0,64.0)); float v=vS+dv*fract(ign(gl_FragCoord.xy+5.588238*fr)+0.45*wn(gl_FragCoord.xy+fr*17.0));   // per-frame jitter: even coverage without a visible hatch
             float ds=abs(dv)*hgt(min(r0,1.25))/ay;                          // spacing between samples along the ray
             float sfine=smoothstep(0.022,0.004,ds); float sfade=smoothstep(0.12,0.035,ds);
             if(sfade>0.004) for(int i=0;i<STEPS;i++){
@@ -532,6 +523,8 @@ function boot() {
                   vec3 tc3=tempC(r);
                   tc3=mix(tc3, vec3(0.42,0.60,1.0), uBlue*armF(r,th)*smoothstep(0.22,0.6,r)*0.8);
                   float inten=1.0/(pow(r,1.55)*12.0+0.05);
+                  float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=(1.0-uBlue)*0.75;
+                  inten*=mix(1.0,dop*dop*dop,beam); tc3=mix(tc3, tc3*vec3(0.84,0.97,1.22), clamp((dop-1.0)*1.6,0.0,1.0)*beam);
                   float lit=(1.0-0.7*dust)*(0.72+0.28*clamp(v*sign(ro.y),-1.0,1.0));
                   float dt=min(abs(dv)*h/ay,0.07);
                   col+=Tr*tc3*inten*dens*lit*dt*17.0*sfade*exp(-max(t-0.9,0.0)*0.5*uHaze);
@@ -562,7 +555,7 @@ function boot() {
     const aP = new Float32Array(NP * 4), aS = new Float32Array(NP * 2), pos = new Float32Array(NP * 3);
     const gs = () => { let u = 0, v = 0; while (u === 0) u = Math.random(); while (v === 0) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2831853 * v); };
     for (let i = 0; i < NP; i++) {
-      const r = Math.min(1.08, 0.16 + Math.pow(Math.random(), 0.7) * 0.92), th = Math.random() * 6.2831853, h = gs() * (0.006 + 0.03 * r * r);
+      const r = Math.min(1.08, 0.16 + Math.pow(Math.random(), 0.7) * 0.92), th = Math.random() * 6.2831853, h = gs() * (0.004 + 0.012 * r * r);
       const big = Math.random() < 0.012;
       aP.set([r, th, h, Math.random()], i * 4); aS.set([big ? 4.6 + Math.random() * 2 : 1.0 + Math.pow(Math.random(), 3) * 1.2, big ? 1 : 0], i * 2);
     }
@@ -586,7 +579,8 @@ function boot() {
           alpha*=smoothstep(0.14,0.5,r)*smoothstep(1.09,0.9,r);                 // few inside the bright gas
           alpha*=0.82+0.18*sin(uT*(0.8+seed*2.0)+seed*90.0);
           alpha*=smoothstep(0.5,6.0,-mv.z);
-          vBig=aS.y; gl_PointSize=aS.x*uDpr; vA=alpha*uGain; gl_Position=projectionMatrix*mv;
+          float graze=smoothstep(0.05,0.34,abs(normalize(cameraPosition-P).y)); alpha*=graze;
+          vBig=aS.y; gl_PointSize=aS.x*uDpr*mix(0.75,1.0,graze); vA=alpha*uGain; gl_Position=projectionMatrix*mv;
         }`,
       fragmentShader: /* glsl */`
         varying vec3 vCol; varying float vA; varying float vBig;

@@ -56,6 +56,7 @@ nav{position:fixed;top:0;right:0;z-index:20;display:flex;align-items:center;just
 #enter{position:fixed;left:0;top:0;z-index:16;width:0;height:0;opacity:0;transition:opacity .5s}
 html:not(.idle) #enter{pointer-events:none}
 #enter .hit{position:absolute;left:-90px;top:-64px;width:180px;height:170px;border-radius:40px;cursor:pointer;display:block}
+#enter .ring,#enter .dot{display:none!important}
 #enter .ring{position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(14,9,4,.9);box-shadow:0 0 0 1px rgba(255,255,255,.22);transition:transform .6s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
 #enter .ring::before,#enter .ring::after{content:"";position:absolute;inset:-1.5px;border-radius:50%;border:1px solid rgba(14,9,4,.75);animation:ringp 2.8s cubic-bezier(.2,.6,.3,1) infinite}
 #enter .ring::after{animation-delay:1.4s}
@@ -423,7 +424,7 @@ if (!renderer) { root.classList.add('nogl', 'ready'); S.hero.style.opacity = '1'
 function boot() {
   renderer.setPixelRatio(DPR);
   renderer.setSize(innerWidth, innerHeight, false);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.NoToneMapping;                  // the same filmic tone curve is applied in the lens pass instead
   renderer.toneMappingExposure = 1.0;
   renderer.setClearColor(0x000000, 1);
   const R = 100;
@@ -478,42 +479,70 @@ function boot() {
         c=mix(c, vec3(0.36,0.035,0.012), smoothstep(0.58,1.0,r)); return c; }
       vec3 ramp(vec3 a,vec3 b,float lo,float hi,float r){ return mix(a,b,clamp((r-lo)/(hi-lo),0.0,1.0)); }
       vec3 closeC(float r){
-        vec3 c=ramp(vec3(0.36,0.62,1.0), vec3(0.62,0.80,1.0), 0.00,0.08,r);      // blue heat at the very centre
-        c=ramp(c, vec3(0.96,0.96,1.0), 0.06,0.16,r);                             // cooling through blue-white to white
-        c=ramp(c, vec3(1.0,0.82,0.46), 0.13,0.27,r);                             // white into gold
-        c=ramp(c, vec3(1.0,0.52,0.14), 0.23,0.46,r);                             // gold into deep orange
-        c=ramp(c, vec3(0.95,0.22,0.05), 0.42,0.64,r);                            // orange into red
-        c=ramp(c, vec3(0.84,0.10,0.03), 0.60,0.78,r);                            // a full, saturated red through the outer disk
-        c=ramp(c, vec3(0.60,0.05,0.02), 0.76,0.96,r);                            // deepening to dark red at the rim
-        c=ramp(c, vec3(0.50,0.07,0.13), 1.00,1.14,r);                            // only the faintest hint of pink at the very last edge
-        return c*(1.0+0.35*smoothstep(0.62,1.0,r)); }                            // a small lift so the outer red reads without washing toward pink
+        vec3 c=ramp(vec3(0.36,0.62,1.0), vec3(0.62,0.80,1.0), 0.00,0.08,r);     // neon blue: the hottest gas, right at the core
+        c=ramp(c, vec3(0.96,0.96,1.0), 0.06,0.16,r);                             // into a ring of white gas
+        c=ramp(c, vec3(1.0,0.95,0.68), 0.15,0.24,r);                             // white into pale yellow
+        c=ramp(c, vec3(1.0,0.80,0.24), 0.21,0.33,r);                             // bright yellow
+        c=ramp(c, vec3(1.0,0.57,0.085), 0.28,0.46,r);                            // yellow into orange
+        c=ramp(c, vec3(1.0,0.35,0.035), 0.44,0.64,r);                            // deep orange
+        c=ramp(c, vec3(0.92,0.19,0.02), 0.62,0.84,r);                            // orange into red
+        c=ramp(c, vec3(0.62,0.08,0.012), 0.84,1.06,r);                           // deep red at the rim
+        return c*(1.0+0.5*smoothstep(0.60,1.0,r)); }
       float ign(vec2 p){ return fract(52.9829189*fract(dot(p,vec2(0.06711056,0.00583715)))); }
       float wn(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
-      // one phase of orbit-stretched gas: ridged filaments (x) and dust (y)
+      // Milky Way pattern (unchanged): orbit-stretched gas
       vec2 phase(vec3 c,float fine){
         vec4 A=tx(c), B=tx(c*vec3(3.0,2.9,2.0)+0.31); vec4 C=vec4(0.5); if(fine>0.02) C=tx(c*vec3(9.0,8.3,4.0)+0.67);
         float f2=0.35+0.65*fine;
         float n=A.r*0.56+(B.g*0.30*f2+0.15*(1.0-f2))+C.b*0.14*fine+0.07*(1.0-fine);
         float rid=1.0-abs(2.0*(B.r*0.6*f2+0.3*(1.0-f2)+C.g*0.4*fine+0.2*(1.0-fine))-1.0);
         return vec2(n*0.72+rid*0.28, A.a*0.62+B.a*0.38); }
-      vec2 field(vec3 p,float r,float th,float v,float fine){
+      // Opening-disk pattern: turbulent gas.
+      //  · laid out in log-spiral coordinates, so features trail inward along spirals instead of sitting on perfect circles
+      //  · three sizes of detail, each bent by the one above it (domain warping), which is what produces curls, hooks and eddies across the flow
+      //  · returns x: gas, y: dust, z: how fast the gas thickens going outward (used to light the cloud faces that look toward the core)
+      vec3 phaseT(float a,float lr,float y,float fine){
+        vec3 c=vec3(2.0*a+3.0*lr/6.2831853, 5.6*lr/6.2831853, y);
+        vec4 A=tx(c); vec2 w1=(A.gb-0.5)*vec2(1.0,0.42);
+        vec3 cB=c*vec3(3.0,3.0,2.0)+vec3(0.31,0.17,0.5)+vec3(w1*0.36,0.0);
+        vec4 B=tx(cB); float Bin=tx(cB-vec3(0.0,0.035,0.0)).r; vec2 w2=B.gb-0.5;
+        vec4 C=vec4(0.5); if(fine>0.02) C=tx(c*vec3(9.0,9.0,4.0)+vec3(0.67,0.41,0.2)+vec3(w1*1.08+w2*vec2(0.40,0.20),0.0));
+        float n=A.r*0.40+B.r*0.36+mix(0.5,C.r,fine)*0.24;
+        float rid=1.0-abs(2.0*(B.a*0.55+mix(0.5,C.a,fine)*0.45)-1.0);
+        return vec3(n*0.76+rid*0.24, A.a*0.60+B.b*0.40, B.r-Bin); }
+      vec3 field(vec3 p,float r,float th,float v,float fine){
         float om=omega(r); const float T=18.0;
         float f1=fract(uGT/T), f2=fract(uGT/T+0.5);
         float w1=1.0-abs(2.0*f1-1.0), w2=1.0-w1;
         float a1=(th-om*(f1-0.5)*T)/6.2831853, a2=(th-om*(f2-0.5)*T)/6.2831853+0.371;
-        float rr=pow(r,0.72)*2.0; float yy=v*0.045;
-        vec2 P1=phase(vec3(a1,rr,yy),fine), P2=phase(vec3(a2,rr+0.43,yy+0.2),fine);
-        float nw=sqrt(w1*w1+w2*w2);                                      // keep contrast through the cross-fade
-        float g=(P1.x*w1+P2.x*w2-0.5)/nw+0.5;
-        float d=(P1.y*w1+P2.y*w2-0.5)/nw+0.5;
-        { float cz=smoothstep(0.004,0.05,r); g=mix(0.62,g,cz); d=mix(0.45,d,cz); }       // the pattern dissolves at the very centre instead of pinching to a point
+        float yy=v*0.045; float nw=sqrt(w1*w1+w2*w2);                      // keep contrast through the cross-fade
+        float kc=1.0-uBlue; float g=0.5, d=0.5, rel=0.0;
+        if(kc<0.98){ float rr=pow(r,0.72)*2.0;
+          vec2 P1=phase(vec3(a1,rr,yy),fine), P2=phase(vec3(a2,rr+0.43,yy+0.2),fine);
+          g=(P1.x*w1+P2.x*w2-0.5)/nw+0.5; d=(P1.y*w1+P2.y*w2-0.5)/nw+0.5; }
+        if(kc>0.02){ float lr=log(r+0.03);
+          vec3 Q1=phaseT(a1,lr,yy,fine), Q2=phaseT(a2,lr,yy+0.37,fine);
+          float gT=(Q1.x*w1+Q2.x*w2-0.5)/nw+0.5, dT=(Q1.y*w1+Q2.y*w2-0.5)/nw+0.5;
+          g=mix(g,gT,kc); d=mix(d,dT,kc); rel=(Q1.z*w1+Q2.z*w2)*kc; }
+        { float cz=smoothstep(0.004,0.05,r); g=mix(0.62,g,cz); d=mix(0.45,d,cz); rel*=cz; }       // the pattern dissolves at the very centre instead of pinching to a point
         float arm=armF(r,th), lane=laneF(r,th);
-        float gas=smoothstep(0.40,0.72,g); gas=0.02+2.6*gas*gas;
+        // opening disk: two broad spiral waves sweep through the gas, so there are big bright bands and dark gaps as well as small detail
+        float lrb=log(r+0.03), thp=th-uGT*0.012;
+        float big=0.6*sin(2.0*(thp+2.2*lrb)+5.0*(g-0.5))+0.4*sin(3.0*(thp+3.1*lrb)+1.7+3.0*(d-0.5));
+        float gg=g+0.075*big*kc*smoothstep(0.16,0.34,r);
+        float ringW=kc*smoothstep(0.10,0.22,r)*(1.0+0.35*smoothstep(0.42,0.9,r)); float lineR=0.0; float gap=0.0;
+        if(ringW>0.01){ float wq=(d-0.5)*0.045+(g-0.5)*0.03;                 // the turbulence pushes the rings in and out, so their edges curl
+          float r0=tx(vec3(0.13, lrb*0.17+wq*0.4, 0.77)).b, rc=tx(vec3(0.37, lrb*0.45+wq, 0.11)).r, rf=tx(vec3(0.71, lrb*1.7+wq*3.0, 0.53)).g;   // broad rings, medium rings, fine rings
+          float rs=(r0-0.5)*0.62+(rc-0.5)*0.50+(rf-0.5)*0.18; gg+=rs*ringW; gap=clamp(-rs*2.6,0.0,1.0)*ringW; lineR=pow(1.0-abs(2.0*rf-1.0),5.0)*ringW; }
+        float gas=smoothstep(mix(0.40,0.455,kc),mix(0.72,0.585,kc),gg); gas=0.02+2.6*gas*gas;   // opening disk: crisp edges between bright and dark gas
+        gas*=1.0+0.7*lineR;                                                  // thin bright threads along the rings
         gas*=mix(1.0, 0.18+1.8*arm, uArms);
         float bar=exp(-r*r/0.030)*pow(abs(cos(th-0.55)),5.0); gas+=1.5*bar*smoothstep(0.5,1.0,uArms);
-        float dust=smoothstep(0.50,0.64,d);
+        float dust=smoothstep(0.50,0.64,d); dust*=mix(1.0, 0.30+1.5*smoothstep(0.22,0.90,r), kc); dust=max(dust, 0.55*gap*smoothstep(0.30,0.75,r));    // dark features grow as the disk gets bigger
         dust=mix(dust, clamp(dust*0.55+lane*1.25,0.0,1.6), uArms);
-        return vec2(gas,dust);
+        // opening disk: the gold layer is filled in — few dark gaps there. The white centre inside it and the cooler layers outside it are left as they were.
+        { float fillK=(1.0-uBlue)*smoothstep(0.13,0.24,r)*(1.0-smoothstep(0.36,0.60,r)); gas=mix(gas, 0.85+0.65*gas, 0.42*fillK); dust*=1.0-0.70*fillK; }
+        return vec3(gas,dust,rel);
       }
       void main(){
         vec2 ndc=vUv*2.0-1.0;
@@ -526,10 +555,10 @@ function boot() {
           float h=hgt(min(r0,1.25)); float vcam=ro.y/h;
           float vS=sy<0.0?min(VM,vcam):max(-VM,vcam); float vE=sy<0.0?-VM:VM;
           if((vE-vS)*sy>0.0){
-            float dv=(vE-vS)/uSteps; float fr=floor(mod(uT*60.0,64.0)); float v=vS+dv*wn(gl_FragCoord.xy+fr*17.3);   // per-frame jitter: even coverage without a visible hatch
+            float dv=(vE-vS)/uSteps; float fr=floor(mod(uT*60.0,64.0)); float v=vS+dv*(0.38+0.24*wn(gl_FragCoord.xy+fr*17.3));   // per-frame jitter: even coverage without a visible hatch
             float ds=abs(dv)*hgt(min(r0,1.25))/ay;                          // spacing between samples along the ray
             float sfine=smoothstep(0.022,0.004,ds); float sfade=smoothstep(0.12,0.035,ds);
-            vec2 fHold=vec2(0.0); bool fHave=false;
+            vec3 fHold=vec3(0.0); bool fHave=false;
             if(sfade>0.004) for(int i=0;i<STEPS;i++){
               if(float(i)>=uSteps) break;
               float t=(v*h-ro.y)/ry;
@@ -538,9 +567,9 @@ function boot() {
                 if(r<RMX){
                   float g=exp(-v*v); float th=atan(p.z,p.x);
                   float fine=sfine*(1.0-0.8*smoothstep(1.2,2.6,t)*uHaze);
-                  if(!fHave||(i-(i/2)*2)==0){ fHold=field(p,r,th,v,fine); fHave=true; }      // evaluated every other step, held in between
-                  vec2 f=fHold;
-                  float prof=smoothstep(1.10,0.80,r);
+                  if(!fHave||(i-(i/3)*3)==0){ fHold=field(p,r,th,v,fine); fHave=true; }      // evaluated every third step, held in between
+                  vec3 f=fHold;
+                  float prof=smoothstep(1.12,mix(0.94,0.80,uBlue),r);                 // the opening disk holds its brightness nearly to the edge
                   float dens=f.x*g*prof;
                   float dust=f.y*exp(-v*v*4.0)*prof*smoothstep(0.06,0.18,r);
                   vec3 tc3=tempC(r);
@@ -550,12 +579,12 @@ function boot() {
                   float knot=aw*smoothstep(0.24,0.5,r)*smoothstep(0.30,0.46,f.y)*(1.0-smoothstep(0.60,0.85,f.y));   // glowing hydrogen beside the dust lanes
                   float young=aw*smoothstep(2.2,4.2,f.x);                                                      // young blue-white clusters in the densest gas
                   tc3=mix(tc3, vec3(0.56,0.72,1.0), 0.22*young);
-                  float inten=1.0/(pow(r,1.55)*12.0+0.05); inten*=1.0+0.35*knot+0.08*young;
-                  { float cu=1.0-uBlue; vec3 cc=closeC(r); cc=mix(cc, vec3(0.12,0.72,0.82)*2.2, 0.05*smoothstep(0.50,0.80,f.y)*smoothstep(0.78,1.0,r));   // a few teal wisps in the outer gas
+                  float iOld=1.0/(pow(r,1.55)*12.0+0.05); float inten=mix(max(iOld, 1.0/(r*5.5+0.07)), iOld, uBlue);   // centre as bright as before; only the outer disk is lifted inten*=1.0+0.35*knot+0.08*young;
+                  { float cu=1.0-uBlue; vec3 cc=closeC(r+0.33*(1.0-clamp(f.x/1.7,0.0,1.0))*smoothstep(0.20,0.36,r));    // a few teal wisps in the outer gas
                     tc3=mix(tc3, cc, cu); inten*=1.0-0.62*cu*(1.0-smoothstep(0.03,0.18,r)); }   // ease the inner gas off pure white so its blue survives
-                  float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=(1.0-uBlue)*0.75;
+                  float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=(1.0-uBlue)*0.75*(1.0-smoothstep(0.45,0.85,r));   // the brighter/dimmer sides apply to the fast inner gas, not the slow outer rim
                   inten*=mix(1.0,dop*dop*dop,beam); tc3=mix(tc3, tc3*vec3(0.84,0.97,1.22), clamp((dop-1.0)*1.6,0.0,1.0)*beam);
-                  float lit=(1.0-0.7*dust)*(0.72+0.28*clamp(v*sign(ro.y),-1.0,1.0));
+                  float lit=(1.0-0.7*dust)*(0.72+0.28*clamp(v*sign(ro.y),-1.0,1.0)); lit*=1.0+clamp(f.z*4.5,-0.4,0.7);   // cloud faces turned toward the core are lit, the far sides fall into shadow
                   float dt=min(abs(dv)*h/ay,0.07);
                   col+=Tr*tc3*inten*dens*lit*dt*17.0*sfade*exp(-max(t-0.9,0.0)*0.5*uHaze);
                   Tr*=exp(-(dust*150.0+dens*3.0)*dt);
@@ -566,32 +595,49 @@ function boot() {
             }
           }
         }
+        // Haze above the disk (opening view): thin glowing gas riding over the surface in puffs and spilling a little past the rim
+        { float kh=1.0-uBlue; if(kh>0.01){ vec3 hz=vec3(0.0); float sgn=ro.y>0.0?1.0:-1.0;
+            for(int i=0;i<3;i++){ float hy=sgn*(i==0?0.030:(i==1?0.075:0.150)); float dh=(i==0?0.045:(i==1?0.06:0.09));
+              float t=(hy-ro.y)/rd.y; if(t>0.0){ vec3 q=ro+rd*t; float r=length(q.xz);
+                float wr=smoothstep(1.16,0.78,r)*smoothstep(0.10,0.30,r);
+                if(wr>0.003){ float lr=log(r+0.03); float th=atan(q.z,q.x)-uGT*0.02;
+                  float pf=tx(vec3((th+1.5*lr)/6.2831853, 2.1*lr/6.2831853, 0.6+float(i)*0.21)).r; pf=smoothstep(0.46,0.80,pf);
+                  hz+=closeC(clamp(r+0.22,0.0,1.0))*wr*pf*min(dh/ay,0.22)*(i==0?1.0:(i==1?0.55:0.22)); } } }
+            col+=hz*0.25*kh; } }
         // Central swell (opening disk only): a low dome of fast inner gas over the core, so the middle has height.
         // The gas inside it turns with the inner disk and leans upward as it goes, so some of it travels over the centre, not only around it.
         float cuB=(1.0-uBlue)*uSwell;
         if(cuB>0.01){
-          const float BA=0.40; const float BC=0.080; const float HB=0.044; float sc=BA/BC;   // BA, BC: outer bounds only · HB: height of the swell at the centre
+          const float BA=0.44; const float BC=0.16; const float HB=0.075; float sc=BA/BC;   // BA, BC: outer bounds only · HB: height of the swell at the centre
           vec3 ro2=vec3(ro.x,ro.y*sc,ro.z), rd2=vec3(rd.x,rd.y*sc,rd.z);
           float qa=dot(rd2,rd2), qb=dot(ro2,rd2), qc=dot(ro2,ro2)-BA*BA; float disc=qb*qb-qa*qc;
           if(disc>0.0){
             float sq=sqrt(disc); float t0=max((-qb-sq)/qa,0.0), t1=(-qb+sq)/qa;
             if(t1>t0){
               gRing=0.0;
-              // The swell is a smooth glow with no pattern of its own: any pattern here has no variation with height, so it shows as vertical threads.
-              // The streaks you see through it are the disk's own, lying flat in the plane beneath.
-              vec3 colB=vec3(0.0); float TrB=1.0; float dtb=(t1-t0)/6.0;
-              float tt=t0+dtb*0.5;
-              for(int i=0;i<6;i++){
+              // Gas over the centre, as a true 3D volume. The pattern lives in ordinary x/y/z space (not angle/radius), so it varies with height
+              // like real billowing gas and has no pole at the axis. The whole volume turns about the axis, and it is twisted by an amount that
+              // depends on a dome-shaped shell distance, so its wisps lean and arc up over the core instead of standing vertically.
+              vec3 colB=vec3(0.0); float TrB=1.0; float dtb=(t1-t0)/14.0;
+              float tt=t0+dtb*(0.2+0.6*wn(gl_FragCoord.xy+floor(mod(uT*60.0,64.0))*17.3+7.0));
+              for(int i=0;i<14;i++){
                 vec3 p=ro+rd*tt; float r=length(p.xz); float m2=(r*r)/(BA*BA)+(p.y*p.y)/(BC*BC);
                 if(m2<1.0){
                   // a gradual rise rather than a ball: the height of the gas tapers smoothly with distance from the centre and merges into the flat disk
-                  float hl=HB*(0.26+0.74*exp(-r*r/0.040));
+                  float hl=HB*(0.14+0.86*exp(-r*r/0.030));                          // a bell-shaped rise: tallest over the core, sloping away on every side
                   float fall=exp(-(p.y*p.y)/(hl*hl)*1.5)*(1.0-smoothstep(0.50,1.0,r/BA))*(1.0-smoothstep(0.70,1.0,m2));
-                  float dens=fall*0.40*cuB;
-                  float re=sqrt(r*r+p.y*p.y*9.0); vec3 cc=closeC(0.09+re*0.75);                    // white-hot at its heart, cooling to gold toward its skin
-                  float inten=1.0/(pow(re,1.55)*12.0+0.05); inten*=1.0-0.45*(1.0-smoothstep(0.03,0.18,re));
-                  colB+=TrB*cc*inten*dens*dtb*7.0;
-                  TrB*=exp(-dens*3.0*dtb);
+                  if(fall>0.004){
+                    float shell=sqrt(r*r+p.y*p.y*14.0);                             // equal on flattened domes over the core
+                    float ang=2.2*log(shell+0.06)-uGT*0.55; float ca=cos(ang), sa=sin(ang);
+                    vec3 c=vec3((ca*p.x-sa*p.z)*0.5, p.y*1.6+0.37+uT*0.004, (sa*p.x+ca*p.z)*0.5);   // turning, twisted frame; a slow rise so it keeps churning
+                    float n=tx(c).r*0.62+tx(c*2.6+0.31).g*0.38;
+                    float wisp=smoothstep(0.43,0.60,n);
+                    float dens=fall*(0.12+1.05*wisp)*0.70*cuB;
+                    float re=sqrt(r*r+p.y*p.y*9.0); vec3 cc=mix(vec3(0.96,0.96,1.0), closeC(re), smoothstep(0.16,0.34,re)); cc=mix(cc, vec3(0.42,0.64,1.0), 0.30+0.30*wisp);   // hot white gas with a blue tint, strongest in the dense wisps
+                    float inten=1.0/(pow(re,1.55)*12.0+0.05); inten*=1.0-0.45*(1.0-smoothstep(0.03,0.18,re));
+                    colB+=TrB*cc*inten*dens*dtb*9.0*(0.55+0.45*clamp(0.5+p.y/hl*sign(ro.y),0.0,1.0));   // lit more on the side facing the camera, so the billows have form
+                    TrB*=exp(-dens*20.0*dtb);                                        // the wisps are dense enough to veil the disk beneath, which is what makes them read as gas in front
+                  }
                 }
                 tt+=dtb;
               }
@@ -605,6 +651,20 @@ function boot() {
         vec3 core=mix(vec3(1.0,0.95,0.84),vec3(0.62,0.80,1.0),cu2)*(0.00042/(bb*bb+0.00003)) + mix(vec3(1.0,0.74,0.40),vec3(0.40,0.62,1.0),cu2)*0.24*exp(-bb*bb/0.004);
         core+=vec3(1.0,0.80,0.52)*0.16*exp(-bb*bb/0.016)*uBlue;                // the bulge still glows from far away
         col+=core*mix(1.0,Tc,0.9)*front;
+        // The star lights the gas around it. Nothing is painted over the gas: its own swirls stay visible and simply turn blue,
+        // strongest beside the star and falling away with distance the way light does. Most of the pool lies in the disk's plane,
+        // so it is foreshortened into an ellipse like everything else on the disk.
+        { float pool=1.0/(1.0+(r0*r0)/(0.085*0.085)); float near=exp(-bb*bb/0.0022);
+          float w=cu2*front*clamp(0.85*pool+0.45*near,0.0,0.95);
+          col=mix(col, col*vec3(0.035,0.27,1.0)*0.85, w); }
+        // the dwarf star at the exact centre: a small neon-blue sphere, white-hot face-on and deep blue at its limb, with a mottled surface
+        if(cu2>0.01){ const float RS=0.012; float bq=dot(ro,rd), cq=dot(ro,ro)-RS*RS, hq=bq*bq-cq;
+          if(hq>0.0){ float ts=-bq-sqrt(hq);
+            if(ts>0.0){ vec3 n=normalize(ro+rd*ts); float mu=clamp(dot(n,-rd),0.0,1.0);
+              float ca=cos(uGT*0.25), sa=sin(uGT*0.25); vec3 nr=vec3(ca*n.x-sa*n.z, n.y, sa*n.x+ca*n.z);
+              float gran=tx(nr*0.9+0.5).r*0.6+tx(nr*2.6+0.2).g*0.4;
+              vec3 sc=mix(vec3(0.0,0.28,1.0)*1.0, vec3(0.08,0.58,1.0)*1.35, pow(mu,1.1)); sc*=0.90+0.20*gran; sc+=vec3(0.40,0.85,1.0)*0.75*pow(mu,5.0);   // icy cyan face with a white-cyan heart, electric blue at its edge
+              col=mix(col, sc, cu2*smoothstep(0.0, RS*RS*0.85, hq)); } } }                       // soft edge: it melts into its own glow instead of showing a hard outline
         col+=(ign(gl_FragCoord.xy+17.0)-0.5)/400.0;                       // dither against banding
         gl_FragColor=vec4(max(col,0.0)*uGain,1.0);
       }`,
@@ -746,10 +806,12 @@ function boot() {
       a.set([Math.pow(Math.random(), 4.5) * 2.4 + 1.15, Math.random()], i * 2);
     }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(a, 2));
-    const u = { uT: { value: 0 }, uGain: { value: 1 }, uDpr: { value: DPR } };
+    const u = { uT: { value: 0 }, uGain: { value: 1 }, uDpr: { value: DPR }, uOcc: { value: 0 } };
     const m = new THREE.ShaderMaterial({ uniforms: u, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
-      vertexShader: `attribute vec2 aA; uniform float uT,uDpr; varying float vA; varying float vS;
-        void main(){ vS=aA.y; vA=(0.5+0.5*aA.y)*(0.8+0.2*sin(uT*(0.6+aA.y*2.0)+aA.y*80.0)); gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+      vertexShader: `attribute vec2 aA; uniform float uT,uDpr,uOcc; varying float vA; varying float vS;
+        void main(){ vS=aA.y; vA=(0.5+0.5*aA.y)*(0.8+0.2*sin(uT*(0.6+aA.y*2.0)+aA.y*80.0));
+          { vec3 d=normalize(position); float occ=1.0; if(d.y*cameraPosition.y<0.0){ float t=-cameraPosition.y/d.y; occ=smoothstep(1.0,1.12,length(cameraPosition.xz+d.xz*t)/100.0); } vA*=mix(occ,1.0,uOcc); }
+          gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
       fragmentShader: `uniform float uGain; varying float vA; varying float vS;
         ${GAL}
         void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f;
@@ -763,22 +825,28 @@ function boot() {
   const composer = new EffectComposer(renderer, rt);
   const renderPass = new RenderPass(gScene, gCam); composer.addPass(renderPass);
   const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.4, 0.85, 0.9); composer.addPass(bloom);
-  const lensU = { tDiffuse: { value: null }, uCore: { value: new THREE.Vector2(0.5, 0.5) }, uFlare: { value: 0 }, uCA: { value: 0.012 }, uVig: { value: 0.5 }, uAspect: { value: 1 }, uTint: { value: new THREE.Vector3(0.45, 0.62, 1.0) }, uExp: { value: 1 }, uTime: { value: 0 } };
+  const lensU = { tDiffuse: { value: null }, uCore: { value: new THREE.Vector2(0.5, 0.5) }, uFlare: { value: 0 }, uCA: { value: 0.012 }, uVig: { value: 0.5 }, uAspect: { value: 1 }, uTint: { value: new THREE.Vector3(0.45, 0.62, 1.0) }, uExp: { value: 1 }, uTime: { value: 0 }, uCool: { value: 1 } };
   const lens = new ShaderPass({ uniforms: lensU,
     vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
     fragmentShader: /* glsl */`
-      uniform sampler2D tDiffuse; uniform vec2 uCore; uniform float uFlare,uCA,uVig,uAspect,uExp,uTime; uniform vec3 uTint; varying vec2 vUv;
+      uniform sampler2D tDiffuse; uniform vec2 uCore; uniform float uFlare,uCA,uVig,uAspect,uExp,uTime,uCool; uniform vec3 uTint; varying vec2 vUv;
       float gh(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
+      // Standard filmic (ACES) tone curve, identical to the renderer's built-in one.
+      vec3 fit(vec3 v){ vec3 a=v*(v+0.0245786)-0.000090537; vec3 b=v*(0.983729*v+0.4329510)+0.238081; return a/b; }
+      vec3 tone(vec3 c){ c=max(c,0.0)/0.6;
+        vec3 m=mat3(0.59719,0.07600,0.02840, 0.35458,0.90834,0.13383, 0.04823,0.01566,0.83777)*c;
+        m=mat3(1.60475,-0.10208,-0.00327, -0.53108,1.10813,-0.07276, -0.07367,-0.00605,1.07602)*fit(m);
+        return clamp(m,0.0,1.0); }
       void main(){ vec2 d=vUv-0.5; float r2=dot(d,d); vec2 off=d*r2*uCA;
         vec3 col=vec3(texture2D(tDiffuse,vUv+off).r, texture2D(tDiffuse,vUv).g, texture2D(tDiffuse,vUv-off).b);
         vec2 q=vUv-uCore; q.x*=uAspect; float ax=abs(q.x), ay=abs(q.y);
         float s1=exp(-ay*38.0)*exp(-ax*3.4)/(1.0+ax*2.0);
         float s2=exp(-ay*240.0)*exp(-ax*3.2);
         float hal=exp(-length(q)*4.2), hal2=exp(-length(q*vec2(0.6,1.0))*11.0);
-        col+=uFlare*(uTint*s1*0.36 + mix(uTint,vec3(1.0),0.5)*s2*0.05 + vec3(1.0,0.42,0.16)*hal*0.035 + vec3(1.0,0.82,0.6)*hal2*0.16);
+        col+=uFlare*((uTint*s1*0.36 + mix(uTint,vec3(1.0),0.5)*s2*0.05)*(1.0-0.85*uCool) + vec3(1.0,0.42,0.16)*hal*0.035*(1.0-0.8*uCool) + mix(vec3(1.0,0.82,0.6)*0.16, vec3(0.0,0.22,1.0)*0.06, uCool)*hal2);   // opening view: the glow at the core is blue, not warm white
         float v=length(d*vec2(1.0,1.12))*1.3; col*=1.0-uVig*smoothstep(0.3,1.05,v);
         col*=uExp; float gr=gh(gl_FragCoord.xy+floor(uTime*24.0)*37.0)-0.5; col+=gr*(0.012+0.05*sqrt(max(dot(col,vec3(0.299,0.587,0.114)),0.0)))*0.6;   // fine film grain, a little stronger in the mid-tones
-        gl_FragColor=vec4(max(col,0.0),1.0); }` });
+        gl_FragColor=vec4(tone(col),1.0); }` });
   composer.addPass(lens); composer.addPass(new OutputPass());
   const LU = lens.uniforms;
 
@@ -853,20 +921,20 @@ function boot() {
       look.addScaledVector(rt3, (pr ? 0.02 : 0.235) * fw * wT).addScaledVector(up3, (pr ? -0.215 : 0.035) * fh * wT); gCam.lookAt(look); }
     gCam.rotateZ(-0.085 * (1 - sst(0.05, 0.14, p)) + (pr ? 0.16 : 0.30) * wT);
     gCam.updateProjectionMatrix(); gCam.updateMatrixWorld(true);
-    gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = mix(1.7, 1.15, kw);
+    gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = mix(1.7, 1.15, kw); gStars.userData.u.uOcc.value = kw;
     volU.uCam.value.copy(pos).multiplyScalar(1 / R); volU.uRot.value.setFromMatrix4(gCam.matrixWorld); volU.uTan.value = Math.tan(gCam.fov * Math.PI / 360);
     volU.uArms.value = spU.uArms.value = mix(0.42, 1, kw); volU.uBlue.value = kw; volU.uHaze.value = 1 - kw;
     { const w = kw > 0.5 ? (p >= 1 && glideT >= GLIDE ? 2 : 1) : (mode === 'idle' ? 0 : 3); if (w !== wideOn) { wideOn = w; sizeVol(); } }
     volU.uSteps.value = wideOn === 2 ? STEPS : Math.round(mix(STEPS, SMALL ? 8 : 10, kw));                                    // the far-off galaxy is a thin slab on screen: fewer samples through it while moving
     const ae = mix(0.10, 1, sst(0.04, 0.62, pos.length() / R));                                   // the iris closes as we skim the core, so the gas stays readable
     coreHot += (((enterBtn.matches(':hover') || document.activeElement === enterBtn) && mode === 'idle' ? 1 : 0) - coreHot) * (1 - Math.exp(-dt * 5));
-    volU.uGain.value = (ae * (1 + 0.35 * glare) + 0.55 * kw) * (1 + 0.14 * coreHot); spU.uGain.value = 0.9 + 0.3 * kw; nbU.uVis.value = (1 - 0.8 * kw) * sst(0.55, 1, e);
+    volU.uGain.value = (ae * (1 + 0.35 * glare) + 0.55 * kw) * (1 + 0.14 * coreHot); spU.uGain.value = (0.9 + 0.3 * kw) * kw; nbU.uVis.value = (1 - 0.8 * kw) * sst(0.55, 1, e);
     tmp.set(0, 0, 0).project(gCam); coreVis = tmp.z < 1 ? 1 : 0;
     enterBtn.style.transform = 'translate(' + ((tmp.x * 0.5 + 0.5) * W).toFixed(1) + 'px,' + ((-tmp.y * 0.5 + 0.5) * H).toFixed(1) + 'px)';
     enterBtn.style.opacity = (mode === 'idle' ? sst(0.75, 1, e) : 0).toFixed(3);
     LU.uCore.value.set(tmp.x * 0.5 + 0.5, tmp.y * 0.5 + 0.5); LU.uTint.value.set(0.42, 0.6, 1.0);
     LU.uFlare.value = (1.0 + 1.3 * glare + 0.5 * coreHot + 0.05 * Math.sin(time * 1.7)) * (1 - 0.9 * kw) * coreVis;
-    LU.uTime.value = time; LU.uCA.value = 0.008; LU.uVig.value = mix(0.6, 0.42, kw); LU.uExp.value = 1 + 0.25 * glare;
+    LU.uTime.value = time; LU.uCool.value = 1 - kw; LU.uCA.value = 0.008; LU.uVig.value = mix(0.42, 0.42, kw); LU.uExp.value = 1 + 0.25 * glare;
     bloom.strength = 0.22 + 0.4 * glare; bloom.radius = 0.55 + 0.3 * glare; bloom.threshold = 0.97 - 0.05 * glare;
 
     setOp(S.hero, sst(0.5, 0.95, e) * (1 - sst(0.045, 0.07, p)));
@@ -882,7 +950,7 @@ function boot() {
     const rest = wideOn === 2; gasTick++;
     if (!rest || accFresh || (gasTick & 1) === 0) {
       renderer.setRenderTarget(volRT); renderer.render(volScene, gCam);
-      accU.uA.value = accFresh ? 1 : rest ? 0.16 : wideOn === 0 ? 0.28 : 0.62; accFresh = false;
+      accU.uA.value = accFresh ? 1 : rest ? 0.16 : wideOn === 0 ? 0.13 : 0.62; accFresh = false;
       const ac = renderer.autoClear; renderer.autoClear = false; renderer.setRenderTarget(accRT); renderer.render(accScene, gCam); renderer.autoClear = ac;
       renderer.setRenderTarget(null);
     }

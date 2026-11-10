@@ -41,7 +41,7 @@ const ContactSection: React.FC<SectionProps> = ({ isOpen, onClose, onMenuItemCli
             alt="Moon phases"
             width={700}
             height={200}
-            className="rounded-2xl w-full max-w-[700px] h-auto border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.35)]"
+            className="rounded-lg w-full max-w-[700px] h-auto"
           />
         </div>
 

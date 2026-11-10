@@ -467,6 +467,18 @@ function boot() {
         c=mix(c, vec3(1.0,0.50,0.13), smoothstep(0.10,0.34,r));
         c=mix(c, vec3(0.86,0.20,0.045), smoothstep(0.30,0.62,r));
         c=mix(c, vec3(0.36,0.035,0.012), smoothstep(0.58,1.0,r)); return c; }
+      vec3 ramp(vec3 a,vec3 b,float lo,float hi,float r){ return mix(a,b,clamp((r-lo)/(hi-lo),0.0,1.0)); }
+      vec3 closeC(float r){
+        vec3 c=ramp(vec3(0.36,0.62,1.0), vec3(0.62,0.80,1.0), 0.00,0.08,r);      // blue heat at the very centre
+        c=ramp(c, vec3(0.96,0.96,1.0), 0.06,0.16,r);                             // cooling through blue-white to white
+        c=ramp(c, vec3(1.0,0.82,0.46), 0.13,0.27,r);                             // white into gold
+        c=ramp(c, vec3(1.0,0.52,0.14), 0.23,0.46,r);                             // gold into deep orange
+        c=ramp(c, vec3(0.93,0.25,0.08), 0.42,0.64,r);                            // orange into red
+        c=ramp(c, vec3(0.74,0.13,0.13), 0.60,0.76,r);                            // red into deep crimson
+        c=ramp(c, vec3(0.60,0.13,0.36), 0.72,0.88,r);                            // the outer quarter leans toward magenta
+        c=ramp(c, vec3(0.36,0.15,0.64), 0.84,1.00,r);                            // then violet
+        c=ramp(c, vec3(0.16,0.13,0.52), 0.96,1.12,r);                            // and indigo at the very edge
+        return c*(1.0+1.0*smoothstep(0.62,1.0,r)); }                             // lift the faint outer gas a little so its colour reads
       float ign(vec2 p){ return fract(52.9829189*fract(dot(p,vec2(0.06711056,0.00583715)))); }
       float wn(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
       // one phase of orbit-stretched gas: ridged filaments (x) and dust (y)
@@ -523,6 +535,8 @@ function boot() {
                   vec3 tc3=tempC(r);
                   tc3=mix(tc3, vec3(0.42,0.60,1.0), uBlue*armF(r,th)*smoothstep(0.22,0.6,r)*0.8);
                   float inten=1.0/(pow(r,1.55)*12.0+0.05);
+                  { float cu=1.0-uBlue; vec3 cc=closeC(r); cc=mix(cc, vec3(0.12,0.72,0.82)*2.2, 0.20*smoothstep(0.50,0.80,f.y)*smoothstep(0.78,1.0,r));   // a few teal wisps in the outer gas
+                    tc3=mix(tc3, cc, cu); inten*=1.0-0.62*cu*(1.0-smoothstep(0.03,0.18,r)); }   // ease the inner gas off pure white so its blue survives
                   float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=(1.0-uBlue)*0.75;
                   inten*=mix(1.0,dop*dop*dop,beam); tc3=mix(tc3, tc3*vec3(0.84,0.97,1.22), clamp((dop-1.0)*1.6,0.0,1.0)*beam);
                   float lit=(1.0-0.7*dust)*(0.72+0.28*clamp(v*sign(ro.y),-1.0,1.0));
@@ -538,7 +552,8 @@ function boot() {
         }
         float tcl=max(tc,0.0); float bb=length(ro+rd*tcl);
         float front=smoothstep(-0.02,0.02,tc);
-        vec3 core=vec3(1.0,0.95,0.84)*(0.00042/(bb*bb+0.00003)) + vec3(1.0,0.74,0.40)*0.24*exp(-bb*bb/0.004);
+        float cu2=1.0-uBlue;
+        vec3 core=mix(vec3(1.0,0.95,0.84),vec3(0.62,0.80,1.0),cu2)*(0.00042/(bb*bb+0.00003)) + mix(vec3(1.0,0.74,0.40),vec3(0.40,0.62,1.0),cu2)*0.24*exp(-bb*bb/0.004);
         core+=vec3(1.0,0.80,0.52)*0.16*exp(-bb*bb/0.016)*uBlue;                // the bulge still glows from far away
         col+=core*mix(1.0,Tc,0.9)*front;
         col+=(ign(gl_FragCoord.xy+17.0)-0.5)/400.0;                       // dither against banding
@@ -662,8 +677,8 @@ function boot() {
   //   approach — starts slowly at the outer disk and keeps gathering speed the closer it gets to the centre, like falling in
   //   exit     — that same acceleration carries straight through the light and out the far side at full speed
   //   settle   — a single late ease-out into the final frame
-  const V_START = 10, V_OUT = 90, CORE_ARC = 97, SLOW_FROM = 285;
-  const speedAt = (L) => { const f = Math.pow(clamp(L / (CORE_ARC + 36), 0, 1), 2.4);
+  const V_START = 12, V_OUT = 90, CORE_ARC = 97, SLOW_FROM = 285;
+  const speedAt = (L) => { const f = Math.pow(clamp(L / (CORE_ARC + 36), 0, 1), 2.2);
     let v = mix(V_START, V_OUT, f) * sst(-2, 5, L);                                                   // gentle start from rest
     const rem = clamp((ARC_T - L) / (ARC_T - SLOW_FROM), 0, 1); return v * Math.max(0.012, Math.pow(rem, 0.75)); };   // quartic ease-out, starting late
   let arcS = 0, progSeen = -1;
@@ -689,11 +704,11 @@ function boot() {
     // idle hold: a slow, heavy drift — never static
     const az = 0.62 + 0.045 * Math.sin(time * 0.045), back = (1 + 0.22 * (1 - ee)) * (1 + 0.02 * Math.sin(time * 0.07));
     const hd = pr ? 122 : 104;
-    tmp.set(Math.sin(az) * hd * back, (pr ? 36 : 17) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
+    tmp.set(Math.sin(az) * hd * back, (pr ? 36 : 21) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
     gPath.getPoint(gUat(p), pos); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));   // carry the idle drift's offset into the move and let it fade, so the approach holds one speed
     // the settled frame keeps breathing: a very slow orbit and dolly
     if (settle > 0) { pos.applyAxisAngle(up, settle * (0.035 * Math.sin(time * 0.05) + psx * 0.012)); pos.multiplyScalar(1 + settle * (0.012 * Math.sin(time * 0.071) - psy * 0.008)); }
-    tmp.set(Math.cos(az), 0, -Math.sin(az)).multiplyScalar(pr ? 2 : 22); tmp.y = pr ? -4 : 1.5;        // hero: aim off the core so it sits on a third
+    tmp.set(Math.cos(az), 0, -Math.sin(az)).multiplyScalar(pr ? 2 : 22); tmp.y = pr ? -4 : -6.5;        // hero: aim off the core so it sits on a third
     look.set(0, 0.4, 0).lerp(tmp, 1 - sst(0.05, 0.13, p));
     const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = mix(f1, pr ? 50 : 38, sst(0.35, 0.72, arcAtP(p) / ARC_T));
     gCam.position.copy(pos); gCam.up.set(0, 1, 0); gCam.lookAt(look); gCam.updateMatrixWorld(true);

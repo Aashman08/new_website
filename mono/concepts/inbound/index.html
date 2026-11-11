@@ -7,7 +7,7 @@
 <meta name="description" content="Concept — Inbound. A personal site for Aashman Rastogi, AI Engineer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Playfair+Display:wght@400&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -21,6 +21,9 @@
 *{box-sizing:border-box}
 html{background:var(--bg);-webkit-text-size-adjust:100%}
 html,body{overflow:hidden}
+html.done,html.done body{overflow-x:hidden;overflow-y:auto}
+#track{display:none;height:400vh;pointer-events:none}
+html.done #track{display:block}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
@@ -144,11 +147,11 @@ html:not(.playing) #rail{visibility:hidden}
 
 /* LANDING — the name, centred over the galaxy, in the existing site's own styling (Inter; sizes, spacing and breakpoints taken from its home page) */
 #stage #s-name{display:block;padding:0;opacity:1!important;visibility:hidden;font-family:var(--site);color:#fff;
-  background:radial-gradient(ellipse 46% 30% at 50% 62%,rgba(0,0,0,.42) 0%,rgba(0,0,0,.2) 55%,rgba(0,0,0,0) 100%)}
+  background:radial-gradient(ellipse 46% 30% at 50% 62%,rgba(0,0,0,calc(.42*var(--scrim,1))) 0%,rgba(0,0,0,calc(.2*var(--scrim,1))) 55%,rgba(0,0,0,0) 100%)}   /* (the darkening behind the name leaves with the name: left behind, it sat over the galaxy's core during the dive and turned it grey) */
 #s-name .who{position:absolute;left:0;right:0;top:57%;transform:translateY(-50%);text-align:center;padding:0 16px}
 h1{font-family:var(--site);font-weight:600;font-size:1.5rem;line-height:1.3;letter-spacing:.2rem;text-transform:uppercase;color:#ddd;margin:0 0 .75rem;text-shadow:0 1px 24px rgba(0,0,0,.55)}
 #s-name .sub{font-weight:300;font-size:.75rem;line-height:1.75;letter-spacing:.15em;color:#fff;margin:0 0 2rem;text-shadow:0 1px 16px rgba(0,0,0,.6)}
-#s-name .bar{position:absolute;left:0;right:0;bottom:9rem;display:flex;justify-content:center;padding:0 16px}
+#s-name .bar{position:absolute;left:0;right:0;top:18px;display:flex;justify-content:center;padding:0 16px}   /* the menu is not on the landing: it appears here, docked at the top, once the visitor starts to scroll */
 /* The menu is a capsule of clear glass, and so is the Enter pill on the opening view. The glass itself is drawn in the lens shader (see glass()),
    because what is behind it is our own picture and can be refracted for real: the picture bent through the rounded rim, the rim lit from where
    the galaxy's core is, the shadow it throws. What is left here is its faint body, a hairline that keeps the edge crisp, and the lettering. */
@@ -176,25 +179,53 @@ h1{font-family:var(--site);font-weight:600;font-size:1.5rem;line-height:1.3;lett
 .menubar.jump .lens i,html.rm .menubar .lens i{transition:none}
 html.rm .menubar .lens{transition:opacity .2s}
 html.nogl .menubar{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.2),0 12px 30px -10px rgba(0,0,0,.45)}   /* no shader to draw the glass: a plain stand-in */
+/* landing: a quiet cue to scroll, where the menu used to be */
+#cue{position:absolute;left:0;right:0;bottom:11vh;display:flex;flex-direction:column;align-items:center;gap:12px;font-family:var(--site);font-size:11px;letter-spacing:.32em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,.6);opacity:0;transition:opacity 1s .9s}
+#cue::after{content:"";width:1px;height:38px;background:linear-gradient(rgba(255,255,255,.8),rgba(255,255,255,0));animation:drip 2.2s ease-in-out infinite}
+#s-name.show #cue{opacity:1}
+html.scrolled #s-name.show #cue{opacity:0;transition:opacity .4s}
+/* About. The galaxy has risen out of the top of the frame; what is left is dark sky with gas clouds either side. The words take the middle of
+   the screen: the photograph and the greeting centred, and under them the three paragraphs as one justified block, itself centred. Each piece
+   arrives as the visitor scrolls and then stays, so the finished section is all on screen together.
+   The type is kept restrained: the greeting in Playfair Display, a hairline under it, the paragraphs in Inter, all three alike, emphasis by
+   brightness alone (no bold, no italics). The photograph is toned down to sit in the scene: less colour, a little darker, a thin ring standing
+   off it. */
+#about{position:fixed;inset:0;z-index:11;pointer-events:none;font-family:var(--site);color:#fff;visibility:hidden}
+#about .col{position:absolute;left:50%;top:51%;width:min(46rem,calc(100vw - 96px));transform:translate(-50%,-50%);text-align:center}
+#about .col>*{opacity:0}
+#about img{display:block;width:clamp(104px,16vh,140px);height:clamp(104px,16vh,140px);border-radius:50%;object-fit:cover;margin:0 auto 24px;filter:saturate(.72) brightness(.9) contrast(1.04);outline:1px solid rgba(255,255,255,.22);outline-offset:8px;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+#about .hello{margin:0 0 22px;font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(2.3rem,4vw,3.8rem);line-height:1.04;letter-spacing:-.012em;color:#f5f5f5}
+#about .hello::after{content:"";display:block;width:44px;height:1px;background:rgba(255,255,255,.34);margin:20px auto 0}
+#about p.t{margin:0 auto 16px;max-width:42rem;font-weight:400;font-size:clamp(.95rem,1.1vw,1.04rem);line-height:1.78;letter-spacing:.003em;color:rgba(255,255,255,.7);text-align:justify;text-shadow:0 1px 10px rgba(0,0,0,.6)}
+#about p.t:last-child{margin-bottom:0}
+#about b{font-weight:inherit;color:rgba(255,255,255,.96)}
+#about a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-decoration-color:rgba(255,255,255,.32);text-underline-offset:5px;pointer-events:auto;transition:text-decoration-color .25s}
+#about a:hover{text-decoration-color:#fff}
+@media (max-width:820px),(orientation:portrait){
+  #about .col{width:calc(100vw - 44px)}
+  #about img{width:96px;height:96px;margin-bottom:18px}
+  #about .hello{margin-bottom:16px} #about .hello::after{margin-top:14px}
+  #about p.t{font-size:.92rem;line-height:1.6;margin-bottom:11px;text-align:left}   /* (a narrow column justified opens wide gaps between words) */
+}
 #replay{position:absolute;right:var(--pad);bottom:28px;font-size:12px;letter-spacing:.05em;font-weight:500;color:rgba(255,255,255,.55);text-decoration:none;padding:6px 2px;transition:color .3s}
 #replay:hover,#replay:focus-visible{color:#fff}
 @media (min-width:640px){
   h1{font-size:2rem;letter-spacing:.35rem;margin-bottom:1rem}
   #s-name .sub{font-size:.875rem;line-height:1.25rem}
-  #s-name .bar{bottom:7rem}
   .menubar{padding:8px 12px}
   .menubar button{padding:8px 16px;font-size:14px;line-height:20px;letter-spacing:.05em}
 }
 @media (min-width:768px){
   h1{font-size:2.7rem;letter-spacing:.5rem}
   #s-name .sub{font-size:1rem;line-height:1.5rem}
-  #s-name .bar{bottom:9rem}
   .menubar button{padding:8px 20px}
 }
-@media (min-width:1024px){#s-name .bar{bottom:13rem}}
 /* it arrives as the galaxy settles: the name, then the line under it, then the menu */
 #s-name h1,#s-name .sub,#s-name .menubar,#replay{opacity:0;transform:translateY(14px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1.2s cubic-bezier(.2,.7,.2,1)}
-#s-name.show h1,#s-name.show .sub,#s-name.show .menubar,#s-name.show #replay{opacity:1;transform:none}
+#s-name.show h1,#s-name.show .sub,#s-name.show #replay{opacity:1;transform:none}
+html.scrolled #s-name.show .menubar{opacity:1;transform:none;transition-delay:0s}
+#s-name .menubar{transform:translateY(-10px)}
+html.scrolled #replay{opacity:0!important;pointer-events:none}
 #s-name.show .sub{transition-delay:.18s}#s-name.show .menubar{transition-delay:.4s}#s-name.show #replay{transition-delay:.7s}
 
 /* SKIP */
@@ -274,9 +305,21 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
         <button type="button">ART</button>
       </div>
     </div>
+    <div id="cue" aria-hidden="true">Scroll</div>
     <a href="#top" id="replay" class="pe">&#8634; Replay intro</a>
   </section>
 </main>
+<section id="about" aria-label="About me">
+  <div class="col">
+    <img src="img/NYC_pic.webp" alt="Aashman Rastogi">
+    <p class="hello">Hi, I&rsquo;m Aashman</p>
+    <p class="t">I&rsquo;m an <b>AI Engineer</b> at <b><a href="https://kindo.ai/" target="_blank" rel="noopener">Kindo AI</a></b>, a Series A cybersecurity AI startup focused on automating security and identity workflows. I&rsquo;m passionate about building impactful products and thrive in fast-moving, collaborative <b>deep tech</b> environments, where I&rsquo;m constantly inspired by the pace of innovation and its real-world impact.</p>
+    <p class="t">I&rsquo;ve definitely caught the entrepreneurship bug and love turning early-stage ideas into things people actually use. Since I was a kid, I&rsquo;ve been deeply fascinated by <b>space and space tech</b>, and I&rsquo;m exploring how emerging technologies can drive the next wave of innovation that ultimately benefits life on Earth.</p>
+    <p class="t">I graduated from <b><a href="https://www.ucla.edu/" target="_blank" rel="noopener">UCLA</a></b> with a degree in <b>Statistics and Data Science</b> and a minor in <b>Data Science Engineering</b>. If you&rsquo;re building something ambitious&mdash;or just want to talk AI, startups, or space&mdash;I&rsquo;d love to connect.</p>
+  </div>
+</section>
+<div id="track" aria-hidden="true"></div>
+
 <button type="button" id="enter" aria-label="Enter — play the opening sequence"><span class="hit"></span><span class="ring"></span><span class="dot"></span><span class="cap" id="enter-cap">Click to enter</span><span class="tip" aria-hidden="true">Drag to look around</span></button>
 
 <button type="button" id="skip">Skip &rarr;</button>
@@ -888,11 +931,16 @@ function boot() {
         if(gTHit>1e5&&Tr<0.5) gTHit=t;
         if(t<gTcl&&r>0.10) gTcO=Tr;
         return gap; }
+      float erfA(float x){ float a=abs(x), t=1.0/(1.0+0.3275911*a); float y=1.0-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*exp(-a*a); return x<0.0?-y:y; }
+      // Light gathered along a stretch of a ray (t0..t1) through a ball of stars whose density falls off as a Gaussian, squashed by 'inv' along each
+      // axis. For a straight ray that integral has an exact answer, so the bulge is a true solid shape at no cost in samples.
+      float ballI(vec3 o,vec3 d,vec3 inv,float t0,float t1){ vec3 oo=o*inv, dd=d*inv; float A=dot(dd,dd), B=dot(oo,dd), C=dot(oo,oo), sA=sqrt(A);
+        return exp(min(B*B/A-C,0.0))*0.8862269/sA*(erfA(sA*t1+B/sA)-erfA(sA*t0+B/sA)); }
       void main(){
         vec2 ndc=(vUv+uJit)*2.0-1.0;                                         // (the whole picture is shifted by a fraction of a pixel each frame: see the averaging pass)
         vec3 rd=normalize(uRot*vec3(ndc.x*uTan*uAspect, ndc.y*uTan, -1.0)); vec3 ro=uCam;
         if(ro.y<0.0){ ro.y=-ro.y; rd.y=-rd.y; gMir=-1.0; }                   // the disk is the same above and below its plane, so a view from underneath is drawn as its mirror image from above
-        const float VM=1.6; const float RMX=1.14; float kcM=1.0-uBlue;
+        const float VM=2.2; const float RMX=1.14; float kcM=1.0-uBlue;        // (how far above and below its mid-plane the gas is followed, in local thicknesses: the Milky Way's arms stand taller than its thin dust)
         float VMt=mix(VM,2.7,kcM), VMb=mix(VM,0.8,kcM);                      // opening disk: the dust clouds stand well above the gas, and the gas is opaque long before the ray reaches its underside
         vec3 col=vec3(0.0); float Tr=1.0, Tc=1.0; vec3 roS=ro-vec3(uStarO.x,0.0,uStarO.y); float tc=-dot(roS,rd); gTcl=tc;   // roS: the camera as seen from the star (which a heavy companion pulls a little off-centre)
         float sy=rd.y<0.0?-1.0:1.0; float ay=max(abs(rd.y),0.004); float ry=sy*ay;
@@ -946,7 +994,7 @@ function boot() {
                 if(r<RMX){
                   float th=atan(p.z,p.x); float dt=min(abs(dv)*h/ay,0.07); float far=exp(-max(t/uDz-0.9,0.0)*0.5*uHaze);
                   if(kcM<0.98){                                                          // Milky Way: thin glowing gas, seen through
-                    float g=exp(-v*v);
+                    float pf=fHave?mix(0.7,1.4,smoothstep(0.25,1.5,fHold.x)):1.0; float g=exp(-v*v/(pf*pf))/pf;   // the gas has depth: where it is dense (the arms) it stands taller, between them it lies thin
                     float fine=sfine*(1.0-0.8*smoothstep(1.2,2.6,t)*uHaze);
                     if(!fHave||(i-(i/3)*3)==0){ fHold=field(p,r,th,v,fine); fHave=true; }      // evaluated every third step, held in between
                     vec4 f=fHold;
@@ -1080,8 +1128,16 @@ function boot() {
         float tcl=max(tc,0.0); float bb=length(roS+rd*tcl);
         float front=smoothstep(-0.02,0.02,tc);
         float cu2=1.0-uBlue;
-        vec3 core=mix(vec3(1.0,0.95,0.84),SM(vec3(0.62,0.80,1.0)),cu2)*(0.00042/(bb*bb+0.00003)) + mix(vec3(1.0,0.74,0.40),SM(vec3(0.40,0.62,1.0)),cu2)*0.24*exp(-bb*bb/0.004);
-        core+=vec3(1.0,0.80,0.52)*0.16*exp(-bb*bb/0.016)*uBlue;                // the bulge still glows from far away
+        vec3 core=mix(vec3(1.0,0.95,0.84),SM(vec3(0.62,0.80,1.0)),cu2)*(0.00042/(bb*bb+0.00003))*mix(1.0,0.45,uBlue) + SM(vec3(0.40,0.62,1.0))*0.24*exp(-bb*bb/0.004)*cu2;
+        // Milky Way: the bulge. A flattened ball of old stars round the centre, longer along the bar, standing well above and below the thin disk.
+        // The part of it on the camera's side of the disk is seen clear; the part beyond the disk is seen through the disk's dust, which is what
+        // makes it sit IN the galaxy when viewed from low down, not on it.
+        if(uBlue>0.01){ const float CB=0.8525245, SB=0.5226872;              // the bar's direction (0.55 rad)
+          vec3 o=vec3(CB*ro.x+SB*ro.z, ro.y, -SB*ro.x+CB*ro.z), dd=vec3(CB*rd.x+SB*rd.z, rd.y, -SB*rd.x+CB*rd.z);
+          float tX=rd.y<-1e-4?-ro.y/rd.y:1e5;                                 // where the line of sight goes down through the disk's plane
+          const vec3 I1=vec3(1.0/0.150,1.0/0.085,1.0/0.105), I2=vec3(1.0/0.060,1.0/0.040,1.0/0.045);   // the outer bulge, and the brighter knot at its heart
+          float near=1.05*ballI(o,dd,I1,0.0,tX)+3.4*ballI(o,dd,I2,0.0,tX), beyond=1.05*ballI(o,dd,I1,tX,1e5)+3.4*ballI(o,dd,I2,tX,1e5);
+          col+=vec3(1.0,0.83,0.58)*(near+beyond*mix(1.0,Tr,0.92))*uBlue; }
         float plF=tPl<max(tc,0.0)?0.0:1.0;                                 // the planet passing in front of the star hides it
         col+=core*mix(mix(1.0,Tc,0.9),0.82*gTcO,kcM)*front*plF;               // (opening: the star stands clear of the gas round it, but the disk's own near side can hide it when seen edge-on)
         // The star lights the gas around it. Nothing is painted over the gas: its own swirls stay visible and simply turn blue,
@@ -1310,6 +1366,70 @@ function boot() {
     const pts = new THREE.Points(g, m); pts.frustumCulled = false; gScene.add(pts);
   }
   // deep starfield (shared look in every scene)
+  /* ── gas clouds in the dark sky of the About section ──
+     Away from the galaxy the sky is not left empty: there are a few clouds of gas and dust in it. They are a real volume, marched through along
+     every line of sight, and what they look like follows from how such clouds are actually seen:
+       · their density is turbulent: ragged knots and thin veils, with the lopsided (lognormal) spread of densities that turbulence gives gas;
+       · they shine where a star inside them lights them. Hydrogen glows deep red, and that glow goes as the SQUARE of the density (it takes two
+         particles meeting), so it picks out the dense parts; dust also scatters the star's own light, mostly forwards, which is the warmer,
+         browner part of the glow. Both fall off with distance from the star, and both are shadowed by whatever cloud lies between;
+       · dust in front blocks what is behind it, blue light more than red: the near parts of a cloud stand dark against the glow of the far parts,
+         and the stars behind are dimmed and reddened, or hidden;
+       · a little cool light reaches their upper sides from the galaxy overhead.
+     They are placed round the edges of where the words will be, fixed in the view the camera comes to rest on, and the camera drifts through them
+     a little as the page is read, so near and far parts slide against each other. Drawn at reduced resolution (they are soft) into cloudRT:
+     rgb is their light, alpha how much of what is behind them shows through.
+     Departures from the real thing: the star's light is scattered once, not many times; only the two lit stars and the galaxy count as lamps;
+     the shadowing looks one short step toward each lamp, not all the way. */
+  const cloudRT = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
+  const skyU = { uSkyM: { value: new THREE.Matrix3() }, uDust: { value: 0 }, tCloud: { value: cloudRT.texture }, uInvRes: { value: new THREE.Vector2(1, 1) }, uGalDir: { value: new THREE.Vector3(0, 1, 0) }, uGlow: { value: 0 } };
+  const cloudU = { uN: { value: noiseTex }, uSkyM: skyU.uSkyM, uRot: volU.uRot, uTan: volU.uTan, uAspect: volU.uAspect, uGalDir: skyU.uGalDir, uCamC: { value: new THREE.Vector3() }, uForm: { value: 0 } };
+  const cloudScene = new THREE.Scene(); let cloudTick = 0, cloudForm = 0, cloudBusy = false;
+  { const m = new THREE.ShaderMaterial({ uniforms: cloudU, depthTest: false, depthWrite: false, glslVersion: THREE.GLSL3,
+      vertexShader: `out vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
+      fragmentShader: /* glsl */`precision highp float; precision highp sampler3D; in vec2 vUv; out vec4 outC;
+        uniform sampler3D uN; uniform mat3 uSkyM,uRot; uniform float uTan,uAspect,uForm; uniform vec3 uCamC,uGalDir;   // uForm: how far the clouds have formed (0 to 1)
+        vec4 tx(vec3 p){ vec3 c=p*32.0; vec3 i=floor(c), f=fract(c); f=f*f*(3.0-2.0*f); return texture(uN,(i+f+0.5)/32.0); }
+        // where the clouds are, in the resting view's own space (x right, y up, the camera looking down -z): two large complexes either side, a low bank and a high one
+        const vec3 C1=vec3(-2.2,-0.5,-4.6), R1=vec3(0.95,0.9,1.3), C2=vec3(2.55,0.5,-5.3), R2=vec3(1.0,0.9,1.45), C3=vec3(1.3,-1.6,-4.0), R3=vec3(1.3,0.36,1.0), C4=vec3(-1.3,1.75,-5.8), R4=vec3(1.25,0.36,1.1);
+        const vec3 L1=vec3(-2.0,-0.25,-4.9), L2=vec3(2.3,0.7,-5.6);       // the two stars that light them
+        // The clouds are not faded in: they form. They start as a few thin wisps close round each star, where the gas is densest, and spread
+        // outward and thicken from there, the stars brightening as the gas gathers round them.
+        float cmask(vec3 p){ float g=1.0/mix(0.42,1.0,uForm); vec3 a=(p-C1)/R1*g, b=(p-C2)/R2*g, c=(p-C3)/R3*g, e=(p-C4)/R4*g; return exp(-dot(a,a))+0.95*exp(-dot(b,b))+0.6*exp(-dot(c,c))+0.45*exp(-dot(e,e)); }
+        float dens(vec3 p,float fine){ float m=cmask(p); if(m<0.03) return 0.0;
+          vec3 q=p*0.085; q+=0.085*(tx(q*0.33+0.2).rgb-0.5);                 // a large, slow displacement first: it draws the gas out into streamers, as flows do
+          float n=tx(q).r*0.5+tx(q*2.03+0.31).g*0.25;
+          if(fine>0.5){ n+=tx(q*4.1+0.67).b*0.125+tx(q*8.3+0.13).a*0.0625+tx(q*16.9+0.4).r*0.031; float rg=1.0-abs(2.0*tx(q*2.6+0.55).a-1.0); n+=0.10*(rg*rg-0.35); }   // finer and finer structure, and thin sheets and filaments
+          else n+=0.11;
+          return max(exp(6.2*(n-0.61-0.13*(1.0-uForm)))-0.5,0.0)*min(m*1.5,1.0)*smoothstep(0.03,0.2,m)*smoothstep(0.0,0.5,uForm); }   // the exponential is what makes the spread of densities lognormal
+        const float SIG=2.3, G=0.45;                                          // how strongly the dust blocks light · how forward its scattering is
+        vec3 lamp(vec3 p,vec3 v,float rho,vec3 L,float I,vec3 sc){ vec3 d=L-p; float r2=dot(d,d); vec3 h=d*inversesqrt(r2);
+          float f=I*smoothstep(0.0,0.75,uForm)/(r2+0.5)*exp(-dens(p+h*0.45,0.0)*0.9*SIG);   // (the gas is lit from the start of its forming: the glow comes up with the gas, not after it)              // the star's light here: weaker with distance, and shadowed by the cloud toward it
+          float mu=dot(v,h), ph=0.5*(1.0-G*G)/pow(1.0+G*G-2.0*G*mu,1.5);
+          return (rho*rho*vec3(0.92,0.17,0.075)*0.30 + rho*ph*sc*0.16)*f; }  // glowing hydrogen (density squared) + the star's light scattered by dust
+        void main(){ vec2 ndc=vUv*2.0-1.0; vec3 v=normalize(uRot*vec3(ndc.x*uTan*uAspect, ndc.y*uTan, -1.0))*uSkyM;
+          if(v.z>-0.3){ outC=vec4(0.0,0.0,0.0,1.0); return; }
+          vec3 o=uCamC, gal=uGalDir*uSkyM; float tA=(-1.6-o.z)/v.z, tB=(-8.4-o.z)/v.z; const int N=36; float dt=(tB-tA)/float(N);
+          float t=tA+dt*fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(0.06711056,0.00583715))));
+          float tc1=dot(L1-o,v), tc2=dot(L2-o,v); vec3 col=vec3(0.0), T=vec3(1.0), T1=vec3(1.0), T2=vec3(1.0);
+          for(int i=0;i<N;i++){ vec3 p=o+v*t; float rho=dens(p,1.0);
+            if(rho>0.004){ vec3 lit=lamp(p,v,rho,L1,1.0,vec3(1.0,0.50,0.24))+lamp(p,v,rho,L2,0.8,vec3(1.0,0.60,0.34));
+              lit+=rho*vec3(0.42,0.52,0.85)*0.05*exp(-dens(p+gal*0.5,0.0)*1.0*SIG);        // the galaxy's light on their upper sides
+              col+=T*lit*dt; T*=exp(-rho*SIG*vec3(0.72,1.0,1.38)*dt); }                       // dust dims what is behind it, blue more than red
+            if(t<tc1) T1=T; if(t<tc2) T2=T; t+=dt; if(T.g<0.02) break; }
+          { float sk=smoothstep(0.55,1.0,uForm); vec3 b=(o+v*tc1)-L1; col+=T1*vec3(1.0,0.66,0.42)*0.00016*sk/(dot(b,b)+0.00010); b=(o+v*tc2)-L2; col+=T2*vec3(1.0,0.78,0.58)*0.00012*sk/(dot(b,b)+0.00010); }   // (small, and last to appear: they come out inside gas that is already there. Shown first and large, they were two bare balls of light)   // the two stars themselves, seen through whatever cloud is in front of them
+          outC=vec4(col,T.g); }` });
+    const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), m); q.frustumCulled = false; cloudScene.add(q); }
+  // the sky layer that goes into the main picture: the clouds' light, and the glow the galaxy leaves along the top of the frame
+  { const m = new THREE.ShaderMaterial({ uniforms: { uRot: volU.uRot, uTan: volU.uTan, uAspect: volU.uAspect, uGalDir: skyU.uGalDir, uGlow: skyU.uGlow, uDust: skyU.uDust, tCloud: skyU.tCloud },
+      transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending, glslVersion: THREE.GLSL3,
+      vertexShader: `out vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
+      fragmentShader: /* glsl */`precision highp float; in vec2 vUv; out vec4 outC; uniform mat3 uRot; uniform float uTan,uAspect,uGlow,uDust; uniform vec3 uGalDir; uniform sampler2D tCloud;
+        void main(){ vec3 col=vec3(0.0);
+          if(uDust>0.002){ vec2 e=0.6/vec2(textureSize(tCloud,0)); col+=0.25*(texture(tCloud,vUv+e).rgb+texture(tCloud,vUv-e).rgb+texture(tCloud,vUv+vec2(e.x,-e.y)).rgb+texture(tCloud,vUv+vec2(-e.x,e.y)).rgb)*uDust; }   // (four close taps: the clouds are drawn smaller than the screen with their samples staggered from pixel to pixel, and this averages the stagger away)
+          if(uGlow>0.002){ vec2 ndc=vUv*2.0-1.0; vec3 d=normalize(uRot*vec3(ndc.x*uTan*uAspect, ndc.y*uTan, -1.0)); float a=acos(clamp(dot(d,uGalDir),-1.0,1.0)); col+=vec3(0.50,0.62,0.95)*0.055*smoothstep(0.50,0.24,a)*uGlow; }   // the galaxy, just out of frame, still lights the sky near it
+          outC=vec4(col,1.0); }` });
+    const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), m); q.frustumCulled = false; q.renderOrder = -9; gScene.add(q); }
   function makeStars(n, rad) {
     const pos = new Float32Array(n * 3), a = new Float32Array(n * 2);
     for (let i = 0; i < n; i++) {
@@ -1318,17 +1438,18 @@ function boot() {
       a.set([Math.pow(Math.random(), 4.5) * 2.4 + 1.15, Math.random()], i * 2);
     }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(a, 2));
-    const u = { uT: { value: 0 }, uGain: { value: 1 }, uDpr: { value: DPR }, uOcc: { value: 0 }, uPlW: plWU };
-    const m = new THREE.ShaderMaterial({ uniforms: u, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
-      vertexShader: `attribute vec2 aA; uniform float uT,uDpr,uOcc; uniform vec4 uPlW; varying float vA; varying float vS;
+    const u = { uT: { value: 0 }, uGain: { value: 1 }, uDpr: { value: DPR }, uOcc: { value: 0 }, uPlW: plWU, uDust: skyU.uDust, tCloud: skyU.tCloud, uInvRes: skyU.uInvRes };
+    const m = new THREE.ShaderMaterial({ uniforms: u, glslVersion: THREE.GLSL3, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: `in vec2 aA; uniform float uT,uDpr,uOcc; uniform vec4 uPlW; out float vA; out float vS;
         void main(){ vS=aA.y; vA=(0.5+0.5*aA.y)*(0.8+0.2*sin(uT*(0.6+aA.y*2.0)+aA.y*80.0));
           { vec3 d=normalize((modelMatrix*vec4(position,0.0)).xyz); float occ=1.0; if(d.y*cameraPosition.y<0.0){ float t=-cameraPosition.y/d.y; occ=smoothstep(1.0,1.12,length(cameraPosition.xz+d.xz*t)/100.0); } vA*=mix(occ,1.0,uOcc);
             if(uPlW.w>0.0){ vec3 oc=cameraPosition-uPlW.xyz; float b=dot(oc,d), h=b*b-(dot(oc,oc)-uPlW.w*uPlW.w); if(h>0.0&&-b-sqrt(h)>0.0) vA=0.0; } }   // (and nothing shows through the planet)
           gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
-      fragmentShader: `uniform float uGain; varying float vA; varying float vS;
+      fragmentShader: `precision highp float; uniform float uGain,uDust; uniform sampler2D tCloud; uniform vec2 uInvRes; in float vA; in float vS; out vec4 outC;
         ${GAL}
         void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f;
-          gl_FragColor=vec4(starCol(fract(vS*7.3)),vA*f*uGain); }` });
+          float tr=mix(1.0,texture(tCloud,gl_FragCoord.xy*uInvRes).a,uDust);                     // how much of this star's light gets through the cloud in front of it: dimmed, and blue more than red
+          outC=vec4(starCol(fract(vS*7.3))*vec3(pow(tr,0.72),tr,pow(tr,1.38)),vA*f*uGain); }` });
     const p = new THREE.Points(g, m); p.frustumCulled = false; p.userData.u = u; return p;
   }
   const gStars = makeStars(SMALL ? 3200 : 8000, 4000); gStars.renderOrder = -5; gScene.add(gStars);
@@ -1400,6 +1521,7 @@ function boot() {
   function resize() {
     const w = innerWidth, h = innerHeight;
     renderer.setSize(w, h, false); composer.setSize(w, h); composer.setPixelRatio(DPR); sizeVol();
+    { const cw = Math.max(2, Math.min(1100, Math.round(w * DPR * 0.7))); cloudRT.setSize(cw, Math.max(2, Math.round(cw * h / w))); skyU.uInvRes.value.set(1 / (w * DPR), 1 / (h * DPR)); }
     gCam.aspect = w / h; gCam.updateProjectionMatrix();
     volU.uAspect.value = LU.uAspect.value = w / h;
   }
@@ -1450,6 +1572,16 @@ function boot() {
   const advance = (dt) => { if (prog !== progSeen) arcS = arcAtP(Math.max(prog, 0.05));              // position was set from outside (click, skip, test hook)
     arcS = Math.min(ARC_T, arcS + speedAt(arcS) * dt); prog = arcS >= ARC_T - 0.05 ? 1 : Math.max(0.05, pAtArc(arcS)); progSeen = prog; };
 
+  /* ── scrolling into About ──
+     The page scrolls for real once it has landed. As the visitor leaves the landing the camera tilts down, away from the galaxy, so the galaxy rises
+     and leaves through the top of the frame, whole, the stars going with it. Its light is left as a faint glow along the top edge. The sky the camera
+     comes to rest on has a little dust in it (see skyU). The amount of tilt follows how far the page has scrolled, in screen heights, eased so the
+     camera has weight; it goes on creeping very slowly while the words are read. */
+  const PAN_MAX = 0.47, SPIN_MAX = 1.0, SC = { pan: [0.05, 1.1] };   // SPIN_MAX: how far the galaxy turns on its axis while it leaves (radians: nearly 60 degrees)  ·                                                   // how far the camera tilts down (radians: about 27 degrees) · where in the scroll that happens
+  let scS = 0, scStill = 9; const qB = new THREE.Quaternion(), qO = new THREE.Quaternion(), eO = new THREE.Euler(0, 0, 0, 'XYZ'), m4 = new THREE.Matrix4();
+  const seg = (x, r) => ease(clamp((x - r[0]) / (r[1] - r[0]), 0, 1));
+  const aboutEl = $('#about'), aboutBits = [...document.querySelectorAll('#about .col>*')], whoEl = $('#s-name .who');
+  const ABOUT_AT = [[1.3, 1.6], [0.92, 1.2], [1.65, 1.95], [2.0, 2.3], [2.35, 2.65]], aboutV = [0, 0, 0, 0, 0];                  // where in the scroll each piece arrives: the photo, the greeting (first), then the three paragraphs
   const GLIDE = 5.2; let glideT = 0, glideP = -1;
   const FOV_END = 30.8;                                        // the settled frame's field of view on wide screens: narrow enough that the galaxy's arms nearly reach the top and bottom of the frame
   // The lens narrows from 50 degrees to that as the camera pulls back, and how far it has narrowed depends only on how far the camera is from the
@@ -1529,11 +1661,32 @@ function boot() {
       up3.setFromMatrixColumn(gCam.matrixWorld, 1);
       look.addScaledVector(up3, -(pr ? LIFT_TALL : LIFT) * fh * wT); gCam.lookAt(look); }
     gCam.rotateZ(-0.085 * (1 - sst(0.05, 0.14, p)) + ROLL * wT);
+    { const sRaw = mode === 'done' && p >= 1 ? scrollY / Math.max(1, H) : 0, was = scS; scS += (sRaw - scS) * (RM ? 1 : 1 - Math.exp(-dt * 3.2)); if (Math.abs(sRaw - scS) < 0.0004) scS = sRaw;
+      scStill = Math.abs(scS - was) > 0.00015 ? 0 : scStill + dt;                                    // how long the scroll has been at rest
+      root.classList.toggle('scrolled', sRaw > 0.12);
+      // As it leaves, the galaxy turns about its own axis, the way its arms already turn. (It is the camera that is carried round the axis; the
+      // far stars and the dust are carried with it, so only the galaxy is seen to turn.)
+      { const spin = SPIN_MAX * seg(scS, SC.pan); if (spin > 0.0002) { qO.setFromAxisAngle(up, spin); gCam.position.applyQuaternion(qO); gCam.quaternion.premultiply(qO); pos.copy(gCam.position); } gStars.rotation.y = -orb.az + spin; }
+      { eO.set(-PAN_MAX, 0, 0); qO.setFromEuler(eO); qB.copy(gCam.quaternion).multiply(qO); m4.makeRotationFromQuaternion(qB); skyU.uSkyM.value.setFromMatrix4(m4); }   // the view the camera will come to rest on: the dust is placed in its terms
+      const pan = PAN_MAX * seg(scS, SC.pan) + 0.03 * clamp((scS - SC.pan[1]) / 1.75, 0, 1);
+      if (pan > 0.0002) gCam.rotateX(-pan);
+      skyU.uGlow.value = sst(0.8, 1.1, scS);
+      // The clouds wait until the galaxy has gone, and then form over a few seconds of their own time (not tied frame for frame to the scroll, so
+      // however fast the visitor scrolls they are seen to gather). Scrolling back up, they thin away again.
+      { const want = sst(0.95, 1.5, scS), was = cloudForm; cloudForm += (want - cloudForm) * (RM ? 1 : 1 - Math.exp(-dt * (want > cloudForm ? 0.8 : 2.2))); if (Math.abs(want - cloudForm) < 0.002) cloudForm = want;
+        cloudBusy = cloudForm !== was; cloudU.uForm.value = ease(cloudForm); skyU.uDust.value = Math.min(1, cloudForm * 5); } skyU.uGalDir.value.copy(pos).multiplyScalar(-1).normalize();
+      cloudU.uCamC.value.set(0.22 * Math.sin(time * 0.031), 0.12 * Math.sin(time * 0.023), -0.9 * clamp((scS - 1.0) / 2.0, 0, 1));   // the camera drifts a little through the clouds, and moves in among them as the page is read
+      // the words: the name leaves as the scroll begins; then the photo, the greeting and each paragraph arrive in turn, and stay
+      const nameK = 1 - sst(0.02, 0.4, scS); whoEl.style.opacity = nameK.toFixed(3); S.name.style.setProperty('--scrim', nameK.toFixed(3)); whoEl.style.transform = 'translateY(calc(-50% - ' + (scS * 70).toFixed(1) + 'px))';
+      // Each piece eases toward where the scroll says it should be over about half a second of its own time, so it never snaps in, however fast the page is scrolled.
+      let anyV = 0; aboutBits.forEach((el, k) => { const want = sst(ABOUT_AT[k][0], ABOUT_AT[k][1], scS); aboutV[k] += (want - aboutV[k]) * (RM ? 1 : 1 - Math.exp(-dt * 2.6)); if (Math.abs(want - aboutV[k]) < 0.002) aboutV[k] = want;
+        const v = aboutV[k]; anyV = Math.max(anyV, v); el.style.opacity = v.toFixed(3); el.style.transform = 'translateY(' + ((1 - ease(v)) * 26).toFixed(1) + 'px)'; });
+      aboutEl.style.visibility = anyV > 0.003 ? 'visible' : 'hidden'; }
     gCam.updateProjectionMatrix(); gCam.updateMatrixWorld(true);
     gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = mix(1.7, 1.15, kw); gStars.userData.u.uOcc.value = kw;
     volU.uCam.value.copy(pos).multiplyScalar(1 / R); volU.uRot.value.setFromMatrix4(gCam.matrixWorld); volU.uTan.value = Math.tan(gCam.fov * Math.PI / 360); volU.uPix.value = 2 * volU.uTan.value * texelU.value.y;
     volU.uArms.value = spU.uArms.value = mix(0.42, 1, kw); volU.uBlue.value = kw; volU.uHaze.value = 1 - kw;
-    { const w = kw > 0.5 ? (p >= 1 && glideT >= GLIDE ? 2 : 1) : (mode === 'idle' ? 0 : 3); if (w !== wideOn) { wideOn = w; sizeVol(); } }
+    { const w = kw > 0.5 ? (p >= 1 && glideT >= GLIDE && scStill > 0.6 ? 2 : 1) : (mode === 'idle' ? 0 : 3); if (w !== wideOn) { wideOn = w; sizeVol(); } }   // (while the scroll is moving the camera the picture is in its moving state)
     if (kw < 0.5) { const D = pos.length() / R, tf = Math.tan(gCam.fov * Math.PI / 360), a = 1.1 / (D * tf * gCam.aspect), b = (1.1 * Math.abs(pos.y) / pos.length() + 0.06) / (D * tf);   // how much of the screen the disk covers, roughly: its outline is an ellipse
       const want = kOpenFor(Math.min(1, 0.785 * a * b)); if (Math.abs(want - covK) > 0.06 * covK || (want >= 0.97 && covK !== 1)) { covK = want >= 0.97 ? 1 : want; sizeVol(); } }
     volU.uSteps.value = wideOn === 2 ? STEPS : Math.round(mix(OSTEPS, mix(SMALL ? 8 : 10, STEPS, stillK), kw));                                    // the far-off galaxy is a thin slab on screen: fewer samples through it while moving
@@ -1554,7 +1707,7 @@ function boot() {
     const nm = p >= 0.74 ? 1 : 0; S.name.style.visibility = nm ? 'visible' : 'hidden'; S.name.classList.toggle('show', !!nm); S.name.classList.toggle('on', mode === 'done');
     // the glass (the Enter pill on the opening view, the menu on the landing: never both at once): where it is and how far it has faded in, read from the page so the bending arrives and moves exactly with it
     { let gk = 0; capK += ((mode === 'idle' ? sst(0.75, 1, e) : 0) - capK) * (RM ? 1 : 1 - Math.exp(-dt * 7));      // the Enter pill fades with the opening view
-      if (nm) { if (!glassSet || glassK < 1) { const r = glassEl.getBoundingClientRect(); glassK = RM ? 1 : +getComputedStyle(glassEl).opacity || 0; LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); glassSet = true; }
+      if (nm) { if (true) { const r = glassEl.getBoundingClientRect(); glassK = RM ? 1 : +getComputedStyle(glassEl).opacity || 0; LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); glassSet = true; }
         gk = glassK; }
       else { glassSet = false; glassK = 0;
         if (capK > 0.004) { const r = capEl.getBoundingClientRect(); LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); gk = capK; } }   // (it rides with the star, so it is looked up every frame)
@@ -1599,6 +1752,7 @@ function boot() {
       accU.pCam.value.copy(accU.uCam.value); accU.pRot.value.copy(accU.uRot.value); accU.pTan.value = accU.uTan.value; pGT = gt; pGM = gm; pSpin = orb.az;
       blitU.tGas.value = accCur.texture;
     }
+    if (skyU.uDust.value > 0.003 && (scStill < 0.4 || cloudBusy || (++cloudTick & 3) === 0)) { renderer.setRenderTarget(cloudRT); renderer.render(cloudScene, gCam); renderer.setRenderTarget(null); }   // the gas clouds (every frame while the scroll is moving, every fourth at rest: they only drift)
     composer.render();
     capInk();
   }

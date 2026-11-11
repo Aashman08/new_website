@@ -1476,6 +1476,13 @@ function boot() {
 
   const GLIDE = 5.2; let glideT = 0, glideP = -1;
   const FOV_END = 30.8;                                        // the settled frame's field of view on wide screens: narrow enough that the galaxy's arms nearly reach the top and bottom of the frame
+  // The lens narrows from 50 degrees to that as the camera pulls back, and how far it has narrowed depends only on how far the camera is from the
+  // galaxy. Zooming in works against pulling back, so a zoom timed on its own slowed the galaxy's shrinking for a second in the middle of the
+  // move and then let it pick up again, which read as a pause. Tied to distance, the galaxy shrinks at a rate that only ever falls.
+  const ZOOM_D0 = 28, ZOOM_D1 = gPath.getPoint(1).length(), ZOOM_T0 = Math.tan(25 * Math.PI / 180), ZOOM_T1 = Math.tan(FOV_END * Math.PI / 360);
+  const zoomFov = (p, d) => { if (p < 0.18) return 50; const u = clamp(Math.log(Math.max(d, ZOOM_D0) / ZOOM_D0) / Math.log(ZOOM_D1 / ZOOM_D0), 0, 1), h = u * u * (2 - u);   // (eases in, so the zoom starts without a jolt)
+    return 2 * Math.atan(ZOOM_T0 * Math.pow(ZOOM_T1 / ZOOM_T0, h)) * 180 / Math.PI; };
+  let pkS = 0;                                                 // how much the settled frame answers the pointer: eased in when control passes to the visitor, so the frame does not jump
   const LIFT = 0.095, LIFT_TALL = 0.08, ROLL = 0.12;                              // the settled frame: how far above the middle the galaxy's core sits, as a fraction of the frame's height (wide screens · tall ones) · how far the camera has rolled by then
   function update(p, e, time, dt) {
     { const k = 30, c = 10; ptr.vx += ((ptr.x - ptr.sx) * k - ptr.vx * c) * dt; ptr.vy += ((ptr.y - ptr.sy) * k - ptr.vy * c) * dt; ptr.sx += ptr.vx * dt; ptr.sy += ptr.vy * dt; }
@@ -1484,7 +1491,7 @@ function boot() {
       for (let i = 0; i < 9; i++) volU.uPal.value[i].set(palNow[i * 3], palNow[i * 3 + 1], palNow[i * 3 + 2]);
       const dx = palNow[27] - PAL_B0[0], dy = palNow[28] - PAL_B0[1], dz = palNow[29] - PAL_B0[2];
       volU.uStarM.value.set(1 + dx * SN[0], dx * SN[1], dx * SN[2], dy * SN[0], 1 + dy * SN[1], dy * SN[2], dz * SN[0], dz * SN[1], 1 + dz * SN[2]); }
-    const pk = mode === 'done' ? 1 : 0, psx = ptr.sx * pk, psy = ptr.sy * pk;
+    pkS += ((mode === 'done' ? 1 : 0) - pkS) * (RM ? 1 : 1 - Math.exp(-dt * 1.6)); const psx = ptr.sx * pkS, psy = ptr.sy * pkS;
     // only the opening fades up from black; everything after is one shot
     if (!(mode === 'done' && fadeEl.style.transition)) { fadeEl.style.transition = ''; fadeEl.style.background = '#000'; fadeEl.style.opacity = ((1 - sst(0.0, 0.7, e)) * (p < 0.04 ? 1 : 0)).toFixed(3); }
 
@@ -1521,7 +1528,7 @@ function boot() {
     tmp.set(Math.sin(az) * hd * back, (pr ? 36 : hd * 0.2004) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
     // carry the idle drift's offset into the move and let it fade
     orb.e0 = Math.atan2(tmp.y, Math.hypot(tmp.x, tmp.z));                                           // the opening view's own tilt
-    gPath.getPoint(gUat(p), pos); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));
+    gPath.getPoint(gUat(p), pos); const dPath = pos.length(); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));
     // The visitor's own view of the opening disk. While it sits idle they can turn it, tilt it and move in or out; once Enter is pressed the tilt and
     // distance ease back to nothing, so the camera slides from wherever they left it onto the shot's own path. (The spin is applied to the scene, not here.)
     if (mode === 'idle') { if (!orb.drag) { orb.az += orb.vaz * dt; orb.el += orb.vel * dt; const f = Math.exp(-dt * 7); orb.vaz *= f; orb.vel *= f; orbWrap(); }
@@ -1538,7 +1545,7 @@ function boot() {
     if (settle > 0) { pos.applyAxisAngle(up, settle * (0.035 * Math.sin(time * 0.05) + psx * 0.012)); pos.multiplyScalar(1 + settle * (0.012 * Math.sin(time * 0.071) - psy * 0.008)); }
     tmp.set(Math.cos(az), 0, -Math.sin(az)).multiplyScalar(pr ? 2 : 4); tmp.y = pr ? -4 : 3;            // hero: the whole disk, centred, sitting a little below the middle
     look.set(0, 0.4, 0).lerp(tmp, 1 - sst(0.05, 0.13, p));
-    const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = mix(f1, pr ? 50 : FOV_END, sst(0.35, 0.72, sFof(p)));
+    const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = pr ? mix(f1, 50, sst(0.35, 0.72, sFof(p))) : Math.min(f1, zoomFov(p, dPath));
     gCam.position.copy(pos); gCam.up.copy(upv); gCam.lookAt(look); gCam.updateMatrixWorld(true);
     // the galaxy stays in the middle of the frame as it recedes: it only rises a little, so its core settles just above the name
     if (wT > 0) { const D = pos.length(), fh = 2 * D * Math.tan(gCam.fov * Math.PI / 360);

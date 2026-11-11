@@ -141,7 +141,7 @@ html.done #after{display:block}
 .eyebrow{color:var(--amber);display:flex;gap:14px;align-items:center}
 .eyebrow::before{content:"";width:34px;height:1px;background:var(--amber)}
 
-#s-hero{flex-direction:column;justify-content:flex-start;padding-top:30px!important;background:radial-gradient(ellipse 52% 34% at 0% 0%,rgba(0,0,0,.62) 0%,rgba(0,0,0,.3) 45%,rgba(0,0,0,0) 72%)}
+#s-hero{flex-direction:column;justify-content:flex-start;padding-top:30px!important;background:none}
 #s-hero .row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-right:clamp(0px,12vw,170px)}
 #s-hero p{margin:14px 0 0;max-width:34ch;font-family:var(--display);font-weight:600;font-size:clamp(17px,1.7vw,24px);line-height:1.25;letter-spacing:-.01em}
 .scrollhint{display:flex;align-items:center;gap:12px;color:var(--dim);white-space:nowrap}
@@ -290,14 +290,7 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
 </nav>
 
 <main id="stage">
-  <section id="s-hero">
-    <div class="row">
-      <div>
-        <div class="label eyebrow">01 &mdash; The disk</div>
-        <p>Since I was a kid, space has been the one thing I couldn&rsquo;t escape.</p>
-      </div>
-    </div>
-  </section>
+  <section id="s-hero"></section>
 
   <section id="s-name">
     <div class="who">
@@ -1533,7 +1526,7 @@ function boot() {
   // one camera move: in over the disk, skimming past the core, straight on out the far side and away, turning to look back as the galaxy recedes
   // the path starts far enough back to see the whole disk (on portrait screens it starts closer, where the opening view already is)
   const WIDE0 = innerWidth >= innerHeight;
-  const hdFor = (asp) => Math.sqrt(105 * 105 + Math.pow(105 / (0.955 * 0.3057 * clamp(asp, 1.25, 2.6)), 2)) / 1.0199;   // distance at which the disk fills about 95% of the width
+  const hdFor = (asp) => Math.sqrt(105 * 105 + Math.pow(105 / (0.78 * 0.3057 * clamp(asp, 1.25, 2.6)), 2)) / 1.0199;   // distance at which the disk fills about 78% of the width
   const HD0 = hdFor(innerWidth / innerHeight);
   const gPath = new THREE.CatmullRomCurve3((WIDE0 ? [V(Math.sin(0.62) * HD0, HD0 * 0.2004, Math.cos(0.62) * HD0)] : []).concat([V(60, 17, 85), V(30, 7, 42), V(5, 1.6, 6), V(-16, 10, -30), V(-58, 72, -118), V(-102, 152, -192)]), false, 'centripetal');
   const GK = WIDE0 ? [0.05, 0.088, 0.115, 0.175, 0.215, 0.33, 1.0] : [0.05, 0.115, 0.175, 0.215, 0.33, 1.0];
@@ -1611,8 +1604,8 @@ function boot() {
     for (let k = 0; k < 11; k++) volU.uBandA.value[k] = (omK(0.15 * Math.pow(1.22, k + 0.5)) * gt) % 6.283185307179586;      // the bands of billow cells seen from above: how far each has turned
     // idle hold: a slow, heavy drift — never static
     const az = 0.62 + 0.045 * Math.sin(time * 0.045), back = (1 + 0.22 * (1 - ee)) * (1 + 0.02 * Math.sin(time * 0.07));
-    const hd = pr ? 122 : hdFor(W / H);                                                             // desktop: just far enough back to see the whole disk, edge to edge
-    tmp.set(Math.sin(az) * hd * back, (pr ? 36 : hd * 0.2004) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
+    const hd = pr ? 144 : hdFor(W / H);                                                             // desktop: just far enough back to see the whole disk, edge to edge
+    tmp.set(Math.sin(az) * hd * back, (pr ? 42 : hd * 0.2004) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
     // carry the idle drift's offset into the move and let it fade
     orb.e0 = Math.atan2(tmp.y, Math.hypot(tmp.x, tmp.z));                                           // the opening view's own tilt
     gPath.getPoint(gUat(p), pos); const dPath = pos.length(); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));

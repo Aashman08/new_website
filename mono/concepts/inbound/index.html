@@ -1446,11 +1446,11 @@ function boot() {
   const renderPass = new RenderPass(gScene, gCam); composer.addPass(renderPass);
   const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.4, 0.85, 0.9); composer.addPass(bloom);
   const lensU = { tDiffuse: { value: null }, uCore: { value: new THREE.Vector2(0.5, 0.5) }, uFlare: { value: 0 }, uCA: { value: 0.012 }, uVig: { value: 0.5 }, uAspect: { value: 1 }, uTint: { value: new THREE.Vector3(0.45, 0.62, 1.0) }, uGlowC: { value: new THREE.Vector3(0.0, 0.22, 1.0) }, uExp: { value: 1 }, uTime: { value: 0 }, uCool: { value: 1 },
-    uGl: { value: new THREE.Vector4(0, 0, 1, 1) }, uGlK: { value: 0 }, uGl2: { value: new THREE.Vector4(0, 0, 1, 1) }, uGl2K: { value: 0 }, uGlHot: { value: 0 }, uGlS: { value: 1 }, uGlLamp: { value: new THREE.Vector2() }, uRes: { value: new THREE.Vector2(1, 1) } };   // uGl: the glass's centre and half-size, in CSS pixels · uGlK: how far it has faded in · uGl2, uGl2K: the same for the smaller piece that slides inside the menu · uGlHot: the pointer is over it · uRes: the page's size in CSS pixels
+    uGl: { value: new THREE.Vector4(0, 0, 1, 1) }, uGlK: { value: 0 }, uGl2: { value: new THREE.Vector4(0, 0, 1, 1) }, uGl2K: { value: 0 }, uGlHot: { value: 0 }, uGlS: { value: 1 }, uRes: { value: new THREE.Vector2(1, 1) } };   // uGl: the glass's centre and half-size, in CSS pixels · uGlK: how far it has faded in · uGl2, uGl2K: the same for the smaller piece that slides inside the menu · uGlHot: the pointer is over it · uRes: the page's size in CSS pixels
   const lens = new ShaderPass({ uniforms: lensU,
     vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
     fragmentShader: /* glsl */`
-      uniform sampler2D tDiffuse; uniform vec2 uCore; uniform float uFlare,uCA,uVig,uAspect,uExp,uTime,uCool; uniform vec3 uTint,uGlowC; uniform vec4 uGl,uGl2; uniform vec2 uRes,uGlLamp; uniform float uGlK,uGl2K,uGlHot,uGlS; varying vec2 vUv;
+      uniform sampler2D tDiffuse; uniform vec2 uCore; uniform float uFlare,uCA,uVig,uAspect,uExp,uTime,uCool; uniform vec3 uTint,uGlowC; uniform vec4 uGl,uGl2; uniform vec2 uRes; uniform float uGlK,uGl2K,uGlHot,uGlS; varying vec2 vUv;
       float gh(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
       // Standard filmic (ACES) tone curve, identical to the renderer's built-in one.
       vec3 fit(vec3 v){ vec3 a=v*(v+0.0245786)-0.000090537; vec3 b=v*(0.983729*v+0.4329510)+0.238081; return a/b; }
@@ -1465,7 +1465,7 @@ function boot() {
       //     down to the picture underneath, so through the rim you see the picture from further in toward the middle. The flat middle bends nothing.
       //     Blue is bent a little more than red (the index is taken as 1.47 / 1.50 / 1.53), which leaves a faint fringe of colour at the rim;
       //   · light: the brightest thing in the scene (the star, or the galaxy's core) is the lamp. The rim that faces it catches a thin bright line,
-      //     the slope just inside it a softer glow, and the far rim a fainter line from light that has crossed the glass;
+      //     and the far rim a fainter one from light that has crossed the glass. The lamp does not follow the pointer: nothing moves inside the glass;
       //   · shadow: the glass throws a soft shadow on the picture, on the side away from the lamp.
       // g: centre and half-size in CSS pixels · K: how far it has faded in · hot: the pointer is on it · S: how thick the glass is (1 on the opening view's
       // gas; thinner over the galaxy's star field, where a thick rim would draw every star at the edge out into a streak).
@@ -1483,14 +1483,12 @@ function boot() {
         vec3 r1=refract(I,N,1.0/1.47), r2=refract(I,N,1.0/1.50), r3=refract(I,N,1.0/1.53);
         bR+=r1.xy/max(-r1.z,0.25)*th; bG+=r2.xy/max(-r2.z,0.25)*th; bB+=r3.xy/max(-r3.z,0.25)*th;
         float aa=clamp(-sd/0.9,0.0,1.0), u2=u*u, u8=u2*u2*u2*u2, edge=u8*u8*aa;                             // a line about a pixel wide at the very rim
-        vec3 Hh=normalize(vec3(L2*0.9,0.44)+vec3(0.0,0.0,1.0));
-        float sp=pow(max(dot(N,Hh),0.0),70.0), sp2=pow(max(dot(vec3(-N.xy,N.z),Hh),0.0),70.0);            // the slope that mirrors the lamp toward the eye, on the near side and on the far side
-        float lit=edge*(0.05+0.85*pow(max(face,0.0),1.5)+0.22*pow(max(-face,0.0),2.5))+0.14*sp+0.05*sp2;
+        float lit=edge*(0.05+0.85*pow(max(face,0.0),1.5)+0.22*pow(max(-face,0.0),2.5));                  // (nothing is lit inside the rim: a glow on the inner slope showed as a stray bar of light across the glass)
         add+=vec3(1.0,0.985,0.96)*lit*K*(1.0+0.7*hot);
         mul*=1.0-K*0.10*u*u*max(-face,0.0); }                                                             // the far side of the rim is a little darker: the glass has thickness
       void main(){ vec2 d=vUv-0.5; float r2=dot(d,d); vec2 off=d*r2*uCA;
         vec2 bR=vec2(0.0), bG=vec2(0.0), bB=vec2(0.0); vec3 gAdd=vec3(0.0); float gMul=1.0;
-        if(uGlK>0.003){ vec2 px=vec2(vUv.x,1.0-vUv.y)*uRes, lamp=vec2(uCore.x,1.0-uCore.y)*uRes+uGlLamp;   // this pixel and the lamp (the star or the core, nudged by the pointer), in CSS pixels, y down
+        if(uGlK>0.003){ vec2 px=vec2(vUv.x,1.0-vUv.y)*uRes, lamp=vec2(uCore.x,1.0-uCore.y)*uRes;   // this pixel and the lamp (the star or the core), in CSS pixels, y down
           glass(px,uGl,uGlK,uGlHot,uGlS,lamp,bR,bG,bB,gAdd,gMul); glass(px,uGl2,uGl2K,0.0,uGlS,lamp,bR,bG,bB,gAdd,gMul); }
         vec2 px2uv=vec2(1.0,-1.0)/uRes;
         vec3 col=vec3(texture2D(tDiffuse,vUv+off+bR*px2uv).r, texture2D(tDiffuse,vUv+bG*px2uv).g, texture2D(tDiffuse,vUv-off+bB*px2uv).b);
@@ -1567,7 +1565,6 @@ function boot() {
   const ZOOM_D0 = 28, ZOOM_D1 = gPath.getPoint(1).length(), ZOOM_T0 = Math.tan(25 * Math.PI / 180), ZOOM_T1 = Math.tan(FOV_END * Math.PI / 360);
   const zoomFov = (p, d) => { if (p < 0.18) return 50; const u = clamp(Math.log(Math.max(d, ZOOM_D0) / ZOOM_D0) / Math.log(ZOOM_D1 / ZOOM_D0), 0, 1), h = u * u * (2 - u);   // (eases in, so the zoom starts without a jolt)
     return 2 * Math.atan(ZOOM_T0 * Math.pow(ZOOM_T1 / ZOOM_T0, h)) * 180 / Math.PI; };
-  const HOVERS = matchMedia('(hover: hover)').matches;      // a pointer that can rest over things: without one (a phone) the rim light stays put, toward the core
   const glassEl = $('.menubar'), lensEl = $('.menubar .lens'), capEl = $('#enter-cap'); let glassSet = false, glassK = 0, capK = 0, capLum = 0, lensK = 0; window.__capLum = () => capLum;   // (test hook: brightness measured behind the Enter pill's lettering) addEventListener('resize', () => { glassSet = false; });
   let pkS = 0;                                                 // how much the settled frame answers the pointer: eased in when control passes to the visitor, so the frame does not jump
   const LIFT = 0.095, LIFT_TALL = 0.08, ROLL = 0.12;                              // the settled frame: how far above the middle the galaxy's core sits, as a fraction of the frame's height (wide screens · tall ones) · how far the camera has rolled by then
@@ -1662,12 +1659,12 @@ function boot() {
 
     setOp(S.hero, sst(0.5, 0.95, e) * (1 - sst(0.045, 0.07, p)));
     const nm = p >= 0.74 ? 1 : 0; S.name.style.visibility = nm ? 'visible' : 'hidden'; S.name.classList.toggle('show', !!nm); S.name.classList.toggle('on', mode === 'done');
-    // the glass (the Enter pill on the opening view, the menu on the landing: never both at once): where it is and how far it has faded in, read from the page so the bending arrives and moves exactly with it; and the menu's rim light, which leans toward the pointer
+    // the glass (the Enter pill on the opening view, the menu on the landing: never both at once): where it is and how far it has faded in, read from the page so the bending arrives and moves exactly with it
     { let gk = 0; capK += ((mode === 'idle' ? sst(0.75, 1, e) : 0) - capK) * (RM ? 1 : 1 - Math.exp(-dt * 7));      // the Enter pill fades with the opening view
       if (nm) { if (!glassSet || glassK < 1) { const r = glassEl.getBoundingClientRect(); glassK = RM ? 1 : +getComputedStyle(glassEl).opacity || 0; LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); glassSet = true; }
-        gk = glassK; LU.uGlLamp.value.set(HOVERS ? clamp(ptr.sx, -1, 1) * W * 0.24 : 0, 0); }                 // the menu's rim light leans toward the pointer
+        gk = glassK; }
       else { glassSet = false; glassK = 0;
-        LU.uGlLamp.value.set(0, 0); if (capK > 0.004) { const r = capEl.getBoundingClientRect(); LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); gk = capK; } }   // (it rides with the star, so it is looked up every frame)
+        if (capK > 0.004) { const r = capEl.getBoundingClientRect(); LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); gk = capK; } }   // (it rides with the star, so it is looked up every frame)
       LU.uGlK.value = gk; LU.uGlHot.value = nm ? 0 : coreHot; LU.uGlS.value = nm ? 0.42 : 1;
       lensK += ((nm && glassEl.classList.contains('lit') ? 1 : 0) - lensK) * (RM ? 1 : 1 - Math.exp(-dt * 9));          // the piece of glass that slides inside the menu
       if (nm && lensK > 0.01) { const r = lensEl.getBoundingClientRect(); LU.uGl2.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); }

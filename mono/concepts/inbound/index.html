@@ -532,31 +532,32 @@ function boot() {
     uN: { value: noiseTex }, uCam: { value: new THREE.Vector3() }, uRot: { value: new THREE.Matrix3() },
     uTan: { value: 0.3 }, uAspect: { value: 1 }, uGT: { value: 0 }, uGM: { value: 0 }, uT: { value: 0 }, uW: { value: 0.09 }, uPat: { value: 0 },
     uArms: { value: 0.4 }, uBlue: { value: 0 }, uGain: { value: 1 }, uHaze: { value: 1 }, uSteps: { value: STEPS }, uSwell: { value: Q.get('noswell') === '1' ? 0 : 1 },
-    uGas: { value: null }, uTemp: { value: null }, uSpin: { value: 0 }, uDz: { value: 1 }, uPix: { value: 0.001 }, uShA: { value: new Float32Array(SH_N) }, uShE: { value: new Float32Array(SH_N) }, uBN: { value: bnTex }, uFr: { value: 0 }, uMip: { value: 1 }, uJit: { value: new THREE.Vector2() },
+    uGas: { value: null }, uTemp: { value: null }, uCells: { value: null }, uSpin: { value: 0 }, uDz: { value: 1 }, uPix: { value: 0.001 }, uShA: { value: new Float32Array(SH_N) }, uShE: { value: new Float32Array(SH_N) }, uBandA: { value: new Float32Array(12) }, uBN: { value: bnTex }, uFr: { value: 0 }, uMip: { value: 1 }, uJit: { value: new THREE.Vector2() },
   };
   // The opening disk's gas is not generated live. An offline flow simulation winds gas up and stirs it; from that, two maps are baked
   // (x: angle round the disk, y: log-radius):
   //   gas.jpg    R: how high the gas stands at each place · G: how high the shadow cast from the core reaches there · B: dust cloud
   //   temp.webp  temperature variation (hue), independent of the relief
+  //   cells.webp billow cells: what shows when the gas is seen from above or below
   // Both are made by tools/flow.py and tools/bake.py.
   // Until they arrive the disk is plain and smooth.
   { const ph = (r, g, b) => { const t = new THREE.DataTexture(new Uint8Array([r, g, b, 255]), 1, 1); t.needsUpdate = true; return t; };
-    volU.uGas.value = ph(116, 0, 0); volU.uTemp.value = ph(128, 128, 128);
-    let got = 0; const done = () => { if (++got === 2) { accFresh = true; diskReady = true; if (RM && frameOnce) frameOnce(); } };   // (with reduced motion there is no running loop: draw once more now that the maps are here)
+    volU.uGas.value = ph(116, 0, 0); volU.uTemp.value = ph(128, 128, 128); volU.uCells.value = ph(128, 128, 128);
+    let got = 0; const done = () => { if (++got === 3) { accFresh = true; diskReady = true; if (RM && frameOnce) frameOnce(); } };   // (with reduced motion there is no running loop: draw once more now that the maps are here)
     const load = (file, key, aniso) => new THREE.TextureLoader().load(file, (t) => { t.flipY = false; t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.ClampToEdgeWrapping;
       t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; t.generateMipmaps = true; t.anisotropy = Math.min(aniso, renderer.capabilities.getMaxAnisotropy());
       t.needsUpdate = true; volU[key].value = t; done(); }, undefined, done);
-    load('gas.jpg', 'uGas', 2); load('temp.webp', 'uTemp', 1); }
+    load('gas.jpg', 'uGas', 2); load('temp.webp', 'uTemp', 1); load('cells.webp', 'uCells', 2); }
   const volMat = new THREE.ShaderMaterial({
     uniforms: volU, depthTest: false, depthWrite: false,
     vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
     fragmentShader: /* glsl */`
       precision highp float; precision highp sampler3D;
       #define STEPS 32
-      uniform sampler3D uN; uniform sampler2D uGas,uTemp; uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uGT,uGM,uT,uBlue,uGain,uHaze,uSteps,uSwell,uSpin,uDz,uPix; uniform float uShA[6], uShE[6]; uniform sampler2D uBN; uniform float uFr,uMip; uniform vec2 uJit;   // uBN: blue-noise mask · uFr: frame count · uJit: this frame's sub-pixel shift of the whole picture   // uGT: the opening disk's clock · uGM: the Milky Way's
+      uniform sampler3D uN; uniform sampler2D uGas,uTemp,uCells; uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uGT,uGM,uT,uBlue,uGain,uHaze,uSteps,uSwell,uSpin,uDz,uPix; uniform float uShA[6], uShE[6], uBandA[12]; uniform sampler2D uBN; uniform float uFr,uMip; uniform vec2 uJit;   // uBN: blue-noise mask · uFr: frame count · uJit: this frame's sub-pixel shift of the whole picture   // uGT: the opening disk's clock · uGM: the Milky Way's
       //   // uSpin: how far the visitor has turned the opening disk · uDz: how far they have moved in or out (1 = the opening view's own distance)
       varying vec2 vUv;
-      vec2 gGx=vec2(0.0), gGy=vec2(0.0); float gTmp=0.0; bool gHaveT=false; float gW1=1.0, gW2=0.0, gE1=0.0, gE2=0.0, gOR=0.0;
+      vec2 gGx=vec2(0.0), gGy=vec2(0.0); float gTmp=0.0, gMot=0.0, gBump=0.0; bool gHaveT=false; float gW1=1.0, gW2=0.0, gE1=0.0, gE2=0.0, gOR=0.0;
       float gDeep=0.0;                                                        // this sample sat in the solid body of the gas, below its soft top
       float gMir=1.0, gIso=0.0, gTHit=1e6, gTrS=1.0, gTcO=1.0, gRN=0.0, gRD=0.0, gTN=0.0, gT0s=1e6, gTcl=0.0; vec3 gColS=vec3(0.0); bool gGotS=false;   // gMir: -1 when the view is from under the disk · gIso: size of a pixel at the sample, for rays stepped along their length · the rest: notes kept while marching the opening disk (see stepOpen)   // per ray: how fast the point where it meets the disk moves across the screen (sets how sharply the maps are read) · the hue variation of the gas it lands on, read once
       ${GAL}
@@ -614,6 +615,20 @@ function boot() {
         float dust=dMW*uBlue;
         return vec4(gas,dust,rel,arm);
       }
+      const float SH0=${SH0}, SHQ=${SHQ.toFixed(5)};                              // inner edge of the first shell · log of the ratio between one shell and the next (2.2)
+      // Billow cells, as seen looking down on the gas. They ride in a dozen narrow bands, each turning as one piece at the Kepler speed of its own
+      // radius, so the cells inside a band keep their shape while neighbouring bands slide past each other, faster the further in (as the cloud
+      // belts of a giant planet do). Where two bands meet, their cells are blended.
+      const float BD0=0.15, BDQ=0.19885;                                  // inner edge of the first band · log of the ratio between one band and the next (1.22)
+      float cellB(float th,float r,float kk,vec2 gx,vec2 gy){
+        return textureGrad(uCells,vec2((th-uSpin-uBandA[int(kk)])/6.2831853+fract(0.618*(kk+1.0)),(log(r+0.03)+1.8325815)/1.9723517),gx,gy).r-0.5; }
+      float cellAt(float th,float r,vec2 gx,vec2 gy){
+        float xs=log(max(r,BD0)/BD0)/BDQ; float kk=min(floor(xs),10.0), fx=xs-kk; float c=cellB(th,r,kk,gx,gy);
+        const float BLW=0.22; float kn=-1.0, wS=1.0;
+        if(fx<BLW&&kk>0.5){ float q=fx/BLW; wS=0.5+0.5*q*q*(3.0-2.0*q); kn=kk-1.0; }
+        else if(fx>1.0-BLW&&kk<9.5){ float q=(1.0-fx)/BLW; wS=0.5+0.5*q*q*(3.0-2.0*q); kn=kk+1.0; }
+        if(kn>=0.0){ float wN=1.0-wS; c=(wS*c+wN*cellB(th,r,kn,gx,gy))/sqrt(wS*wS+wN*wN); }
+        return c; }
       // ── Opening disk: gas as a real volume ──
       // The simulated flow is only the map. From it the gas gets height (dense bands stand up as ridges, thin ones sink into troughs),
       // enough density to be opaque with a soft translucent top, light from the core with the shadows that ridges and clouds throw outward,
@@ -627,6 +642,7 @@ function boot() {
         ext=0.0; src=vec3(0.0); gap=0.0; gDeep=0.0;
         float av=abs(p.y)/hgt(min(r,1.25)); if(av>2.8){ gap=av-2.4; return; }   // above everything
         float wI=smoothstep(0.15,0.30,r);                                    // the relief dies away into the smooth white centre
+        float topK=smoothstep(0.42,0.85,abs(rd.y));                          // 0 seen from the side, 1 from above or below
         float tau=1.0, Vs=0.0, C=0.0, nz=0.0, nk=1.0, w1=1.0, w2=0.0, vv=0.0; vec2 u1=vec2(0.0), u2=vec2(0.0), gx=vec2(0.0), gy=vec2(0.0); vec2 q=p.xz;
         if(r>0.10){                                                          // (the centre itself is plain: nothing to look up)
           vv=(log(r+0.03)-LR0)/DLR;
@@ -636,7 +652,8 @@ function boot() {
           else { gx=vec2((q.x*gGx.y-q.y*gGx.x)*ir/6.2831853, dot(q,gGx)*il); gy=vec2((q.x*gGy.y-q.y*gGy.x)*ir/6.2831853, dot(q,gGy)*il); }   // otherwise worked out by hand from where the ray lands, so there is no seam where the angle wraps
           u1=vec2((base-dO*e1*TD)/6.2831853, vv); u2=vec2((base-dO*e2*TD)/6.2831853, vv);
           nk=mix(1.0, sqrt(w1*w1+w2*w2), smoothstep(0.08,0.7,abs(dO)*TD*0.5));   // keep the relief where the two copies have drifted apart
-          vec3 G=vec3(0.0); if(w1>0.0) G+=textureGrad(uGas,u1,gx,gy).rgb*w1; if(w2>0.0) G+=textureGrad(uGas,u2,gx,gy).rgb*w2;
+          float fz=1.0+3.0*topK;                                             // (seen from above, the hair-fine wound streaks are read more softly: they are a grazing-light effect, and from overhead the cells take over)
+          vec3 G=vec3(0.0); if(w1>0.0) G+=textureGrad(uGas,u1,gx*fz,gy*fz).rgb*w1; if(w2>0.0) G+=textureGrad(uGas,u2,gx*fz,gy*fz).rgb*w2;
           tau=1.0+(G.r*2.2-1.0)/nk; Vs=G.g*3.4; C=G.b;
         }
         float tauE=(1.0+(tau-1.0)*wI)*(1.0-0.75*smoothstep(0.78,1.08,r));   // toward the rim the gas thins down to a wedge, it does not end in a wall
@@ -653,20 +670,29 @@ function boot() {
         gDeep=x<0.60?1.0:0.0;
         if(rg+rdu<1e-3&&rh<2e-3){ ext=rh; return; }                          // nothing here worth shading
         if(!gHaveT&&wI>0.0&&(rg>0.03||rdu>0.03)){                            // the hue of this stretch of gas: read once, where the ray first lands
-          float tq=0.0; if(w1>0.0) tq+=textureGrad(uTemp,u1,gx,gy).r*w1; if(w2>0.0) tq+=textureGrad(uTemp,u2,gx,gy).r*w2; gTmp=(tq-0.5)/nk; gHaveT=true; }
+          float tq=0.0; if(w1>0.0) tq+=textureGrad(uTemp,u1,gx,gy).r*w1; if(w2>0.0) tq+=textureGrad(uTemp,u2,gx,gy).r*w2; gTmp=(tq-0.5)/nk;
+          gMot=0.0; gBump=0.0;
+          if(topK>0.01){ float cp=cellAt(th,r*1.03,gx,gy), cm=cellAt(th,r/1.03,gx,gy);   // the billow cells here, and which way their surface leans (a little further out against a little further in)
+            gMot=0.5*(cp+cm); gBump=cp-cm; }
+          gHaveT=true; }
         float tmp=gTmp;
+        // Seen from above or below. From the side, what shows is the outline of the ridges and the light on their faces. Looking down, the eye goes
+        // into the gas instead: it is made as opaque as it is along a slanting ray, so its lit tops and shadowed hollows read as a surface with relief,
+        // and the billow cells show: bright and hot at their crowns, dark and cooler in the creases between them, and lit on the side that faces the core.
+        float mot=clamp(gMot*2.2,-0.8,1.0)*topK*wI, bump=clamp(gBump*6.0,-1.0,1.0)*topK*wI;
         float lit=smoothstep(-0.25,0.25,av-Vs); lit=mix(1.0,lit,smoothstep(0.10,0.26,r));   // above the shadow line the core shines on the gas; the centre is the light itself
         float E=(1.0-0.62*(1.0-smoothstep(0.03,0.18,r)))/(0.62+r);
-        float sh=-0.55*tmp*(0.45+1.1*r); sh=sh/(1.0+abs(sh)/0.26)*wI;
+        float sh=-0.55*tmp*(0.45+1.1*r); sh=sh/(1.0+abs(sh)/0.26)*wI; sh-=0.08*mot+0.05*bump;
         float deep=clamp(1.0-tau,-0.6,0.6)*wI;                               // troughs show deeper, hotter gas
-        float fwd=max(dot(q/max(r,1e-3), -rd.xz/max(length(rd.xz),1e-3)),0.0); fwd*=fwd;   // looking toward the core through the gas: thin lit tops glow like the edges of backlit cloud
-        vec3 sg=mix(closeC(r+sh+0.10*wI-0.10*deep)*(0.36+0.34*deep), closeC(r+sh-0.07*wI)*1.45*(1.0+1.8*fwd*smoothstep(0.70,1.10,x)), lit)*E;   // in shadow only its own glow, cooler; lit, brighter and hotter
+        float fwd=max(dot(q/max(r,1e-3), -rd.xz/max(length(rd.xz),1e-3)),0.0); fwd*=fwd*(1.0-smoothstep(0.5,0.9,abs(rd.y)));   // looking toward the core through the gas: thin lit tops glow like the edges of backlit cloud
+        vec3 sg=mix(closeC(r+sh+0.10*wI-0.10*deep)*(0.36+0.34*deep)*(1.0+0.7*topK), closeC(r+sh-0.07*wI)*1.45*(1.0+1.8*fwd*smoothstep(0.70,1.10,x)), lit)*E;   // in shadow only its own glow, cooler; lit, brighter and hotter
         vec3 sd=(closeC(r+0.34)*0.05+closeC(r+0.16)*0.30*lit*(1.0+1.5*fwd))*E;   // it barely glows; it shows where the core lights it
         vec3 sz=closeC(r-0.12)*1.2*E*lit*(0.30+1.7*fwd);                     // haze only shows by the light it scatters, mostly forward
         float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=0.75*(1.0-smoothstep(0.45,0.85,r));   // the fast inner gas is brighter on the side coming toward us
         sg*=mix(1.0,dop*dop*dop,beam); sg=mix(sg, sg*vec3(0.84,0.97,1.22), clamp((dop-1.0)*1.6,0.0,1.0)*beam);
         const float KG=1.5, KD=1.7;
-        ext=KG*rg+KD*rdu+rh; src=(KG*rg*sg+KD*rdu*sd+rh*sz)/max(ext,1e-4);
+        sg*=max(1.0+0.30*mot+0.26*bump,0.5); float kS=1.0+1.4*smoothstep(0.45,0.90,abs(rd.y));
+        ext=(KG*rg+KD*rdu)*kS+rh; src=((KG*rg*sg+KD*rdu*sd)*kS+rh*sz)/max(ext,1e-4);
       }
       // ── The gas beside the star ──
       // This is the most violent part of the disk, and it follows the same law as the rest: the closer to the star, the faster the gas goes round.
@@ -675,7 +701,6 @@ function boot() {
       // being carried round and wound up by the flow, and fading as the other takes over. Because the orbital time changes so much with distance
       // (a factor of three between a shell's two edges), the gas is handled as a few nested shells, each renewing at its own rate: about three times
       // a second right at the star, every couple of seconds at the edge of the white. Inside a shell the speed is exactly Kepler's at every point.
-      const float SH0=${SH0}, SHQ=${SHQ.toFixed(5)};                              // inner edge of the first shell · log of the ratio between one shell and the next (2.2)
       float swellN(vec3 p,float r,float shell,float kk,float tw){
         int ki=int(kk); float sIn=SH0*exp(kk*SHQ);
         float res=omega(shell)-omega(sIn*2.2), T=4.5/omega(sIn);            // how much faster this gas turns than its shell's outer edge · how long a copy of the pattern lasts (about 0.7 of an orbit at the shell's inner edge)
@@ -1220,6 +1245,7 @@ function boot() {
     volU.uGT.value = gt; volU.uGM.value = gm; volU.uT.value = spU.uT.value = time; volU.uPat.value = 0;
     for (let k = 0; k < SH_N; k++) { const sIn = SH0 * Math.exp(k * SHQ);                              // the shells of gas beside the star: how far each has turned, and where each is in its cycle of renewal
       volU.uShA.value[k] = (omK(sIn * 2.2) * gt) % 6.283185307179586; volU.uShE.value[k] = (gt * omK(sIn) / 4.5 + 0.618 * k) % 1; }
+    for (let k = 0; k < 11; k++) volU.uBandA.value[k] = (omK(0.15 * Math.pow(1.22, k + 0.5)) * gt) % 6.283185307179586;      // the bands of billow cells seen from above: how far each has turned
     // idle hold: a slow, heavy drift — never static
     const az = 0.62 + 0.045 * Math.sin(time * 0.045), back = (1 + 0.22 * (1 - ee)) * (1 + 0.02 * Math.sin(time * 0.07));
     const hd = pr ? 122 : hdFor(W / H);                                                             // desktop: just far enough back to see the whole disk, edge to edge

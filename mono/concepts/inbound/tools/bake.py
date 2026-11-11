@@ -3,12 +3,13 @@
 gas.jpg    (RGB 4:4:4, 4096x1024)  R how high the gas stands, as a multiple of the disk's local thickness (/2.2)
                                    G how high the shadow cast from the core reaches (/3.4) · B dust-cloud column
 temp.webp  (grey, 1024x256)        temperature variation (hue), independent of the relief
+cells.webp (grey, 2048x512)        billow cells: what shows when the gas is seen from above or below
 
 x = angle round the disk, y = log-radius (row 0 = inner edge r 0.13, last row = r 1.12)
 
 Usage (numpy, scipy, Pillow):
     python3 flow.py 7 flow.npz 12 1.0 0.11 0.10      # the flow simulation, about half a minute
-    python3 bake.py flow.npz ..                      # writes gas.jpg and temp.webp next to index.html
+    python3 bake.py flow.npz ..                      # writes gas.jpg, temp.webp and cells.webp next to index.html
 Settings can be overridden as name=value after the output folder (see P below); debug=1 also writes pictures of the maps.
 The shader in index.html (openGas) rebuilds the same gas from these maps: heights, taper and dust shape must stay in step with it.
 """
@@ -72,6 +73,11 @@ lump = norm(np.abs(S(iso(2.0, 12.0, 3.0), yl, xl)) + 0.45 * np.abs(S(iso(10.0, 5
 dg = norm(S(iso(1.5, 9.0, 3.4), yl, xl)) + 0.22 * norm(S(iso(8.0, 30.0, 3.0), yl, xl))   # medium-sized soft clouds
 C = sst(P['c0'], P['c1'], dg) * sst(0.34, 0.60, r)
 
+# ── billow cells, as seen looking down on the gas: broad soft cells with finer mottling inside them, leaning back
+#    a little the way young cloud does in a shearing flow. They are not wound up here: the page carries them round in rigid bands (see cellB). ──
+cells = norm(1.0 * norm(iso(2.0, 6.0, 3.4)) + 0.3 * norm(iso(6.0, 16.0, 3.0)))
+cells = map_coordinates(cells, [YO, XO + 0.9 * (YO / (OH - 1.0)) * DL * OW / (2 * np.pi)], order=1, mode='grid-wrap')
+
 tau = 1.0 + P['Ab'] * bands + P['As'] * streak + P['Al'] * lump
 tau = 1.0 + 0.9 * np.tanh((tau - 1.0) / 0.9)                      # soft limits
 tau = np.clip(tau, 0.3, 2.15)
@@ -101,6 +107,8 @@ gas = np.stack([relief, Vs / 3.4, np.clip(C, 0, 1)], -1)
 Image.fromarray((gas * 255 + 0.5).astype(np.uint8), 'RGB').save(outdir + '/gas.jpg', quality=int(P.get('q', 86)), subsampling=0, optimize=True)
 def quarter(a): return a.reshape(OH // 4, 4, OW // 4, 4).mean(axis=(1, 3))
 Image.fromarray((quarter(np.clip(tmp, 0, 1)) * 255 + 0.5).astype(np.uint8), 'L').save(outdir + '/temp.webp', quality=90, method=6)
+def half(a): return a.reshape(OH // 2, 2, OW // 2, 2).mean(axis=(1, 3))
+Image.fromarray((half(np.clip(0.5 + 0.2 * cells, 0, 1)) * 255 + 0.5).astype(np.uint8), 'L').save(outdir + '/cells.webp', quality=86, method=6)
 
 # how lit the visible top is (a quick check of the shadows)
 top = np.maximum(0.95 * tauE, H / hg + 0.05)

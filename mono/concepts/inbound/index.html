@@ -295,7 +295,6 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 /* ───────── environment ───────── */
 const Q = new URLSearchParams(location.search);
@@ -493,10 +492,24 @@ function boot() {
   noiseTex.minFilter = noiseTex.magFilter = THREE.LinearFilter;
   noiseTex.wrapS = noiseTex.wrapT = noiseTex.wrapR = THREE.RepeatWrapping; noiseTex.needsUpdate = true;
 
+  const KEP = 0.0853, KB = 0.0000494, omK = (r) => KEP / Math.sqrt(r * r * r + KB);                  // Kepler's law for the opening disk (see omega() below): the same numbers for the page's script and the shaders
+  const SH_N = 6, SH0 = 0.014, SHQ = Math.log(2.2);                                                    // the gas beside the star, in shells (see swellN)
+  // A 64x64 tiling blue-noise mask (void-and-cluster). Every ray's samples are offset by it, and the offset steps on by the golden ratio each frame.
+  // Unlike plain random offsets, neighbouring pixels never clump: what grain is left in a single frame is fine and even, and averages out in a few frames.
+  const bnTex = (() => { const b = atob('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'), d = new Uint8Array(4096); for (let i = 0; i < 4096; i++) d[i] = b.charCodeAt(i);
+    const t = new THREE.DataTexture(d, 64, 64, THREE.RedFormat, THREE.UnsignedByteType); t.minFilter = t.magFilter = THREE.NearestFilter; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.needsUpdate = true; return t; })();
   const GAL = /* glsl */`
     uniform float uW, uPat, uArms;
     float gRing=1.0;                                                  // set to 0 while shading the central swell, so it keeps its own speed
-    float omega(float r){ return uW/pow(r+0.16,1.5)*mix(1.0,0.38,smoothstep(0.28,1.0,r))*(1.0+0.8*gRing*smoothstep(0.10,0.20,r)*(1.0-smoothstep(0.30,0.44,r))); }   // +80% in the flat ring from the edge of the white out into the gold                 // near-Keplerian: the inner disk whips round, the outer layers turn slowly
+    // Opening disk: Kepler's law, as measured in real accretion disks. Gas in a thin disk orbits at the speed a free body would at that distance, so the
+    // rate of turning goes as (radius)^-3/2: gas a quarter as far out goes round eight times as often. KEP sets how fast the whole thing is played
+    // (the gold ring turns once in about nine seconds; a real disk of these proportions round a white dwarf would take over half an hour).
+    // The law holds to within 3% from the rim in to a tenth of the disk's radius. Only inside about four star-radii is it held back (KB), levelling
+    // off at two and a half turns a second: there a real disk's gas is being braked against the star, and a screen could not show the true rate.
+    const float KEP=${KEP}, KB=${KB};
+    float omega(float r){ return KEP/sqrt(r*r*r+KB); }
+    // Milky Way: its own, gentler rotation law
+    float omegaM(float r){ return uW/pow(r+0.16,1.5)*mix(1.0,0.38,smoothstep(0.28,1.0,r))*(1.0+0.8*gRing*smoothstep(0.10,0.20,r)*(1.0-smoothstep(0.30,0.44,r))); }
     float kMW(){ return clamp((uArms-0.42)/0.58,0.0,1.0); }           // 0 in the opening disk, 1 in the Milky Way
     float armPhase(float r,float th){ float k=kMW(); return th - uPat - mix(3.3,2.25,k)*log(r+0.05) - 0.53*k; }   // Milky Way: looser arms that leave from the ends of the bar
     float armF(float r,float th){ float k=kMW(); float c=0.5+0.5*cos(2.0*armPhase(r,th));
@@ -517,9 +530,9 @@ function boot() {
   const STEPS = SMALL ? 11 : 16, OSTEPS = SMALL ? 20 : 26;          // samples through the gas: Milky Way · opening disk (denser, so its lit top resolves)
   const volU = {
     uN: { value: noiseTex }, uCam: { value: new THREE.Vector3() }, uRot: { value: new THREE.Matrix3() },
-    uTan: { value: 0.3 }, uAspect: { value: 1 }, uGT: { value: 0 }, uT: { value: 0 }, uW: { value: 0.09 }, uPat: { value: 0 },
+    uTan: { value: 0.3 }, uAspect: { value: 1 }, uGT: { value: 0 }, uGM: { value: 0 }, uT: { value: 0 }, uW: { value: 0.09 }, uPat: { value: 0 },
     uArms: { value: 0.4 }, uBlue: { value: 0 }, uGain: { value: 1 }, uHaze: { value: 1 }, uSteps: { value: STEPS }, uSwell: { value: Q.get('noswell') === '1' ? 0 : 1 },
-    uGas: { value: null }, uTemp: { value: null }, uSpin: { value: 0 }, uDz: { value: 1 }, uPix: { value: 0.001 },
+    uGas: { value: null }, uTemp: { value: null }, uSpin: { value: 0 }, uDz: { value: 1 }, uPix: { value: 0.001 }, uShA: { value: new Float32Array(SH_N) }, uShE: { value: new Float32Array(SH_N) }, uBN: { value: bnTex }, uFr: { value: 0 }, uMip: { value: 1 }, uJit: { value: new THREE.Vector2() },
   };
   // The opening disk's gas is not generated live. An offline flow simulation winds gas up and stirs it; from that, two maps are baked
   // (x: angle round the disk, y: log-radius):
@@ -540,9 +553,11 @@ function boot() {
     fragmentShader: /* glsl */`
       precision highp float; precision highp sampler3D;
       #define STEPS 32
-      uniform sampler3D uN; uniform sampler2D uGas,uTemp; uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uGT,uT,uBlue,uGain,uHaze,uSteps,uSwell,uSpin,uDz,uPix;   // uSpin: how far the visitor has turned the opening disk · uDz: how far they have moved in or out (1 = the opening view's own distance)
+      uniform sampler3D uN; uniform sampler2D uGas,uTemp; uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uGT,uGM,uT,uBlue,uGain,uHaze,uSteps,uSwell,uSpin,uDz,uPix; uniform float uShA[6], uShE[6]; uniform sampler2D uBN; uniform float uFr,uMip; uniform vec2 uJit;   // uBN: blue-noise mask · uFr: frame count · uJit: this frame's sub-pixel shift of the whole picture   // uGT: the opening disk's clock · uGM: the Milky Way's
+      //   // uSpin: how far the visitor has turned the opening disk · uDz: how far they have moved in or out (1 = the opening view's own distance)
       varying vec2 vUv;
       vec2 gGx=vec2(0.0), gGy=vec2(0.0); float gTmp=0.0; bool gHaveT=false; float gW1=1.0, gW2=0.0, gE1=0.0, gE2=0.0, gOR=0.0;
+      float gDeep=0.0;                                                        // this sample sat in the solid body of the gas, below its soft top
       float gMir=1.0, gIso=0.0, gTHit=1e6, gTrS=1.0, gTcO=1.0, gRN=0.0, gRD=0.0, gTN=0.0, gT0s=1e6, gTcl=0.0; vec3 gColS=vec3(0.0); bool gGotS=false;   // gMir: -1 when the view is from under the disk · gIso: size of a pixel at the sample, for rays stepped along their length · the rest: notes kept while marching the opening disk (see stepOpen)   // per ray: how fast the point where it meets the disk moves across the screen (sets how sharply the maps are read) · the hue variation of the gas it lands on, read once
       ${GAL}
       vec4 tx(vec3 p){ vec3 c=p*32.0; vec3 i=floor(c), f=fract(c); f=f*f*(3.0-2.0*f); return texture(uN,(i+f+0.5)/32.0); }
@@ -565,6 +580,7 @@ function boot() {
         return c*(1.0+0.5*smoothstep(0.60,1.0,r)); }
       float ign(vec2 p){ return fract(52.9829189*fract(dot(p,vec2(0.06711056,0.00583715)))); }
       float wn(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
+      float bn(vec2 o){ return fract(texture(uBN,(gl_FragCoord.xy+o)/64.0).r+uFr*0.61803399); }   // where along its step this pixel's samples sit this frame (o: a different, unrelated set for each use)
       // Milky Way pattern (unchanged): orbit-stretched gas
       vec2 phase(vec3 c,float fine){
         // scaled so the clouds are about as wide as they are long (they were thin streaks along the orbit before)
@@ -574,8 +590,8 @@ function boot() {
         float rid=1.0-abs(2.0*(B.r*0.6*f2+0.3*(1.0-f2)+C.g*0.4*fine+0.2*(1.0-fine))-1.0);
         return vec2(n*0.72+rid*0.28, A.a*0.62+B.a*0.38); }
       vec4 field(vec3 p,float r,float th,float v,float fine){
-        float om=omega(r); const float T=18.0;
-        float f1=fract(uGT/T), f2=fract(uGT/T+0.5);
+        float om=omegaM(r); const float T=18.0;
+        float f1=fract(uGM/T), f2=fract(uGM/T+0.5);
         float w1=1.0-abs(2.0*f1-1.0), w2=1.0-w1;
         float a1=(th-om*(f1-0.5)*T)/6.2831853, a2=(th-om*(f2-0.5)*T)/6.2831853+0.371;
         float yy=v*0.045; float nw=sqrt(w1*w1+w2*w2);                      // keep contrast through the cross-fade
@@ -608,7 +624,7 @@ function boot() {
       // Returns  ext: opacity per unit of height, measured in local disk thicknesses · src: the colour this gas shows where it is all you see.
       void openGas(vec3 p,float r,float th,vec3 rd,out float ext,out vec3 src,out float gap){
         const float LR0=-1.8325815, DLR=1.9723517, TD=22.0;                  // the maps span log(0.16) .. log(1.15) in radius
-        ext=0.0; src=vec3(0.0); gap=0.0;
+        ext=0.0; src=vec3(0.0); gap=0.0; gDeep=0.0;
         float av=abs(p.y)/hgt(min(r,1.25)); if(av>2.8){ gap=av-2.4; return; }   // above everything
         float wI=smoothstep(0.15,0.30,r);                                    // the relief dies away into the smooth white centre
         float tau=1.0, Vs=0.0, C=0.0, nz=0.0, nk=1.0, w1=1.0, w2=0.0, vv=0.0; vec2 u1=vec2(0.0), u2=vec2(0.0), gx=vec2(0.0), gy=vec2(0.0); vec2 q=p.xz;
@@ -634,6 +650,7 @@ function boot() {
         float rdu=smoothstep(0.06,0.50,C+0.15*nz)*smoothstep(zb-0.05,zb+0.22,av)*(1.0-smoothstep(mix(zb,zt,0.15),zt+0.1,av))*(1.0-smoothstep(0.94,1.08,r));
         float rh=0.028*smoothstep(0.90,1.30,x)*exp(-max(av-tauE,0.0))*(0.5+0.5*tau)*smoothstep(0.12,0.30,r)*(1.0-smoothstep(1.02,1.14,r));   // haze: thin gas lifting off the top
         gap=av-max(1.45*tauE, zt+0.1);                                       // how far this point stands clear of everything but haze (the march strides over empty space)
+        gDeep=x<0.60?1.0:0.0;
         if(rg+rdu<1e-3&&rh<2e-3){ ext=rh; return; }                          // nothing here worth shading
         if(!gHaveT&&wI>0.0&&(rg>0.03||rdu>0.03)){                            // the hue of this stretch of gas: read once, where the ray first lands
           float tq=0.0; if(w1>0.0) tq+=textureGrad(uTemp,u1,gx,gy).r*w1; if(w2>0.0) tq+=textureGrad(uTemp,u2,gx,gy).r*w2; gTmp=(tq-0.5)/nk; gHaveT=true; }
@@ -651,6 +668,25 @@ function boot() {
         const float KG=1.5, KD=1.7;
         ext=KG*rg+KD*rdu+rh; src=(KG*rg*sg+KD*rdu*sd+rh*sz)/max(ext,1e-4);
       }
+      // ── The gas beside the star ──
+      // This is the most violent part of the disk, and it follows the same law as the rest: the closer to the star, the faster the gas goes round.
+      // Gas that turns faster on its inner side is sheared: within about one orbit any clump is drawn out into a trailing spiral, and in a real disk
+      // turbulence makes new clumps just as fast. So the pattern here is renewed on the local orbital time: two copies take turns, each starting fresh,
+      // being carried round and wound up by the flow, and fading as the other takes over. Because the orbital time changes so much with distance
+      // (a factor of three between a shell's two edges), the gas is handled as a few nested shells, each renewing at its own rate: about three times
+      // a second right at the star, every couple of seconds at the edge of the white. Inside a shell the speed is exactly Kepler's at every point.
+      const float SH0=${SH0}, SHQ=${SHQ.toFixed(5)};                              // inner edge of the first shell · log of the ratio between one shell and the next (2.2)
+      float swellN(vec3 p,float r,float shell,float kk,float tw){
+        int ki=int(kk); float sIn=SH0*exp(kk*SHQ);
+        float res=omega(shell)-omega(sIn*2.2), T=4.5/omega(sIn);            // how much faster this gas turns than its shell's outer edge · how long a copy of the pattern lasts (about 0.7 of an orbit at the shell's inner edge)
+        float e1=uShE[ki], e2=fract(e1+0.5); float j1=1.0-abs(2.0*e1-1.0); j1=j1*j1*(3.0-2.0*j1); float j2=1.0-j1;
+        if(j1<0.02){ j1=0.0; j2=1.0; } else if(j2<0.02){ j2=0.0; j1=1.0; }
+        vec3 off=fract(vec3(0.618,0.371,0.137)*(kk+1.0)); float n=0.0;       // each shell has its own pattern
+        for(int i=0;i<2;i++){ float jw=i==0?j1:j2;
+          if(jw>0.0){ float ang=tw-uShA[ki]-res*(i==0?e1:e2)*T; float ca=cos(ang), sn=sin(ang);
+            vec3 c=vec3((ca*p.x-sn*p.z)*0.5, p.y*gMir*1.6+0.37+uT*0.004, (sn*p.x+ca*p.z)*0.5)+off;   // turning, twisted frame; a slow rise so it keeps churning
+            n+=jw*(tx(c).r*0.62+tx(c*2.6+0.31).g*0.38); } }
+        return 0.5+(n-0.5)/mix(1.0, sqrt(j1*j1+j2*j2), smoothstep(0.01,0.06,r*abs(res)*T*0.5)); }   // keep the wisps as distinct where the two copies have drifted apart
       // One sample of the opening disk's gas: adds what it shows to the ray and takes away what it hides, and notes a few things the layers
       // drawn afterwards need to know (where the ray first lands, what lies in front of the core and of the swell over it). Returns the clear gap above the gas.
       float stepOpen(vec3 p,float r,float t,float dl,float h,vec3 rd,float fade,inout vec3 col,inout float Tr){
@@ -663,7 +699,7 @@ function boot() {
         if(t<gTcl&&r>0.10) gTcO=Tr;
         return gap; }
       void main(){
-        vec2 ndc=vUv*2.0-1.0;
+        vec2 ndc=(vUv+uJit)*2.0-1.0;                                         // (the whole picture is shifted by a fraction of a pixel each frame: see the averaging pass)
         vec3 rd=normalize(uRot*vec3(ndc.x*uTan*uAspect, ndc.y*uTan, -1.0)); vec3 ro=uCam;
         if(ro.y<0.0){ ro.y=-ro.y; rd.y=-rd.y; gMir=-1.0; }                   // the disk is the same above and below its plane, so a view from underneath is drawn as its mirror image from above
         const float VM=1.6; const float RMX=1.14; float kcM=1.0-uBlue;
@@ -671,15 +707,21 @@ function boot() {
         vec3 col=vec3(0.0); float Tr=1.0, Tc=1.0; float tc=-dot(ro,rd); gTcl=tc;
         float sy=rd.y<0.0?-1.0:1.0; float ay=max(abs(rd.y),0.004); float ry=sy*ay;
         float tp=-ro.y/ry; vec3 pp=ro+rd*max(tp,0.0); float r0=length(pp.xz);
-        gGx=dFdx(pp.xz); gGy=dFdy(pp.xz);
+        gGx=dFdx(pp.xz)*uMip; gGy=dFdy(pp.xz)*uMip;                          // (uMip < 1: the maps are read finer than one gas pixel, because the averaging pass rebuilds the picture at a higher resolution from several frames)
         { const float TD=22.0; gE1=fract(uGT/TD); gE2=fract(uGT/TD+0.5); float k1=1.0-abs(2.0*gE1-1.0); k1=k1*k1*(3.0-2.0*k1); float k2=1.0-k1;
           gW1=k1>0.02?k1:0.0; gW2=k2>0.02?k2:0.0; float ws=gW1+gW2; gW1/=ws; gW2/=ws; gOR=omega(0.95); }   // the two copies of the maps and their weights (a copy that has all but faded out is not read at all)
-        float jitO=fract(wn(gl_FragCoord.xy)+floor(mod(uT*60.0,1024.0))*0.61803399);   // where the samples sit along the ray, moved every frame: each pixel steps through its offsets in an even sequence, so the frames average out cleanly
+        float swW=0.0, swT=0.0, swA=0.0;                                     // the gas over the core: how much of it this pixel shows, and how far away
+        float jitO=bn(vec2(0.0));                                            // where the samples sit along the ray, moved every frame: each pixel steps through its offsets in an even sequence, so the frames average out cleanly
         // the swell over the core: where the ray enters and leaves its bounds (needed first, to know which gas lies in front of it)
         float cuB=(1.0-uBlue)*uSwell; const float BA=0.44; const float BC=0.16; const float HB=0.075; float t0s=1e6, t1s=-1.0;   // BA, BC: outer bounds only · HB: height of the swell at the centre
         if(cuB>0.01){ float sc=BA/BC; vec3 ro2=vec3(ro.x,ro.y*sc,ro.z), rd2=vec3(rd.x,rd.y*sc,rd.z);
           float qa=dot(rd2,rd2), qb=dot(ro2,rd2), qc=dot(ro2,ro2)-BA*BA; float disc=qb*qb-qa*qc;
-          if(disc>0.0){ float sq=sqrt(disc); t0s=max((-qb-sq)/qa,0.0); t1s=(-qb+sq)/qa; if(t1s<=t0s){ t0s=1e6; t1s=-1.0; } } }
+          if(disc>0.0){ float sq=sqrt(disc); t0s=max((-qb-sq)/qa,0.0); t1s=(-qb+sq)/qa; if(t1s<=t0s){ t0s=1e6; t1s=-1.0; } }
+          if(t1s>t0s){                                                       // within those bounds the gas is a thin layer: keep only the stretch of the ray that passes through it, so every sample counts
+            float a2=dot(rd.xz,rd.xz); float tcx=a2>1e-8?clamp(-dot(ro.xz,rd.xz)/a2,t0s,t1s):t0s; float rc=length(ro.xz+rd.xz*tcx);
+            float ys=1.75*HB*(0.14+0.86*exp(-rc*rc/0.030))+0.004;             // (as tall as the gas stands at the ray's closest pass to the axis, where it is tallest)
+            if(abs(rd.y)>1e-5){ float u1=(ys-ro.y)/rd.y, u2=(-ys-ro.y)/rd.y; t0s=max(t0s,min(u1,u2)); t1s=min(t1s,max(u1,u2)); } else if(abs(ro.y)>ys) t1s=-1.0;
+            if(t1s<=t0s){ t0s=1e6; t1s=-1.0; } } }
         gT0s=t0s;
         if(r0<RMX*1.6){
           // Where the ray first meets the top of the gas layer. The layer's top is a shallow bowl (it thickens outward), which a straight line
@@ -690,13 +732,12 @@ function boot() {
           float h=mix(hgt(min(r0,1.25)), hgt(min(rIn,1.25)), kcM); float vcam=ro.y/h;
           float vS=sy<0.0?min(VMt,vcam):max(-VMt,vcam); float vE=sy<0.0?(vcam>VMb?-VMb:-VMt):(vcam<-VMb?VMb:VMt);
           if((vE-vS)*sy>0.0){
-            float dv=(vE-vS)/uSteps; float fr=floor(mod(uT*60.0,64.0)); float jA=mix(1.0,0.8,uBlue);
-            float jit=kcM>0.5?jitO:wn(gl_FragCoord.xy+fr*17.3);
-            float v=vS+dv*(0.5-0.5*jA+jA*jit);
+            float dv=(vE-vS)/uSteps; float jA=mix(1.0,0.8,uBlue);
+            float v=vS+dv*(0.5-0.5*jA+jA*jitO);
             float ds=abs(dv)*hgt(min(r0,1.25))/ay;                          // spacing between samples along the ray
             float sfine=smoothstep(0.022,0.004,ds); float sfade=smoothstep(0.12,0.035,ds);
             float sfO=mix(sfade, smoothstep(0.34,0.14,ds), kcM);            // (opening disk: rays that only graze it are handed to the march along the ray, below)
-            vec4 fHold=vec4(0.0); bool fHave=false;
+            vec4 fHold=vec4(0.0); bool fHave=false; float sMul=1.0;
             if(max(sfade,sfO)>0.004) for(int i=0;i<STEPS;i++){
               if(float(i)>=uSteps) break;
               float t=(v*h-ro.y)/ry;
@@ -723,8 +764,14 @@ function boot() {
                     Tr*=exp(-(dust*150.0*mix(1.0, mix(0.09,0.85,smoothstep(0.46,0.96,r)), 1.0-uBlue)+dens*3.0)*dt*uBlue);
                   }
                   if(kcM>0.02){                                                          // opening disk: dense gas you see the top of
-                    float gap=stepOpen(p,r,t,dt,h,rd,sfO,col,Tr);
-                    if(kcM>0.98) v+=dv*clamp(floor(gap/0.45),0.0,2.0);                  // clear air above the gas: stride through it
+                    float gap=stepOpen(p,r,t,dt*sMul,h,rd,sfO,col,Tr);
+                    if(kcM>0.98){
+                      // Samples are spent where they show. Clear air above the gas is strode over: cautiously on a slanting ray (a ridge further along
+                      // may stand higher), all the way down on a steep one. Deep in the solid body, under the soft top, the steps lengthen: on a slanting
+                      // ray almost nothing from there reaches the eye, and on a steep one the gas hardly changes along the ray.
+                      float steep=smoothstep(0.30,0.70,ay);
+                      v+=dv*mix(clamp(floor(gap/0.45),0.0,2.0), clamp(floor((gap-0.05)/abs(dv)),0.0,16.0), steep);
+                      float nMul=gDeep>0.5?min(sMul*1.7,4.0):(Tr<0.15?2.0:1.0); v+=dv*(0.5*(sMul+nMul)-1.0); sMul=nMul; }
                   }
                 }
                 if(t<tc) Tc=Tr;
@@ -747,7 +794,7 @@ function boot() {
             if(tB>tA){ float nT=min(uSteps*2.0,56.0); float dl=(tB-tA)/nT; float t=tA+dl*jitO;      // (twice as many samples: these rays cross many ridges, and there are few of them)
               for(int i=0;i<56;i++){ if(float(i)>=nT) break;
                 vec3 p=ro+rd*t; float r=length(p.xz);
-                if(r<RMX){ gIso=max(t*uPix,1e-5); stepOpen(p,r,t,dl,hgt(min(r,1.25)),rd,1.0,col,Tr); }
+                if(r<RMX){ gIso=max(t*uPix*uMip,1e-5); stepOpen(p,r,t,dl,hgt(min(r,1.25)),rd,1.0,col,Tr); }
                 t+=dl; if(Tr<0.02) break; }
               gIso=0.0; } }
           if(!gGotS){ gColS=col; gTrS=Tr; }
@@ -763,9 +810,9 @@ function boot() {
               // Gas over the centre, as a true 3D volume. The pattern lives in ordinary x/y/z space (not angle/radius), so it varies with height
               // like real billowing gas and has no pole at the axis. The whole volume turns about the axis, and it is twisted by an amount that
               // depends on a dome-shaped shell distance, so its wisps lean and arc up over the core instead of standing vertically.
-              vec3 colB=vec3(0.0); float TrB=1.0; float dtb=(t1-t0)/14.0;
-              float tt=t0+dtb*(0.2+0.6*wn(gl_FragCoord.xy+floor(mod(uT*60.0,64.0))*17.3+7.0));
-              for(int i=0;i<14;i++){
+              vec3 colB=vec3(0.0); float TrB=1.0; float nS=clamp(ceil((t1-t0)/0.022),6.0,24.0); float dtb=(t1-t0)/nS;   // a sample about every 0.02 of the disk's radius: 6 to 24 of them
+              float tt=t0+dtb*bn(vec2(23.0,41.0));
+              for(int i=0;i<24;i++){ if(float(i)>=nS) break;
                 vec3 p=ro+rd*tt; float r=length(p.xz); float m2=(r*r)/(BA*BA)+(p.y*p.y)/(BC*BC);
                 if(m2<1.0){
                   // a gradual rise rather than a ball: the height of the gas tapers smoothly with distance from the centre and merges into the flat disk
@@ -773,19 +820,26 @@ function boot() {
                   float fall=exp(-(p.y*p.y)/(hl*hl)*1.5)*(1.0-smoothstep(0.50,1.0,r/BA))*(1.0-smoothstep(0.70,1.0,m2));
                   if(fall>0.004){
                     float shell=sqrt(r*r+p.y*p.y*14.0);                             // equal on flattened domes over the core
-                    float ang=2.2*log(shell+0.06)-uGT*0.55-uSpin; float ca=cos(ang), sa=sin(ang);
-                    vec3 c=vec3((ca*p.x-sa*p.z)*0.5, p.y*gMir*1.6+0.37+uT*0.004, (sa*p.x+ca*p.z)*0.5);   // turning, twisted frame; a slow rise so it keeps churning
-                    float n=tx(c).r*0.62+tx(c*2.6+0.31).g*0.38;
-                    float wisp=smoothstep(0.43,0.60,n);
-                    float dens=fall*(0.12+1.05*wisp)*0.70*cuB;
+                    float sph=sqrt(r*r+p.y*p.y);                                     // true distance from the star: what sets how fast gas orbits, above the plane as well as in it
+                    float xs=log(max(sph,SH0)/SH0)/SHQ; float kk=min(floor(xs),4.0), fx=xs-kk;   // which shell, and how far through it
+                    float tw=2.2*log(shell+0.06)-uSpin; float n=swellN(p,r,sph,kk,tw);
+                    { const float BLW=0.17; float kn=-1.0, wS=1.0;                   // near a shell's edge its pattern is blended with its neighbour's
+                      if(fx<BLW&&kk>0.5){ float q=fx/BLW; wS=0.5+0.5*q*q*(3.0-2.0*q); kn=kk-1.0; }
+                      else if(fx>1.0-BLW&&kk<4.5){ float q=(1.0-fx)/BLW; wS=0.5+0.5*q*q*(3.0-2.0*q); kn=kk+1.0; }
+                      if(kn>=0.0){ float wN=1.0-wS; n=0.5+(wS*(n-0.5)+wN*(swellN(p,r,sph,kn,tw)-0.5))/sqrt(wS*wS+wN*wN); } }
+                    float nearS=1.0-smoothstep(0.14,0.40,shell);                       // close to the star the gas is torn into distinct filaments with clear gaps between them; further out it is the soft billowing it always was
+                    float wisp=smoothstep(mix(0.43,0.52,nearS),mix(0.60,0.64,nearS),n);
+                    float dens=fall*mix(0.12+1.05*wisp, 0.02+1.9*wisp*wisp, nearS)*0.70*cuB;
                     float re=sqrt(r*r+p.y*p.y*9.0); vec3 cc=mix(vec3(0.96,0.96,1.0), closeC(re), smoothstep(0.16,0.34,re)); cc=mix(cc, vec3(0.42,0.64,1.0), 0.30+0.30*wisp);   // hot white gas with a blue tint, strongest in the dense wisps
                     float inten=1.0/(pow(re,1.55)*12.0+0.05); inten*=1.0-0.45*(1.0-smoothstep(0.03,0.18,re));
                     colB+=TrB*cc*inten*dens*dtb*9.0*(0.55+0.45*clamp(0.5+p.y/hl*sign(ro.y),0.0,1.0));   // lit more on the side facing the camera, so the billows have form
+                    { float wq=TrB*inten*dens*dtb; swW+=wq; swT+=wq*tt; }
                     TrB*=exp(-dens*20.0*dtb);                                        // the wisps are dense enough to veil the disk beneath, which is what makes them read as gas in front
                   }
                 }
-                tt+=dtb;
+                tt+=dtb; if(TrB<0.03) break;                                       // nothing further in can be seen
               }
+              swA=gTrS*(1.0-TrB);
               col=gColS+gTrS*colB+TrB*(col-gColS); Tc*=TrB;                       // layers along the ray: the disk gas in front of the swell, the swell, the disk gas behind it
             }
           }
@@ -801,8 +855,8 @@ function boot() {
             if(abs(rd.y)>1e-6){ float u1=(HM-ro.y)/rd.y, u2=(-HM-ro.y)/rd.y; tA=max(tA,min(u1,u2)); tB=min(tB,max(u1,u2)); } else if(ro.y>HM) tB=tA-1.0;
             tA=max(tA,0.0);
             if(tB>tA){
-              float dtA=(tB-tA)/10.0; float t=tA+dtA*fract(jitO+0.37); vec3 hz=vec3(0.0); float Th=1.0, ThF=1.0;
-              float ang=-(uGT*0.03+uSpin), ca=cos(ang), sa=sin(ang);
+              float dtA=(tB-tA)/10.0; float t=tA+dtA*bn(vec2(11.0,37.0)); vec3 hz=vec3(0.0); float Th=1.0, ThF=1.0;
+              float ang=-(uGT*0.065+uSpin), ca=cos(ang), sa=sin(ang);
               for(int i=0;i<10;i++){
                 vec3 q=ro+rd*t; float r=length(q.xz); float y=abs(q.y);
                 float rad=smoothstep(0.06,0.30,r)*(1.0-smoothstep(0.80,RA-0.04,r))*(1.0-smoothstep(0.42*HM,HM,y));
@@ -846,7 +900,8 @@ function boot() {
         col+=(ign(gl_FragCoord.xy+17.0)-0.5)/400.0;                       // dither against banding
         // Alongside the colour, how far away what this pixel shows is (0: empty sky, -1: not known), so the running average can follow it when the view moves.
         float tRep=-1.0;
-        if(kcM>0.5){ float tg=gRD>1e-4?gTN/gRD:0.0, tz=hzW>1e-5?hzT/hzW:0.0; tRep=gRD>0.3?tg:(tz>0.0?tz:tg); }
+        if(kcM>0.5){ float tg=gRD>1e-4?gTN/gRD:0.0, tz=hzW>1e-5?hzT/hzW:0.0; tRep=gRD>0.3?tg:(tz>0.0?tz:tg);
+          if(swA>0.05&&swW>1e-7){ float rg=gRD>1e-4?gRN/gRD:r0; if(swA>0.5*gRD*smoothstep(0.15,0.30,rg)) tRep=swT/swW; } }   // near the star the fast gas over the core is what moves: follow that
         gl_FragColor=vec4(max(col,0.0)*uGain,tRep);
       }`,
   });
@@ -864,28 +919,33 @@ function boot() {
   // What it costs depends on how much of the screen the disk fills, so its resolution follows that: sharpest when the disk is a band across
   // the screen, softer once the camera has moved in until the disk fills the view. It changes in small steps, so there is never a visible jump.
   let covK = 1;
-  const kOpenFor = (cov) => Math.min(1, Math.sqrt(22 * 2.07e6 / ((6 + 26 * cov) * innerWidth * innerHeight * DPR * DPR)));   // (6 + 26 x cover) ms is what one pass costs at 1080p on a recent laptop; this holds it near 22 ms
+  const kOpenFor = (cov) => Math.min(1, Math.sqrt(22 * 2.07e6 / ((6 + 22 * cov) * innerWidth * innerHeight * DPR * DPR)));   // (6 + 22 x cover) ms is what one pass costs at 1080p on a recent laptop; this holds it near 22 ms
   const kOpen = () => Q.get('hi') === '1' ? 0.66 : covK;
 
   // the far-off galaxy costs far less per pixel than the close-up, so it gets more resolution: some while the camera is still moving, more once it has come to rest
-  let wideOn = 0, moveMul = 1, restMul = 1, accFresh = true, gasTick = 0, gasW = 2, gasH = 2, resStep = 0, stillK = 0, lastR = 0, pOx = 0, pOy = 0;      // wideOn: 0 opening (still) · 3 dive (moving, close) · 1 pull-back (moving, wide) · 2 settled (still)
+  const ACC_MAX = 7.5e6;
+  const erf = (x) => { const t = 1 / (1 + 0.3275911 * x); return 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); };
+  let perfMul = 1, perfT = 0;                                          // see the frame loop: keeps the opening view smooth by drawing the gas smaller when frames run long
+  let wideOn = 0, moveMul = 1, restMul = 1, accFresh = true, gasTick = 0, gasW = 2, gasH = 2, accW = 2, accH = 2, gasFr = 0, resStep = 0, stillK = 0, lastR = 0, pOx = 0, pOy = 0;      // wideOn: 0 opening (still) · 3 dive (moving, close) · 1 pull-back (moving, wide) · 2 settled (still)
   const mkAcc = () => new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
-  const accA = mkAcc(), accB = mkAcc(); let accCur = accA, accPrev = accB, pGT = 0;
-  const sizeVol = () => { const k = Math.min(1, wideOn === 2 ? restMul : wideOn === 0 ? kOpen() * restMul : (wideOn === 1 ? mix(K_WIDE, restMul, resStep / 4) : kOpen()) * moveMul); sharpU.value = wideOn === 2 ? 0.3 : wideOn === 0 ? 0.35 : 0.4; texelU.value.set(1 / Math.max(2, Math.round(innerWidth * DPR * k)), 1 / Math.max(2, Math.round(innerHeight * DPR * k)));
-    gasW = Math.max(2, Math.round(innerWidth * DPR * k)); gasH = Math.max(2, Math.round(innerHeight * DPR * k)); volRT.setSize(gasW, gasH); };   // the running average is NOT reset here: it is looked up by position, so it carries across a change of resolution
-  const sharpU = { value: 0.3 }, texelU = { value: new THREE.Vector2(1, 1) };
+  const accA = mkAcc(), accB = mkAcc(); let accCur = accA, accPrev = accB, pGT = 0, pGM = 0;
+  const kGas = () => Math.min(1, Math.max(0.3, kOpen() * perfMul));                                       // opening disk: the size the cost model suggests, trimmed or raised by how the frame rate is actually holding up
+  const sizeVol = () => { const k = Math.min(1, wideOn === 2 ? restMul : wideOn === 0 ? kGas() * restMul : (wideOn === 1 ? mix(K_WIDE, restMul, resStep / 4) : kGas()) * moveMul); sharpU.value = wideOn === 2 ? 0.3 : wideOn === 0 ? 0.35 : 0.4; texelU.value.set(1 / Math.max(2, Math.round(innerWidth * DPR * k)), 1 / Math.max(2, Math.round(innerHeight * DPR * k)));
+    gasW = Math.max(2, Math.round(innerWidth * DPR * k)); gasH = Math.max(2, Math.round(innerHeight * DPR * k)); volRT.setSize(gasW, gasH);
+    accW = gasW; accH = gasH; accTexelU.value.set(1 / accW, 1 / accH); accU.uUp.value = 1; accU.uWN.value = 1; volU.uMip.value = 1; };   // the averaged picture is kept at the gas picture's own size   // the running average is NOT reset here: it is looked up by position, so it carries across a change of resolution
+  const sharpU = { value: 0.3 }, texelU = { value: new THREE.Vector2(1, 1) }, accTexelU = { value: new THREE.Vector2(1, 1) };   // texelU: one pixel of the gas picture · accTexelU: one pixel of the averaged picture
   // Averaging the gas over several frames is what removes the grain. To do that while the camera is moving, each pixel looks up
   // where the gas it now shows was on screen one frame earlier (camera motion and the disk's own rotation both accounted for),
   // so the average follows the picture instead of smearing it.
-  const accU = { tGas: { value: volRT.texture }, tHist: { value: accB.texture }, uA: { value: 1 }, uDg: { value: 0 }, uDs: { value: 0 },
+  const accU = { tGas: { value: volRT.texture }, tHist: { value: accB.texture }, uA: { value: 1 }, uDg: { value: 0 }, uDm: { value: 0 }, uDs: { value: 0 },
     uCam: { value: new THREE.Vector3() }, pCam: { value: new THREE.Vector3() }, uRot: { value: new THREE.Matrix3() }, pRot: { value: new THREE.Matrix3() },
-    uTan: { value: 0.3 }, pTan: { value: 0.3 }, uAspect: { value: 1 }, uHTexel: { value: new THREE.Vector2(1, 1) }, uCTexel: texelU, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms };
-  const blitU = { tGas: { value: accA.texture }, uSharp: sharpU, uTexel: texelU, uCam: volU.uCam, uRot: volU.uRot, uTan: volU.uTan, uAspect: volU.uAspect, uDof: { value: 0 } };
+    uTan: { value: 0.3 }, pTan: { value: 0.3 }, uAspect: { value: 1 }, uHTexel: { value: new THREE.Vector2(1, 1) }, uCTexel: texelU, uJit: volU.uJit, uUp: { value: 1 }, uWN: { value: 1 }, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms };
+  const blitU = { tGas: { value: accA.texture }, uSharp: sharpU, uTexel: accTexelU, uCam: volU.uCam, uRot: volU.uRot, uTan: volU.uTan, uAspect: volU.uAspect, uDof: { value: 0 } };
   const accScene = new THREE.Scene();
   { const m = new THREE.ShaderMaterial({ uniforms: accU, depthTest: false, depthWrite: false,
       vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
       fragmentShader: /* glsl */`
-        uniform sampler2D tGas,tHist; uniform float uA,uDg,uDs,uTan,pTan,uAspect; uniform vec3 uCam,pCam; uniform mat3 uRot,pRot; uniform vec2 uHTexel,uCTexel; varying vec2 vUv;
+        uniform sampler2D tGas,tHist; uniform float uA,uDg,uDm,uDs,uTan,pTan,uAspect; uniform vec3 uCam,pCam; uniform mat3 uRot,pRot; uniform vec2 uHTexel,uCTexel,uJit; uniform float uUp,uWN; varying vec2 vUv;   // uUp: how many pixels of this picture one gas pixel spans · uWN: makes the weights below average out to the plain blend rate
         ${GAL}
         // The running average is read with a sharp (Catmull-Rom) filter. A plain bilinear read softens the picture a little every
         // frame, and by a different amount depending on how often it is read, which showed as a change in sharpness when the camera settled.
@@ -897,26 +957,37 @@ function boot() {
                 +texture2D(tHist,vec2(t0.x,t3.y)).rgb*w0.x*w3.y+texture2D(tHist,vec2(t12.x,t3.y)).rgb*w12.x*w3.y+texture2D(tHist,vec2(t3.x,t3.y)).rgb*w3.x*w3.y;
           return max(r,0.0); }
         void main(){
-          vec4 c4=texture2D(tGas,vUv); vec3 cur=c4.rgb; float a=uA; vec3 hist=cur;
+          // The gas is drawn smaller than the screen, and this average is kept at the screen's own resolution. Each frame the gas picture is shifted by
+          // a different fraction of a pixel, so over a few frames its samples land all over every screen pixel. A new sample is only trusted by the
+          // screen pixels its ray actually passes through; the others keep what they remember until a sample lands on them. A view that holds still,
+          // or turns steadily, builds up detail finer than the gas was drawn at; where the gas itself changes too fast for that, the picture falls
+          // back to the latest frame, smoothly enlarged.
+          vec2 pg=(vUv-uJit)/uCTexel; vec2 ic=floor(pg); vec2 dd=pg-ic-0.5; vec2 uvN=(ic+0.5)*uCTexel;   // the nearest gas sample, and how far its ray passes from this pixel (in gas pixels)
+          vec4 c4=texture2D(tGas,uvN); vec3 cur=c4.rgb; float a=uA; vec3 hist=cur; bool ok=false;
+          vec3 soft=texture2D(tGas,vUv-uJit).rgb;                             // the latest frame, smoothly enlarged
+          float lost=0.0;
           if(a<0.999){
             vec2 ndc=vUv*2.0-1.0; vec3 rd=normalize(uRot*vec3(ndc.x*uTan*uAspect, ndc.y*uTan, -1.0));
             vec3 P=uCam+rd*60.0;                                              // empty sky: treated as far away
             if(c4.a>0.0){ vec3 X=uCam+rd*c4.a; float r=length(X.xz);          // opening disk: the gas or haze this pixel shows, where it actually is
-              float d=(r<1.2&&abs(X.y)<0.14)?-(uDg*omega(r)+uDs):-(uDg*0.03+uDs);   // the disk's gas turns at its own speed, the haze round it slowly; both turn with the visitor's hand
+              float d=(r<1.2&&abs(X.y)<0.16)?-(uDg*omega(length(X))+uDs):-(uDg*0.065+uDs);   // the disk's gas turns at the speed for its distance from the star, the haze round it slowly; all turn with the visitor's hand
               float c=cos(d), s=sin(d); P=vec3(c*X.x-s*X.z, X.y, s*X.x+c*X.z); }   // where it was a frame ago
             else if(c4.a<0.0){ float t=-uCam.y/rd.y;                          // Milky Way: taken to lie in the plane of the disk
               if(t>0.0){ vec3 H=uCam+rd*t; float r=length(H.xz);
-                if(r<1.3){ float d=-(uDg*omega(r)+uDs); float c=cos(d), s=sin(d); P=vec3(c*H.x-s*H.z, 0.0, s*H.x+c*H.z); } } }
+                if(r<1.3){ float d=-(uDg*omega(r)+uDm*omegaM(r)+uDs); float c=cos(d), s=sin(d); P=vec3(c*H.x-s*H.z, 0.0, s*H.x+c*H.z); } } }
             vec3 q=(P-pCam)*pRot;
             if(q.z<-1e-4){ vec2 puv=vec2(q.x/(-q.z*pTan*uAspect), q.y/(-q.z*pTan))*0.5+0.5;
-              if(puv.x>=0.0&&puv.x<=1.0&&puv.y>=0.0&&puv.y<=1.0) hist=histCR(puv); else a=1.0; } else a=1.0;
-            // The remembered picture is only trusted where it agrees with what the pixels around this one show now. When the view changes quickly
+              if(puv.x>=0.0&&puv.x<=1.0&&puv.y>=0.0&&puv.y<=1.0){ hist=histCR(puv); ok=true; } }
+            // The remembered picture is only trusted where it agrees with what the gas samples around this one show now. When the view changes quickly
             // (the haze swinging out of frame, a ridge uncovering what was behind it) the old picture would otherwise linger as a trail of fading copies.
-            vec3 n1=texture2D(tGas,vUv+vec2(uCTexel.x,0.0)).rgb, n2=texture2D(tGas,vUv-vec2(uCTexel.x,0.0)).rgb, n3=texture2D(tGas,vUv+vec2(0.0,uCTexel.y)).rgb, n4=texture2D(tGas,vUv-vec2(0.0,uCTexel.y)).rgb;
-            vec3 lo=min(cur,min(min(n1,n2),min(n3,n4))), hi=max(cur,max(max(n1,n2),max(n3,n4))); vec3 pad=(hi-lo)*0.5+0.012;
-            hist=clamp(hist,lo-pad,hi+pad);
+            vec3 lo=cur, hi=cur;
+            for(int j=-1;j<=1;j++) for(int i=-1;i<=1;i++){ if(i==0&&j==0) continue; vec3 nb=texture2D(tGas,uvN+vec2(float(i),float(j))*uCTexel).rgb; lo=min(lo,nb); hi=max(hi,nb); }
+            vec3 pad=(hi-lo)*0.5+0.012; vec3 hc=clamp(hist,lo-pad,hi+pad);
+            lost=smoothstep(0.35,1.2,length(hist-hc)/(length(hi-lo)+0.03));   // how badly the remembered picture disagreed
+            hist=hc;
           }
-          gl_FragColor=vec4(mix(hist,cur,a),1.0); }` });
+          vec3 o=ok?mix(hist,soft,a):soft;
+          gl_FragColor=vec4(o,1.0); }` });
     const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), m); q.frustumCulled = false; accScene.add(q); }
   { const m = new THREE.ShaderMaterial({ uniforms: blitU, depthTest: false, depthWrite: false,
       vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
@@ -946,7 +1017,7 @@ function boot() {
     const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), m); q.frustumCulled = false; q.renderOrder = -10; gScene.add(q); }
   // embedded stars riding the same rotation law: tiny, crisp, sparse inside the bright gas
   const NP = SMALL ? 3500 : 9000;
-  const spU = { uGT: { value: 0 }, uT: { value: 0 }, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms, uGain: { value: 1 }, uDpr: { value: DPR } };
+  const spU = { uGT: volU.uGT, uGM: volU.uGM, uT: { value: 0 }, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms, uGain: { value: 1 }, uDpr: { value: DPR } };
   {
     const aP = new Float32Array(NP * 4), aS = new Float32Array(NP * 2), pos = new Float32Array(NP * 3);
     const gs = () => { let u = 0, v = 0; while (u === 0) u = Math.random(); while (v === 0) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2831853 * v); };
@@ -962,11 +1033,11 @@ function boot() {
       uniforms: spU, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
       vertexShader: /* glsl */`
         attribute vec4 aP; attribute vec2 aS;
-        uniform float uGT,uT,uGain,uDpr;
+        uniform float uGT,uGM,uT,uGain,uDpr;
         varying vec3 vCol; varying float vA; varying float vBig;
         ${GAL}
         void main(){
-          float r=aP.x, seed=aP.w; float th=aP.y+uGT*omega(r);
+          float r=aP.x, seed=aP.w; float th=aP.y+uGT*omega(r)+uGM*omegaM(r);
           vec3 P=vec3(cos(th)*r,aP.z,sin(th)*r)*${R.toFixed(1)};
           vec4 mv=modelViewMatrix*vec4(P,1.0);
           float a=armF(r,th);
@@ -990,7 +1061,7 @@ function boot() {
   }
   // newborn stars: they ignite inside the gas, shine, and fade, carried round by the same rotation as the disk
   const NB = SMALL ? 320 : 900;
-  const nbU = { uGT: spU.uGT, uT: spU.uT, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms, uVis: { value: 1 }, uDpr: { value: DPR }, uSpin: volU.uSpin };
+  const nbU = { uGT: volU.uGT, uGM: volU.uGM, uT: spU.uT, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms, uVis: { value: 1 }, uDpr: { value: DPR }, uSpin: volU.uSpin };
   {
     const aP = new Float32Array(NB * 4), aS = new Float32Array(NB * 3), pos = new Float32Array(NB * 3);
     for (let i = 0; i < NB; i++) {
@@ -1005,11 +1076,11 @@ function boot() {
       uniforms: nbU, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
       vertexShader: /* glsl */`
         attribute vec4 aP; attribute vec3 aS;
-        uniform float uGT,uT,uVis,uDpr,uSpin;
+        uniform float uGT,uGM,uT,uVis,uDpr,uSpin;
         varying vec3 vCol; varying float vA; varying float vFlash;
         ${GAL}
         void main(){
-          float r=aP.x, seed=aP.w; float th=aP.y+uGT*omega(r)+uSpin;
+          float r=aP.x, seed=aP.w; float th=aP.y+uGT*omega(r)+uGM*omegaM(r)+uSpin;
           vec3 P=vec3(cos(th)*r,aP.z,sin(th)*r)*${R.toFixed(1)};
           vec4 mv=modelViewMatrix*vec4(P,1.0); float dist=max(-mv.z,0.001);
           float ph=fract(uT/aS.x+seed);                                             // where this star is in its life
@@ -1083,8 +1154,8 @@ function boot() {
         col+=uFlare*((uTint*s1*0.36 + mix(uTint,vec3(1.0),0.5)*s2*0.05)*(1.0-0.85*uCool) + vec3(1.0,0.42,0.16)*hal*0.035*(1.0-0.8*uCool) + mix(vec3(1.0,0.82,0.6)*0.16, vec3(0.0,0.22,1.0)*0.06, uCool)*hal2);   // opening view: the glow at the core is blue, not warm white
         float v=length(d*vec2(1.0,1.12))*1.3; col*=1.0-uVig*smoothstep(0.3,1.05,v);
         col*=uExp; float gr=gh(gl_FragCoord.xy+floor(uTime*24.0)*37.0)-0.5; col+=gr*(0.012+0.05*sqrt(max(dot(col,vec3(0.299,0.587,0.114)),0.0)))*0.6;   // fine film grain, a little stronger in the mid-tones
-        gl_FragColor=vec4(tone(col),1.0); }` });
-  composer.addPass(lens); composer.addPass(new OutputPass());
+        vec3 c=tone(col); gl_FragColor=vec4(mix(pow(c,vec3(0.41666))*1.055-0.055, c*12.92, vec3(lessThanEqual(c,vec3(0.0031308)))),1.0); }` });   // (linear light to the screen's sRGB encoding, done here to save a separate full-screen pass)
+  composer.addPass(lens);
   const LU = lens.uniforms;
 
   function resize() {
@@ -1098,7 +1169,7 @@ function boot() {
   /* ── per-frame state ── */
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
   const tmp = V(0, 0, 0), look = V(0, 0, 0), pos = V(0, 0, 0), rt3 = V(0, 0, 0), up3 = V(0, 0, 0), up = V(0, 1, 0), upv = V(0, 1, 0);
-  let gt = 0, coreVis = 0, coreHot = 0;
+  let gt = 0, gm = 0, coreVis = 0, coreHot = 0;                      // gt: the opening disk's clock · gm: the Milky Way's
   const setOp = (el, o) => { el.style.opacity = o.toFixed(3); el.style.visibility = o < 0.004 ? 'hidden' : 'visible'; el.classList.toggle('on', o > 0.5); };
   // one camera move: in over the disk, skimming past the core, straight on out the far side and away, turning to look back as the galaxy recedes
   // the path starts far enough back to see the whole disk (on portrait screens it starts closer, where the opening view already is)
@@ -1145,8 +1216,10 @@ function boot() {
     if (Math.abs(p - glideP) > 0.15) glideT = p >= 0.999 ? GLIDE : GLIDE * sst(0.30, 0.99, sF);       // position was set from outside (skip, replay, test hook)
     glideP = p; if (sF < 0.30) glideT = 0; else glideT = Math.min(GLIDE, glideT + dt);
     const wT = ease(glideT / GLIDE);                                                                 // drives both the sideways drift and the roll
-    gt += (RM ? 0 : dt) * mix(1, 0.2, kw);
-    volU.uGT.value = spU.uGT.value = gt; volU.uT.value = spU.uT.value = time; volU.uPat.value = 0;
+    { const dg = RM ? 0 : dt; gt += dg * 1.3 * (1 - kw); gm += dg * 0.2 * kw; }                     // each picture keeps its own clock (the opening disk's sets how fast its Kepler orbits play), so neither jumps while one turns into the other
+    volU.uGT.value = gt; volU.uGM.value = gm; volU.uT.value = spU.uT.value = time; volU.uPat.value = 0;
+    for (let k = 0; k < SH_N; k++) { const sIn = SH0 * Math.exp(k * SHQ);                              // the shells of gas beside the star: how far each has turned, and where each is in its cycle of renewal
+      volU.uShA.value[k] = (omK(sIn * 2.2) * gt) % 6.283185307179586; volU.uShE.value[k] = (gt * omK(sIn) / 4.5 + 0.618 * k) % 1; }
     // idle hold: a slow, heavy drift — never static
     const az = 0.62 + 0.045 * Math.sin(time * 0.045), back = (1 + 0.22 * (1 - ee)) * (1 + 0.02 * Math.sin(time * 0.07));
     const hd = pr ? 122 : hdFor(W / H);                                                             // desktop: just far enough back to see the whole disk, edge to edge
@@ -1194,7 +1267,7 @@ function boot() {
     LU.uCore.value.set(tmp.x * 0.5 + 0.5, tmp.y * 0.5 + 0.5); LU.uTint.value.set(0.42, 0.6, 1.0);
     LU.uFlare.value = (1.0 + 1.3 * glare + 0.5 * coreHot + 0.05 * Math.sin(time * 1.7)) * (1 - 0.9 * kw) * coreVis;
     LU.uTime.value = time; LU.uCool.value = 1 - kw; LU.uCA.value = 0.008; LU.uVig.value = mix(0.42, 0.42, kw); LU.uExp.value = 1 + 0.25 * glare;
-    blitU.uDof.value = 5.5 * (1 - sst(0.05, 0.10, p)) * (1 - kw) * sst(0.03, 0.12, Math.abs(pos.y) / pos.length()) / (1080 * texelU.value.y);            // lens blur, in gas pixels: on the opening view, easing off as the dive begins
+    blitU.uDof.value = 5.5 * (1 - sst(0.05, 0.10, p)) * (1 - kw) * sst(0.03, 0.12, Math.abs(pos.y) / pos.length()) / (1080 * accTexelU.value.y);         // lens blur, in pixels of the averaged picture: on the opening view, easing off as the dive begins
     bloom.strength = 0.22 + 0.4 * glare + 0.14 * (1 - kw); bloom.radius = 0.55 + 0.3 * glare + 0.1 * (1 - kw); bloom.threshold = 0.97 - 0.05 * glare - 0.12 * (1 - kw);   // opening disk: the hot gas spills a little more light
 
     setOp(S.hero, sst(0.5, 0.95, e) * (1 - sst(0.045, 0.07, p)));
@@ -1203,19 +1276,22 @@ function boot() {
   }
 
   let shown = false, diskReady = false, pSpin = 0; const tBoot = performance.now();
-  window.__bench = (n = 12) => { const b = new Uint16Array(4), t0 = performance.now(); for (let i = 0; i < n; i++) { renderer.setRenderTarget(volRT); renderer.render(volScene, gCam); } renderer.readRenderTargetPixels(volRT, 0, 0, 1, 1, b); renderer.setRenderTarget(null); return { ms: Math.round((performance.now() - t0) / n * 10) / 10, w: volRT.width, h: volRT.height }; };   // test hook: cost of drawing the gas once
+  const RAW = Q.get('raw') === '1';                                    // test hook: show each frame of gas as drawn, without averaging over time
+  window.__bench = (n = 12) => { const b = new Uint16Array(4), t0 = performance.now(); for (let i = 0; i < n; i++) { renderer.setRenderTarget(volRT); renderer.render(volScene, gCam); } renderer.readRenderTargetPixels(volRT, 0, 0, 1, 1, b); renderer.setRenderTarget(null); return { ms: Math.round((performance.now() - t0) / n * 10) / 10, w: volRT.width, h: volRT.height, gt }; };   // test hook: cost of drawing the gas once (and the disk's clock)
   function render() {
     if (!shown && (diskReady || performance.now() - tBoot > 2500)) { shown = true; requestAnimationFrame(() => root.classList.add('ready')); }   // the picture is revealed once the disk's surface has arrived (or after a short wait, if it never does)
     // gas: averaged over time in every state, so it is as clean in motion as it is at rest.
     // At rest it is redrawn every other frame at full resolution; while the camera moves it is redrawn every frame.
     const rest = wideOn === 2; gasTick++;
     if (!rest || accFresh || (gasTick & 1) === 0) {
+      { gasFr++; const i = gasFr % 16 + 1; let hx = 0, hy = 0, f = 0.5, j = i; while (j > 0) { hx += f * (j & 1); j >>= 1; f *= 0.5; } f = 1 / 3; j = i; while (j > 0) { hy += f * (j % 3); j = Math.floor(j / 3); f /= 3; }   // this frame's sub-pixel shift: sixteen positions spread evenly over one gas pixel (Halton 2,3)
+        volU.uFr.value = gasFr % 1024; volU.uJit.value.set(0, 0); }
       renderer.setRenderTarget(volRT); renderer.render(volScene, gCam);
       { const t = accCur; accCur = accPrev; accPrev = t; }                                              // write the new average into one target, read the last one from the other
-      if (accCur.width !== gasW || accCur.height !== gasH) accCur.setSize(gasW, gasH);
+      if (accCur.width !== accW || accCur.height !== accH) accCur.setSize(accW, accH);
       accU.tHist.value = accPrev.texture; accU.uHTexel.value.set(1 / accPrev.width, 1 / accPrev.height);
       accU.uCam.value.copy(volU.uCam.value); accU.uRot.value.copy(volU.uRot.value); accU.uTan.value = volU.uTan.value; accU.uAspect.value = volU.uAspect.value;
-      accU.uDg.value = gt - pGT; accU.uDs.value = orb.az - pSpin;
+      accU.uDg.value = gt - pGT; accU.uDm.value = gm - pGM; accU.uDs.value = orb.az - pSpin;
       const inGas = 1 - sst(0.03, 0.09, Math.abs(volU.uCam.value.y));                                  // flying through the gas itself: the look-up is unreliable there, so average less
       // how still is the picture? As the camera eases to a stop, the moving state converges on the settled state (same averaging,
       // same sharpening, same sample count), so the hand-over between them has nothing left to change.
@@ -1227,10 +1303,10 @@ function boot() {
       if (wideOn === 1) { sharpU.value = mix(0.4, 0.3, stillK);
         const rs = Math.min(4, Math.floor(stillK * 5)); if (rs > resStep) { resStep = rs; sizeVol(); } }   // four small steps up to full resolution while the picture is still easing
       else if (wideOn !== 2 && resStep) resStep = 0;
-      accU.uA.value = accFresh ? 1 : rest ? 0.16 : wideOn === 0 ? mix(0.36, 0.13, stillK) : mix(mix(wideOn === 1 ? 0.28 : 0.2, 0.125, stillK), 0.75, inGas); accFresh = false;
+      accU.uA.value = accFresh || RAW ? 1 : rest ? 0.16 : wideOn === 0 ? mix(0.24, 0.09, stillK) : mix(mix(wideOn === 1 ? 0.28 : 0.2, 0.125, stillK), 0.75, inGas); accFresh = false;
       renderer.setRenderTarget(accCur); renderer.render(accScene, gCam);
       renderer.setRenderTarget(null);
-      accU.pCam.value.copy(accU.uCam.value); accU.pRot.value.copy(accU.uRot.value); accU.pTan.value = accU.uTan.value; pGT = gt; pSpin = orb.az;
+      accU.pCam.value.copy(accU.uCam.value); accU.pRot.value.copy(accU.uRot.value); accU.pTan.value = accU.uTan.value; pGT = gt; pGM = gm; pSpin = orb.az;
       blitU.tGas.value = accCur.texture;
     }
     composer.render();
@@ -1252,7 +1328,11 @@ function boot() {
     warm += dt;
     if (warm > 3 && raw < 0.1) { ftE += (raw - ftE) * 0.12; const still = wideOn === 2 || wideOn === 0;
       slow = ftE > (still ? 0.075 : 0.06) ? slow + raw : Math.max(0, slow - raw);              // only step in when the page is genuinely struggling
-      if (slow > 0.5) { if (still) restMul = Math.max(0.5, restMul * 0.87); else moveMul = Math.max(0.6, moveMul * 0.9); sizeVol(); slow = 0; ftE = 0.0167; } }
+      if (slow > 0.5) { if (still) restMul = Math.max(0.5, restMul * 0.87); else moveMul = Math.max(0.6, moveMul * 0.9); sizeVol(); slow = 0; ftE = 0.0167; }
+      // Opening disk: hold a workable frame rate on any machine. The gas is the costly part, and the averaging pass rebuilds the picture at the screen's
+      // resolution whatever size it is drawn at, so it is drawn a little smaller when frames run slower than about 30 a second, and larger when there is room.
+      perfT += raw; if (perfT > 0.7 && (wideOn === 0 || wideOn === 3)) { perfT = 0;
+        const pm = clamp(ftE > 0.045 ? perfMul * 0.94 : ftE < 0.024 ? perfMul * 1.05 : perfMul, 0.8, 1.3); if (pm !== perfMul) { perfMul = pm; sizeVol(); } } }
     if (mode === 'playing') { advance(dt); if (prog >= 0.86) setMode('done'); }           // control passes as the frame settles; the move eases out underneath
     else if (mode === 'done' && prog < 1) advance(dt);
     update(prog, introT, time, dt); render();

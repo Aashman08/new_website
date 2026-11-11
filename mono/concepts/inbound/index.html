@@ -96,15 +96,26 @@ html.orbiting,html.orbiting *{cursor:grabbing!important;user-select:none;-webkit
 #enter .ring::after{animation-delay:1.4s}
 @keyframes ringp{from{transform:scale(1);opacity:.9}to{transform:scale(2.4);opacity:0}}
 #enter .dot{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:rgba(14,9,4,.92);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
-#enter .cap{position:absolute;top:52px;left:0;transform:translateX(-50%);white-space:nowrap;font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;color:#fff;
-  background:rgba(8,5,3,.86);border:1px solid rgba(255,241,214,.28);border-radius:99px;padding:11px 18px 11px 21px;box-shadow:0 8px 30px rgba(0,0,0,.45);transition:background .3s,color .3s,letter-spacing .5s cubic-bezier(.2,.8,.2,1),transform .5s cubic-bezier(.2,.8,.2,1)}
+/* The Enter pill is the same glass as the landing menu (see .menubar): bent at the rim by the lens shader, lit along its edge, and completely clear:
+   nothing is laid over the gas inside it. Its lettering is white or near-black, whichever reads better against the gas behind it at that moment (see capInk). */
+#enter .cap{position:absolute;top:52px;left:0;transform:translateX(-50%) scale(var(--cs,1));white-space:nowrap;font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;
+  color:#fff;text-shadow:0 0 6px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.4);
+  border-radius:99px;padding:12px 19px 12px 22px;
+  background:none;                                                /* fully clear: no fill, no blur, no change of colour. The gas shows through as it is */
+  box-shadow:inset 0 2px 3px -1px rgba(255,255,255,.4),inset 0 -2px 3px -2px rgba(255,255,255,.25),0 8px 22px -8px rgba(0,0,0,.4);
+  transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .35s,color .35s,text-shadow .35s}
+#enter .cap.ink{color:#0b0806;text-shadow:0 0 6px rgba(255,255,255,.4),0 1px 1px rgba(255,255,255,.25)}
+#enter .cap::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
+  background:radial-gradient(60% 150% at 50% 0%,rgba(255,255,255,.95) 0%,rgba(255,255,255,.4) 36%,rgba(255,255,255,0) 72%),
+    radial-gradient(48% 130% at 50% 100%,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 70%),rgba(255,255,255,.16);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 #enter:hover .ring,#enter:focus-visible .ring{transform:scale(1.3);box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 0 9px rgba(14,9,4,.16)}
 #enter:hover .dot,#enter:focus-visible .dot{transform:scale(1.9)}
-#enter:hover .cap,#enter:focus-visible .cap{background:#fff;color:#0c0703;letter-spacing:.36em;transform:translateX(-50%) translateY(4px)}
+#enter:hover .cap,#enter:focus-visible .cap{--cs:1.05;box-shadow:inset 0 3px 5px -1px rgba(255,255,255,.75),inset 0 -3px 5px -2px rgba(255,255,255,.45),0 10px 26px -8px rgba(0,0,0,.45)}   /* under the pointer the glass lifts a little and its rim catches more light; it stays clear */
 #enter:active .ring{transform:scale(.9)}
-#enter:active .cap{transform:translateX(-50%) translateY(6px) scale(.97)}
+#enter:active .cap{--cs:.96}
 #enter:focus-visible{outline:none}
-#enter:focus-visible .cap{outline:2px solid var(--amber);outline-offset:4px}
+#enter:focus-visible .cap{outline:2px solid rgba(255,255,255,.8);outline-offset:4px}
 html.playing .links{opacity:.28;pointer-events:none}
 html:not(.playing) #skip{opacity:0;pointer-events:none}
 html:not(.playing) #rail{visibility:hidden}
@@ -168,11 +179,9 @@ h1{font-family:var(--site);font-weight:600;font-size:1.5rem;line-height:1.3;lett
 .menubar .lens{position:absolute;left:0;top:0;width:0;height:0;border-radius:9999px;pointer-events:none;opacity:0;
   background:linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.07) 55%,rgba(255,255,255,.11) 100%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(255,255,255,.2),inset 0 0 0 1px rgba(255,255,255,.07),inset 0 6px 9px -6px rgba(255,255,255,.3),0 3px 12px rgba(0,0,0,.22);
-  transform:translate(var(--lx,0px),var(--ly,0px)) scale(var(--ls,1));
-  transition:transform .38s cubic-bezier(.22,1,.36,1),width .38s cubic-bezier(.22,1,.36,1),opacity .3s}   /* (it glides and stops: no overshoot, which made its right edge swing past the item and back) */
+  scale:var(--ls,1);transition:opacity .3s,scale .3s cubic-bezier(.22,1,.36,1)}
 .menubar.lit .lens{opacity:1}
 .menubar.press .lens{--ls:.94}
-.menubar.jump .lens{transition:opacity .3s}
 html.rm .menubar .lens{transition:opacity .2s}
 #replay{position:absolute;right:var(--pad);bottom:28px;font-size:12px;letter-spacing:.05em;font-weight:500;color:rgba(255,255,255,.55);text-decoration:none;padding:6px 2px;transition:color .3s}
 #replay:hover,#replay:focus-visible{color:#fff}
@@ -478,10 +487,19 @@ $('#cta-work').addEventListener('click', (e) => { e.preventDefault(); const a = 
 document.querySelectorAll('nav [data-open]').forEach((b) => b.addEventListener('click', ensureLanded));
 /* the menu's sliding piece of glass */
 { const bar = $('.menubar'), lens = bar.querySelector('.lens'); let cur = null, hov = null;
+  // Its left and right edges are eased toward the item's by one loop and written in the same frame, so they cannot get out of step. (Left to the
+  // browser, its position and its width were animated by two different mechanisms; whenever those drifted apart the right edge ran past the item
+  // and came back, most of all between Research and Art, whose widths differ most.) Each edge only ever closes on its target: it cannot overshoot.
+  let L = 0, Rt = 0, tL = 0, tR = 0, top = 0, raf = 0, lastT = 0;
+  const put = () => { lens.style.transform = 'translate(' + L.toFixed(2) + 'px,' + top + 'px)'; lens.style.width = Math.max(0, Rt - L).toFixed(2) + 'px'; };
+  const step = (now) => { const k = 1 - Math.exp(-clamp((now - lastT) / 1000, 0, 0.05) * 16); lastT = Math.max(lastT, now);   // (a frame's own time can be a little earlier than the moment the move was asked for: never step backwards)
+    L += (tL - L) * k; Rt += (tR - Rt) * k;
+    if (Math.abs(tL - L) < 0.05 && Math.abs(tR - Rt) < 0.05) { L = tL; Rt = tR; raf = 0; } else raf = requestAnimationFrame(step); put(); };
   const go = (b) => { if (!b) { cur = null; bar.classList.remove('lit', 'press'); return; }
-    const first = !cur; cur = b; if (first) bar.classList.add('jump');                                 // it appears where it is wanted; only later moves glide
-    lens.style.width = b.offsetWidth + 'px'; lens.style.height = b.offsetHeight + 'px'; lens.style.setProperty('--lx', b.offsetLeft + 'px'); lens.style.setProperty('--ly', b.offsetTop + 'px');
-    if (first) { void lens.offsetWidth; bar.classList.remove('jump'); } bar.classList.add('lit'); };
+    const first = !cur; cur = b; tL = b.offsetLeft; tR = tL + b.offsetWidth; top = b.offsetTop; lens.style.height = b.offsetHeight + 'px';
+    if (first || RM) { L = tL; Rt = tR; cancelAnimationFrame(raf); raf = 0; put(); }                    // it appears where it is wanted; only later moves glide
+    else if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(step); }
+    bar.classList.add('lit'); };
   const want = () => go(hov || (bar.contains(document.activeElement) && document.activeElement.matches(':focus-visible') ? document.activeElement : null));
   bar.querySelectorAll('button').forEach((b) => {
     b.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'touch') { hov = b; want(); } });
@@ -490,7 +508,7 @@ document.querySelectorAll('nav [data-open]').forEach((b) => b.addEventListener('
   bar.addEventListener('pointerleave', () => { hov = null; bar.classList.remove('press'); want(); });
   addEventListener('pointerup', (e) => { bar.classList.remove('press'); if (e.pointerType === 'touch') { hov = null; setTimeout(want, 350); } });
   addEventListener('pointercancel', () => { bar.classList.remove('press'); hov = null; want(); });
-  addEventListener('resize', () => { if (cur) go(cur); }); }
+  addEventListener('resize', () => { if (cur) { const c = cur; cur = null; go(c); } }); }
 document.querySelectorAll('[data-soon]').forEach((b) => b.addEventListener('click', () => toast(b.dataset.soon + ' section to be built')));
 setMode(Q.get('skip') === '1' ? 'done' : 'idle'); if (mode === 'done') prog = 1;
 if (P_PARAM !== null) { prog = P_PARAM; introT = 1; setMode(prog >= 1 ? 'done' : prog <= 0 ? 'idle' : 'paused'); }
@@ -1531,7 +1549,7 @@ function boot() {
   const zoomFov = (p, d) => { if (p < 0.18) return 50; const u = clamp(Math.log(Math.max(d, ZOOM_D0) / ZOOM_D0) / Math.log(ZOOM_D1 / ZOOM_D0), 0, 1), h = u * u * (2 - u);   // (eases in, so the zoom starts without a jolt)
     return 2 * Math.atan(ZOOM_T0 * Math.pow(ZOOM_T1 / ZOOM_T0, h)) * 180 / Math.PI; };
   const HOVERS = matchMedia('(hover: hover)').matches;      // a pointer that can rest over things: without one (a phone) the rim light stays put, toward the core
-  const glassEl = $('.menubar'); let glassSet = false, glassK = 0, glassMx = -1; addEventListener('resize', () => { glassSet = false; });
+  const glassEl = $('.menubar'), capEl = $('#enter-cap'); let glassSet = false, glassK = 0, glassMx = -1, capK = 0, capLum = 0; window.__capLum = () => capLum;   // (test hook: brightness measured behind the Enter pill's lettering) addEventListener('resize', () => { glassSet = false; });
   let pkS = 0;                                                 // how much the settled frame answers the pointer: eased in when control passes to the visitor, so the frame does not jump
   const LIFT = 0.095, LIFT_TALL = 0.08, ROLL = 0.12;                              // the settled frame: how far above the middle the galaxy's core sits, as a fraction of the frame's height (wide screens · tall ones) · how far the camera has rolled by then
   function update(p, e, time, dt) {
@@ -1625,10 +1643,13 @@ function boot() {
 
     setOp(S.hero, sst(0.5, 0.95, e) * (1 - sst(0.045, 0.07, p)));
     const nm = p >= 0.74 ? 1 : 0; S.name.style.visibility = nm ? 'visible' : 'hidden'; S.name.classList.toggle('show', !!nm); S.name.classList.toggle('on', mode === 'done');
-    // the glass menu: where it is and how far it has faded in (read from the page, so the bending arrives and moves exactly with it), and its rim light, which leans toward the pointer
-    { let gk = 0; if (nm) { if (!glassSet || glassK < 1) { const r = glassEl.getBoundingClientRect(); glassK = RM ? 1 : +getComputedStyle(glassEl).opacity || 0; LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); glassSet = true; }
+    // the glass (the Enter pill on the opening view, the menu on the landing: never both at once): where it is and how far it has faded in, read from the page so the bending arrives and moves exactly with it; and the menu's rim light, which leans toward the pointer
+    { let gk = 0; capK += ((mode === 'idle' ? sst(0.75, 1, e) : 0) - capK) * (RM ? 1 : 1 - Math.exp(-dt * 7));      // the Enter pill fades with the opening view
+      if (nm) { if (!glassSet || glassK < 1) { const r = glassEl.getBoundingClientRect(); glassK = RM ? 1 : +getComputedStyle(glassEl).opacity || 0; LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); glassSet = true; }
         gk = glassK; const mx = HOVERS ? Math.round(500 + 380 * clamp(ptr.sx, -1, 1)) : 500; if (mx !== glassMx) { glassMx = mx; glassEl.style.setProperty('--mx', (mx / 10) + '%'); } }
-      else { glassSet = false; glassK = 0; } LU.uGlK.value = gk; }
+      else { glassSet = false; glassK = 0;
+        if (capK > 0.004) { const r = capEl.getBoundingClientRect(); LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); gk = capK; } }   // (it rides with the star, so it is looked up every frame)
+      LU.uGlK.value = gk; }
     if (audio.on && audio.ctx) { const t = audio.ctx.currentTime; audio.filter.frequency.setTargetAtTime(300 + 1000 * vis(p, 0.06, 0.18, 0.22, 0.5), t, 0.3); audio.master.gain.setTargetAtTime(0.16, t, 0.25); }
   }
 
@@ -1670,7 +1691,20 @@ function boot() {
       blitU.tGas.value = accCur.texture;
     }
     composer.render();
+    capInk();
   }
+  // The Enter pill is clear glass, so its lettering has to suit whatever gas is behind it. About five times a second the finished picture is read
+  // back where the lettering sits, and the lettering is set near-black on bright gas and white on dark. Black wins as soon as the background is
+  // brighter than the point where the two would contrast equally (a luminance of 0.18); a margin either side stops it flickering between them.
+  let capInkT = 0, capDark = false; const capBuf = new Uint8Array(4 * 420 * 64);
+  function capInk() { const now = performance.now(); if (mode !== 'idle' || capK < 0.3 || (now - capInkT < 200 && !RM)) return; capInkT = now;
+    const g = LU.uGl.value, gl = renderer.getContext(), sc = renderer.domElement.width / innerWidth;
+    const w = Math.min(420, Math.max(1, Math.round(g.z * 1.5 * sc))), h = Math.min(64, Math.max(1, Math.round(g.w * 0.9 * sc)));
+    const x = Math.round(g.x * sc - w / 2), y = Math.round(renderer.domElement.height - g.y * sc - h / 2);
+    if (x < 0 || y < 0 || x + w > renderer.domElement.width || y + h > renderer.domElement.height) return;
+    renderer.setRenderTarget(null); gl.readPixels(x, y, w, h, gl.RGBA, gl.UNSIGNED_BYTE, capBuf);
+    let L = 0, n = 0; for (let i = 0; i < w * h * 4; i += 12) { L += 0.2126 * Math.pow(capBuf[i] / 255, 2.2) + 0.7152 * Math.pow(capBuf[i + 1] / 255, 2.2) + 0.0722 * Math.pow(capBuf[i + 2] / 255, 2.2); n++; } L /= n;
+    const dark = capDark ? L > 0.14 : L > 0.22; if (dark !== capDark) { capDark = dark; capEl.classList.toggle('ink', dark); } capLum = L; }
   /* ── loop ── */
   let last = performance.now(), time = 0, raf = 0, slow = 0, ftE = 0.016, warm = 0;
   frameOnce = () => { for (let k = 0; k < (RM ? 20 : 1); k++) { update(prog, introT, time + k / 60, k ? 0 : 0.016); render(); } };   // (with reduced motion there is no running loop to average the gas over time, so a still is built from twenty passes at once)

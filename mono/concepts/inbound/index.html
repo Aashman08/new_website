@@ -64,6 +64,17 @@ html:not(.idle) #pal,html.nogl #pal{opacity:0;pointer-events:none;visibility:hid
 #pal-menu button .sw{width:56px;height:10px;flex:none}
 #pal-menu button[aria-checked="true"]{color:var(--ink)}
 #pal-menu button[aria-checked="true"]::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--amber);margin-left:auto}
+#pal-menu{max-height:calc(100vh - 84px);overflow:auto}
+#pal-menu .pl{touch-action:none;cursor:grab}
+#pal-menu .pl .pd{width:14px;height:14px;border-radius:50%;flex:none;margin:0 21px;background:radial-gradient(circle at 34% 32%,var(--c1),var(--c2) 78%)}
+#pal-menu .pl small{margin-left:auto;font-size:11px;color:var(--dim)}
+#pal-menu p{font-size:11px;line-height:1.4;color:var(--dim);padding:2px 10px 8px;margin:0}
+#pal-menu .rm{color:var(--amber);font-size:12px}
+#pal-menu .rm[hidden]{display:none}
+#pl-ghost{position:fixed;left:0;top:0;z-index:60;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;pointer-events:none;display:none;
+  background:radial-gradient(circle at 34% 32%,var(--c1,#fff),var(--c2,#888) 78%);box-shadow:0 0 0 1.5px rgba(255,255,255,.9),0 0 0 8px rgba(255,255,255,.12);transition:opacity .15s}
+#pl-ghost.bad{opacity:.35}
+html.pl-drag,html.pl-drag *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
 #sound .eq{display:flex;gap:2px;align-items:flex-end;height:10px}
 #sound .eq b{width:2px;height:3px;background:currentColor;display:block}
 #sound[aria-pressed="true"]{color:var(--amber);border-color:rgba(255,178,74,.5)}
@@ -231,7 +242,7 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
 <nav aria-label="Controls">
   <div id="pal">
     <button type="button" id="pal-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pal-menu"><span class="sw" aria-hidden="true"></span><span>Customize</span><span class="car" aria-hidden="true"></span></button>
-    <div id="pal-menu" role="menu" aria-label="Disk colour" hidden><h3>Disk colour</h3></div>
+    <div id="pal-menu" role="menu" aria-label="Customize the disk" hidden><h3>Disk colour</h3></div>
   </div>
   <button type="button" id="sound" aria-pressed="false" aria-label="Toggle ambient sound"><span class="eq"><b></b><b></b><b></b></span><span id="sound-t">Sound off</span></button>
 </nav>
@@ -353,9 +364,9 @@ const fadeEl = $('#fade'), skipBtn = $('#skip');
 
 /* ───────── toast / panel ───────── */
 let toastTimer = 0;
-function toast(msg) {
-  const t = $('#toast'); t.innerHTML = '<b>[PLACEHOLDER]</b>' + msg; t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+function toast(msg, tag = '[PLACEHOLDER]', ms = 2800) {
+  const t = $('#toast'); t.innerHTML = '<b></b>'; t.firstChild.textContent = tag; t.append(msg); t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
 }
 const panel = $('#panel'); let lastFocus = null;
 function openPanel(name) {
@@ -474,13 +485,94 @@ let palId = 'ember';
   window.__setPalette = (id) => { const pl = PALS.find((q) => q.id === id); if (!pl) return; palId = id; palTgt.set(palFlat(pl)); mark(); if (RM) { palNow.set(palTgt); if (frameOnce) frameOnce(); } };
   btn.addEventListener('click', () => open(menu.hidden, true));
   items.forEach((b) => b.addEventListener('click', () => { window.__setPalette(b.dataset.pal); open(false); btn.focus(); }));
-  menu.addEventListener('keydown', (e) => { const i = items.indexOf(document.activeElement);
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus(); }
-    else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); } else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+  menu.addEventListener('keydown', (e) => { const all = [...menu.querySelectorAll('button:not([hidden])')], i = all.indexOf(document.activeElement);   // (every row of the menu, the planet rows too)
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); all[(i + (e.key === 'ArrowDown' ? 1 : all.length - 1)) % all.length].focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); all[0].focus(); } else if (e.key === 'End') { e.preventDefault(); all[all.length - 1].focus(); }
     else if (e.key === 'Escape') { e.stopPropagation(); open(false); btn.focus(); } });
   addEventListener('pointerdown', (e) => { if (!menu.hidden && !(e.target.closest && e.target.closest('#pal'))) open(false); });
   enterBtn.addEventListener('click', () => open(false));
   mark();
+}
+
+/* ───────── a planet in the disk ─────────
+   Drag one from the menu onto the disk (or drag the one already there somewhere else). What it then does comes from the planet-disk literature:
+     · it orbits at the Kepler speed of the radius it was dropped at, and drifts slowly inward (migration), parking at the disk's inner edge;
+     · it raises a one-armed spiral wake, leading inside its orbit and trailing outside, of the shape given by Rafikov (2002) / Ogilvie & Lubow (2002);
+       the wake is strong once the planet passes the "thermal mass" (mass ratio q = (H/r)^3);
+     · it opens a gap along its orbit whose final depth and width follow the fits of Kanagawa et al. (2015, 2016) to simulations:
+       depth 1/(1 + 0.04 K) with K = q^2 (H/r)^-5 / alpha, width 0.41 r sqrt(q) (H/r)^-3/4 alpha^-1/4;
+     · the gap does not appear all at once. Gas is pushed aside only as it goes past the planet, so the clearing starts at the planet and sweeps
+       round: ahead of it inside its orbit, behind it outside, and last along the orbit itself, where gas lingers a sixth of a turn ahead and behind
+       (the L4 and L5 points). The gas pushed out piles up along the gap's edges; two thin streams cross the gap and feed a small disk round the planet;
+     · a companion heavy enough pulls the star off-centre (both circle their centre of mass) and leaves the hole lopsided;
+     · its Hill sphere (r (q/3)^1/3) is where gas falling onto it glows.
+   These are formulas fitted to simulations, not a live simulation: they hold for one planet on a circular orbit. Time is compressed: a real gap takes
+   hundreds of orbits to open; here the clearing takes about `lap` seconds to go once round at the gap's shoulders. q is the planet's mass over the
+   star's (0.8 Suns); alpha is the disk's viscosity (0.01, a quiet disk). */
+const PLANETS = [
+  { id: 'earth',   name: 'Rocky planet', sub: 'Earth mass',   q: 3.8e-6, rb: 0.010, col: [0.34, 0.44, 0.58], emit: [0, 0, 0], mig: 30, lap: 9, co: 0.3, tad: 0, ecc: 0, arm2: [0, 0], note: 'Too light to open a gap. Look for its faint spiral wake.' },
+  { id: 'neptune', name: 'Ice giant',    sub: 'Neptune mass', q: 6.4e-5, rb: 0.016, col: [0.30, 0.52, 0.85], emit: [0, 0, 0], mig: 12, lap: 9, co: 0.3, tad: 0.85, ecc: 0, arm2: [0, 0], note: 'Raises a clear spiral wake and thins the gas along its orbit.' },
+  { id: 'jupiter', name: 'Gas giant',    sub: 'Jupiter mass', q: 1.2e-3, rb: 0.026, col: [0.78, 0.62, 0.44], emit: [0, 0, 0], mig: 20, lap: 9, co: 0.3, tad: 0.85, ecc: 0.05, arm2: [0.45, 2.3], note: 'Heavy enough to clear a gap along its orbit.' },
+  { id: 'bd',      name: 'Brown dwarf',  sub: '50 Jupiters',  q: 0.06,   rb: 0.030, col: [0.42, 0.16, 0.10], emit: [0.85, 0.20, 0.05], mig: 80, lap: 7, co: 0.9, tad: 0, ecc: 0.22, arm2: [0.8, 3.14159], note: 'A failed star. It tears the disk in two.' },
+];
+const PL_ALPHA = 0.01, PL_RMIN = 0.2, PL_RMAX = 1.05;
+const planet = { on: false, kind: null, rp: 0.6, phi: 0, age: 0, gap: 0, wake: 0, held: false };   // age: how long it has been on this orbit, on the disk's clock   // gap, wake: how far its final gap depth and wake have faded in · held: it is in the visitor's hand, so it stays under the cursor instead of orbiting
+const plOld = { r: 0.5, half: 0.1, depth: 0 };              // the gap it left behind when it was moved or taken away: this fills back in over a few seconds
+const plLeave = () => { if (!planet.on || RM) return; const ph = plPhys(planet.kind, planet.rp), d = planet.gap * (1 - Math.exp(-planet.age / (planet.kind.lap * 1.3) / 0.6));
+  if (d > plOld.depth * 0.8) { plOld.r = planet.rp; plOld.half = ph.half; plOld.depth = d; } };
+const plPhys = (k, rp) => { const h = (0.008 + 0.027 * rp * rp) / rp, K = k.q * k.q / (Math.pow(h, 5) * PL_ALPHA);     // h: the disk's own thickness over radius, where the planet is
+  return { h, depth: 1 - 1 / (1 + 0.04 * K), half: Math.min(0.5 * rp, 0.205 * rp * Math.sqrt(k.q) * Math.pow(h, -0.75) * Math.pow(PL_ALPHA, -0.25)),
+    wake: Math.min(1, 0.35 * Math.sqrt(k.q / (h * h * h))), hill: rp * Math.cbrt(k.q / 3) }; };
+let diskAt = null, plScreen = null, plGrab = null;          // set once the renderer is up: a screen point's place on the disk · where the planet is on screen · try to pick the planet up
+function plPlace(id, r, phi, instant) { const k = PLANETS.find((q) => q.id === id); if (!k) return;
+  plLeave(); planet.on = true; planet.kind = k; planet.rp = clamp(r, PL_RMIN, PL_RMAX); planet.phi = phi; const ph = plPhys(k, planet.rp);
+  planet.age = instant || RM ? 1e4 : 0; planet.gap = instant || RM ? ph.depth : 0; planet.wake = instant || RM ? ph.wake : 0; plMark(); toast(k.note, k.name, 5200); if (RM && frameOnce) frameOnce(); }
+function plRemove() { plLeave(); planet.on = false; planet.kind = null; plMark(); if (RM && frameOnce) frameOnce(); }
+let plMark = () => {};
+window.__planet = (id, r, phiDeg, instant) => id ? plPlace(id, r == null ? 0.6 : r, (phiDeg || 0) * Math.PI / 180, instant) : plRemove();
+window.__planetState = () => ({ on: planet.on, id: planet.kind && planet.kind.id, rp: planet.rp, phi: planet.phi, age: planet.age, gap: planet.gap, wake: planet.wake, old: plOld.depth, held: planet.held, scr: plScreen ? plScreen() : null });
+{
+  const menu = $('#pal-menu'), btn = $('#pal-btn');
+  const css = (c) => 'rgb(' + c.map((v) => Math.round(255 * Math.pow(clamp(v, 0, 1), 1 / 2.2))).join(',') + ')';
+  const paint = (el, k) => { el.style.setProperty('--c1', css(k.col.map((v, i) => Math.min(1, v * 1.5 + k.emit[i])))); el.style.setProperty('--c2', css(k.col.map((v, i) => v * 0.25 + k.emit[i] * 0.4))); };
+  const h = document.createElement('h3'); h.textContent = 'Drop a planet'; menu.append(h);
+  const ghost = document.createElement('div'); ghost.id = 'pl-ghost'; ghost.setAttribute('aria-hidden', 'true'); document.body.append(ghost);
+  const closeMenu = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+  let drag = null, skipClick = false;
+  const okAt = (x, y) => { const q = diskAt && diskAt(x, y); return q && q.r >= PL_RMIN && q.r <= PL_RMAX ? q : null; };
+  const rows = PLANETS.map((k) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'pl'; b.setAttribute('role', 'menuitem'); b.dataset.pl = k.id;
+    const d = document.createElement('span'); d.className = 'pd'; d.setAttribute('aria-hidden', 'true'); paint(d, k);
+    const sm = document.createElement('small'); sm.textContent = k.sub; b.append(d, document.createTextNode(k.name), sm); menu.append(b);
+    b.addEventListener('pointerdown', (e) => { if (e.button || mode !== 'idle') return; drag = { k, pid: e.pointerId, x0: e.clientX, y0: e.clientY, moved: false, menu: true }; });
+    b.addEventListener('click', () => { if (skipClick || mode !== 'idle') return;                    // a plain click or the keyboard: put it on the near side of the disk
+      const q = okAt(innerWidth * 0.5, innerHeight * 0.66) || { r: 0.6, phi: 0.9 }; plPlace(k.id, q.r, q.phi); closeMenu(); btn.focus(); });
+    return b; });
+  const hint = document.createElement('p'); hint.textContent = 'Drag one onto the disk. You can pick it up again and move it around.'; menu.append(hint);
+  const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'rm'; rm.setAttribute('role', 'menuitem'); rm.textContent = 'Remove the planet'; rm.hidden = true; menu.append(rm);
+  rm.addEventListener('click', () => { plRemove(); closeMenu(); btn.focus(); });
+  plMark = () => { rm.hidden = !planet.on; };
+  plGrab = (e) => { if (!planet.on || !plScreen) return false; const q = plScreen(); if (!q || Math.hypot(e.clientX - q.x, e.clientY - q.y) > Math.max(16, q.rad + 10)) return false;
+    drag = { k: planet.kind, pid: e.pointerId, x0: e.clientX, y0: e.clientY, moved: false, menu: false }; plLeave(); return true; };
+  // While it is being dragged the planet itself is under the cursor, wherever the cursor is over the disk: its wake turns with it at once, and its
+  // gap is left behind as it moves across the disk and opens again where it is held. (Off the disk there is nothing to put it on, so a small marker
+  // follows the cursor instead, and the planet waits at the last place it was.)
+  let rmQ = false;
+  const stop = () => { drag = null; planet.held = false; root.classList.remove('pl-drag'); ghost.style.display = 'none'; };
+  addEventListener('pointermove', (e) => { if (!drag || e.pointerId !== drag.pid) return;
+    if (!drag.moved) { if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 6) return;
+      drag.moved = true; if (drag.menu) closeMenu(); root.classList.add('pl-drag'); paint(ghost, drag.k); const sz = Math.round(14 + drag.k.rb * 520); ghost.style.width = ghost.style.height = sz + 'px'; ghost.style.margin = (-sz / 2) + 'px 0 0 ' + (-sz / 2) + 'px'; }
+    const q = mode === 'idle' && okAt(e.clientX, e.clientY);
+    if (q) { const k = drag.k;
+      if (!planet.on || planet.kind !== k) { plLeave(); planet.on = true; planet.kind = k; planet.age = RM ? 1e4 : 0; planet.gap = 0; planet.wake = 0; planet.rp = q.r; plMark(); }
+      if (!RM) planet.age = Math.min(planet.age, 3 / k.co * k.lap * 1.3) * Math.exp(-Math.abs(q.r - planet.rp) / (0.3 * plPhys(k, q.r).half + 0.005));   // moving across the disk leaves the gap behind: at the new orbit the clearing starts again (a small nudge keeps most of it)
+      planet.rp = q.r; planet.phi = q.phi; planet.held = true; drag.placed = true; ghost.style.display = 'none'; }
+    else { planet.held = false; ghost.style.display = 'block'; ghost.classList.add('bad'); ghost.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)'; }
+    if (RM && frameOnce && !rmQ) { rmQ = true; requestAnimationFrame(() => { rmQ = false; frameOnce(); }); } });
+  addEventListener('pointerup', (e) => { if (!drag || e.pointerId !== drag.pid) return; const d = drag; stop(); if (!d.moved) return;
+    skipClick = true; setTimeout(() => { skipClick = false; }, 0);                                    // (letting go over the menu row itself must not also count as a click on it)
+    if (d.placed) toast(d.k.note, d.k.name, 5200); else if (d.menu) toast('Let go over the disk to place it.', d.k.name, 2600);
+    if (RM && frameOnce) frameOnce(); });
+  addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.pid) stop(); });
 }
 
 /* ───────── looking around (opening view only) ─────────
@@ -504,6 +596,7 @@ function orbHome() { orb.el = orb.ld = orb.tld = orb.el0 = orb.ld0 = orb.vel = 0
       if (orbKick) orbKick(); } };
   addEventListener('pointerdown', (e) => {
     if (mode !== 'idle' || !free(e.target) || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    if (pts.size === 0 && plGrab && plGrab(e)) return;                                             // the pointer went down on the planet: it is being picked up, not the view turned
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY }); orb.moved = false; orb.vaz = orb.vel = 0;
     orb.flip = Math.cos(orb.e0 + orb.el) < 0 ? -1 : 1;                                             // upside down, left and right swap, so the disk still follows the hand
     if (e.target === glEl) { try { glEl.setPointerCapture(e.pointerId); } catch (err) {} }
@@ -561,7 +654,8 @@ function boot() {
   const bnTex = (() => { const b = atob('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'), d = new Uint8Array(4096); for (let i = 0; i < 4096; i++) d[i] = b.charCodeAt(i);
     const t = new THREE.DataTexture(d, 64, 64, THREE.RedFormat, THREE.UnsignedByteType); t.minFilter = t.magFilter = THREE.NearestFilter; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.needsUpdate = true; return t; })();
   const GAL = /* glsl */`
-    uniform float uW, uPat, uArms;
+    uniform float uW, uPat, uArms; uniform vec4 uPlW;                  // uPlW: the planet's centre and radius in the scene's own units (radius 0: none)
+    float plOcc(vec3 c,vec3 s){ if(uPlW.w<=0.0) return 1.0; vec3 d=s-c; float L=length(d); d/=L; vec3 oc=c-uPlW.xyz; float b=dot(oc,d), h=b*b-(dot(oc,oc)-uPlW.w*uPlW.w); if(h<=0.0) return 1.0; float t=-b-sqrt(h); return (t>0.0&&t<L)?0.0:1.0; }   // 0 when the planet stands between the camera and a star
     float gRing=1.0;                                                  // set to 0 while shading the central swell, so it keeps its own speed
     // Opening disk: Kepler's law, as measured in real accretion disks. Gas in a thin disk orbits at the speed a free body would at that distance, so the
     // rate of turning goes as (radius)^-3/2: gas a quarter as far out goes round eight times as often. KEP sets how fast the whole thing is played
@@ -594,7 +688,9 @@ function boot() {
     uN: { value: noiseTex }, uCam: { value: new THREE.Vector3() }, uRot: { value: new THREE.Matrix3() },
     uTan: { value: 0.3 }, uAspect: { value: 1 }, uGT: { value: 0 }, uGM: { value: 0 }, uT: { value: 0 }, uW: { value: 0.09 }, uPat: { value: 0 },
     uArms: { value: 0.4 }, uBlue: { value: 0 }, uGain: { value: 1 }, uHaze: { value: 1 }, uSteps: { value: STEPS }, uSwell: { value: Q.get('noswell') === '1' ? 0 : 1 },
-    uGas: { value: null }, uTemp: { value: null }, uCells: { value: null }, uSpin: { value: 0 }, uDz: { value: 1 }, uPix: { value: 0.001 }, uShA: { value: new Float32Array(SH_N) }, uShE: { value: new Float32Array(SH_N) }, uBandA: { value: new Float32Array(12) }, uPal: { value: Array.from({ length: 9 }, () => new THREE.Vector3()) }, uStarM: { value: new THREE.Matrix3() }, uBN: { value: bnTex }, uFr: { value: 0 }, uMip: { value: 1 }, uJit: { value: new THREE.Vector2() },
+    uGas: { value: null }, uTemp: { value: null }, uCells: { value: null }, uSpin: { value: 0 }, uDz: { value: 1 }, uPix: { value: 0.001 }, uShA: { value: new Float32Array(SH_N) }, uShE: { value: new Float32Array(SH_N) }, uBandA: { value: new Float32Array(12) }, uPal: { value: Array.from({ length: 9 }, () => new THREE.Vector3()) }, uStarM: { value: new THREE.Matrix3() },
+    uPl: { value: new THREE.Vector4() }, uPlG: { value: new THREE.Vector4(0.1, 0, 0, 0.03) }, uPlP: { value: new THREE.Vector3() }, uPlC: { value: new THREE.Vector3() }, uPlE: { value: new THREE.Vector3() }, uPlH: { value: 0.01 },
+    uPlT: { value: new THREE.Vector4(0, 1, 0, 0.02) }, uPlX: { value: new THREE.Vector4() }, uPlA: { value: new THREE.Vector2() }, uPlO: { value: new THREE.Vector3(0.5, 0.1, 0) }, uStarO: { value: new THREE.Vector3() }, uBN: { value: bnTex }, uFr: { value: 0 }, uMip: { value: 1 }, uJit: { value: new THREE.Vector2() },
   };
   // The opening disk's gas is not generated live. An offline flow simulation winds gas up and stirs it; from that, two maps are baked
   // (x: angle round the disk, y: log-radius):
@@ -610,17 +706,22 @@ function boot() {
       t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; t.generateMipmaps = true; t.anisotropy = Math.min(aniso, renderer.capabilities.getMaxAnisotropy());
       t.needsUpdate = true; volU[key].value = t; done(); }, undefined, done);
     load('gas.jpg', 'uGas', 2); load('temp.webp', 'uTemp', 1); load('cells.webp', 'uCells', 2); }
+  const plWU = { value: new THREE.Vector4() };                      // the planet, for the star shaders
   const volMat = new THREE.ShaderMaterial({
     uniforms: volU, depthTest: false, depthWrite: false,
     vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
     fragmentShader: /* glsl */`
       precision highp float; precision highp sampler3D;
       #define STEPS 32
-      uniform sampler3D uN; uniform sampler2D uGas,uTemp,uCells; uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uGT,uGM,uT,uBlue,uGain,uHaze,uSteps,uSwell,uSpin,uDz,uPix; uniform float uShA[6], uShE[6], uBandA[12]; uniform sampler2D uBN; uniform float uFr,uMip; uniform vec2 uJit; uniform vec3 uPal[9]; uniform mat3 uStarM;   // uBN: blue-noise mask · uFr: frame count · uJit: this frame's sub-pixel shift of the whole picture   // uGT: the opening disk's clock · uGM: the Milky Way's
+      uniform sampler3D uN; uniform sampler2D uGas,uTemp,uCells; uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uGT,uGM,uT,uBlue,uGain,uHaze,uSteps,uSwell,uSpin,uDz,uPix; uniform float uShA[6], uShE[6], uBandA[12]; uniform sampler2D uBN; uniform float uFr,uMip; uniform vec2 uJit; uniform vec3 uPal[9]; uniform mat3 uStarM;
+      uniform vec4 uPl,uPlG,uPlT,uPlX; uniform vec3 uPlP,uPlC,uPlE,uPlO,uStarO; uniform vec2 uPlA; uniform float uPlH;   // uPlT: time since the planet came to this orbit, how fast the clearing sweeps round, its slowest rate, half-width of the ribbon of gas that shares the orbit · uPlX: how lopsided the outer edge is, which way, how much gas still lingers ahead of and behind the planet, the planet's own rate of turning · uPlA: the second arm's strength and how far round it sits · uPlO: a gap left behind (radius, half-width, depth) · uStarO: how far the star is pulled off-centre (x, z) and the orbit doing it
+      //   // the planet. uPl: orbit radius, angle now, body radius, 1 when there is one · uPlG: half-width of its gap, how deep the gap is now, how strong its wake is now, the disk's thickness over radius there · uPlP: where it is · uPlC, uPlE: its colour and own glow · uPlH: its Hill radius
+      //   // uBN: blue-noise mask · uFr: frame count · uJit: this frame's sub-pixel shift of the whole picture   // uGT: the opening disk's clock · uGM: the Milky Way's
       //   // uSpin: how far the visitor has turned the opening disk · uDz: how far they have moved in or out (1 = the opening view's own distance)
       varying vec2 vUv;
       vec2 gGx=vec2(0.0), gGy=vec2(0.0); float gTmp=0.0, gMot=0.0, gBump=0.0; bool gHaveT=false; float gW1=1.0, gW2=0.0, gE1=0.0, gE2=0.0, gOR=0.0;
       float gDeep=0.0;                                                        // this sample sat in the solid body of the gas, below its soft top
+      float gTP=1e6, gTrP=1.0; vec3 gColP=vec3(0.0); bool gGotP=false;          // the planet: how far along the ray it is, and what the gas in front of it adds and hides
       float gMir=1.0, gIso=0.0, gTHit=1e6, gTrS=1.0, gTcO=1.0, gRN=0.0, gRD=0.0, gTN=0.0, gT0s=1e6, gTcl=0.0; vec3 gColS=vec3(0.0); bool gGotS=false;   // gMir: -1 when the view is from under the disk · gIso: size of a pixel at the sample, for rays stepped along their length · the rest: notes kept while marching the opening disk (see stepOpen)   // per ray: how fast the point where it meets the disk moves across the screen (sets how sharply the maps are read) · the hue variation of the gas it lands on, read once
       ${GAL}
       vec4 tx(vec3 p){ vec3 c=p*32.0; vec3 i=floor(c), f=fract(c); f=f*f*(3.0-2.0*f); return texture(uN,(i+f+0.5)/32.0); }
@@ -721,15 +822,54 @@ function boot() {
           tau=1.0+(G.r*2.2-1.0)/nk; Vs=G.g*3.4; C=G.b;
         }
         float tauE=(1.0+(tau-1.0)*wI)*(1.0-0.75*smoothstep(0.78,1.08,r));   // toward the rim the gas thins down to a wedge, it does not end in a wall
+        // A planet in the disk (the physics is set out in the page's script, under 'a planet in the disk').
+        float plGap=0.0, plWake=0.0, plHot=0.0, plSh=0.0;
+        if(uPlO.z>0.004){ float g=(r-uPlO.x)/uPlO.y; g*=g; plGap=uPlO.z*exp(-g*g); }   // a gap the planet has left behind (it was moved, or taken away), filling back in
+        if(uPl.w>0.5){
+          float xr=r/uPl.x, dr=r-uPl.x, x15=xr*sqrt(xr), lx=log(max(xr,1e-3)); float hH=hgt(min(r,1.25)), hP=hgt(uPl.x);
+          float dA=th-uPl.y; dA-=6.2831853*floor(dA/6.2831853);                 // how far round this gas is ahead of the planet (0 to a full turn)
+          float dB=6.2831853-dA, dS=dA>3.14159265?dA-6.2831853:dA;
+          // The gap's edges are not clean: they follow the gas's own ridges, and round a heavy companion the outer edge is lopsided.
+          float hw=uPlG.x*(1.0+0.22*clamp(tau-1.0,-0.6,0.6))*(dr>0.0?1.0+uPlX.x*cos(th-uSpin-uPlX.y):1.0);
+          float g=dr/hw; g*=g; float prof=exp(-g*g);
+          // How far the clearing has got. Gas is only pushed aside as it goes past the planet. Inside the orbit it runs ahead of the planet and outside
+          // it falls behind, faster the further from the orbit it is; so the gap opens as two cleared lanes that start at the planet and sweep round,
+          // one ahead on the inside and one behind on the outside, each deepening with every lap. Gas that shares the planet's orbit hardly moves
+          // against it: that ribbon goes last, eaten away from the planet outward, and lingers longest a sixth of a turn ahead of and behind it.
+          float ang=uPlT.x*uPlT.y*max(abs(omega(r)-uPlX.w),uPlT.z); const float SW=0.6;
+          float nA=(ang-dA)/6.2831853+smoothstep(6.2831853-SW,6.2831853,dA), nB=(ang-dB)/6.2831853+smoothstep(6.2831853-SW,6.2831853,dB);   // laps completed, for gas running ahead and for gas falling behind
+          float wAh=1.0-smoothstep(-uPlT.w,uPlT.w,dr);
+          float f=wAh*(1.0-exp(-max(nA,0.0)/0.6))+(1.0-wAh)*(1.0-exp(-max(nB,0.0)/0.6));
+          f*=1.0-uPlX.z*exp(-(dr*dr)/(uPlT.w*uPlT.w))*exp(-pow((abs(dS)-1.0472)/0.42,2.0));
+          float gapP=uPlG.y*prof*f;
+          // The gas is not destroyed, it is shoved to the sides: it piles up along both edges of the gap, more on the outside.
+          float rim=uPlG.y*f*(0.55*exp(-pow((dr-1.22*hw)/(0.36*hw),2.0))+0.30*exp(-pow((dr+1.22*hw)/(0.36*hw),2.0)));
+          // The wake: a broad spiral arm of compressed gas through the planet, leading inside its orbit and trailing outside, fading after about one
+          // turn as its shock spends itself. A heavy planet raises a second arm in the inner disk.
+          float psi=abs(lx-0.6666667*(x15-1.0))/uPlG.w;                         // how far the arm has wound round by this radius
+          float tpw=uPlG.w/max(abs(1.0-x15),1e-3), sb=tpw/sqrt(1.0+tpw*tpw);
+          float dph=dA+sign(dr)*psi; dph-=6.2831853*floor(dph/6.2831853+0.5); float dn=r*abs(dph)*sb, sw=2.0*hH;
+          float amp=uPlG.z*exp(-psi/3.5)*smoothstep(0.3,1.4,abs(dr)/hP);
+          plWake=amp*exp(-(dn*dn)/(sw*sw));
+          if(dr<0.0&&uPlA.x>0.0){ float d2=dph-uPlA.y; d2-=6.2831853*floor(d2/6.2831853+0.5); float dn2=r*abs(d2)*sb; plWake+=amp*uPlA.x*smoothstep(1.0,3.0,-dr/hP)*exp(-(dn2*dn2)/(sw*sw)); }
+          // Inside the gap the arm is all that is left: two thin streams of gas, one from each edge, falling onto the planet and feeding a small disk round it.
+          float ws=max(2.2*hH,0.5*uPlH); float strm=exp(-(dn*dn)/(ws*ws))*exp(-psi/1.6);
+          vec3 dP=p-uPlP; float cpd=exp(-(dot(dP.xz,dP.xz)+9.0*dP.y*dP.y)/(0.2*uPlH*uPlH+1e-6));
+          plGap=max(plGap*(1.0-prof), gapP*(1.0-0.5*strm)*(1.0-cpd)); plHot=cpd*(0.4+0.6*uPlG.z);
+          plSh=step(0.0,dr)*(1.0-smoothstep(uPl.z*0.6,uPl.z*1.4,r*abs(dS)))*(1.0-smoothstep(uPl.z*0.6,uPl.z*1.4,abs(p.y)))*exp(-dr/0.45);   // its shadow: a strip pointing straight away from the star
+          tauE*=1.0+0.45*plWake+rim;
+          Vs*=1.0-uPlG.y*f*step(0.0,dr)*exp(-pow((dr-1.25*hw)/(0.5*hw),2.0));   // the far wall of the gap stands in direct starlight
+        }
+        tauE*=1.0-0.9*plGap;
         float x=av/max(tauE,0.05);
         if(wI>0.0&&((x>0.45&&x<1.6)||C>0.03)){                               // fine billows, different at every height: the top of the gas is not a smooth sheet (only read near the top, where it shows)
           if(w1>0.0) nz+=tx(vec3(u1.x*6.0, vv*3.2, av*0.07+0.3)).r*w1; if(w2>0.0) nz+=tx(vec3(u2.x*6.0, vv*3.2, av*0.07+0.3)).r*w2;
           nz=(nz-0.5)/nk; tauE*=1.0+0.24*nz*wI; x=av/max(tauE,0.05); }
         float rim=1.0-smoothstep(0.82,1.06,r+0.26*clamp(1.0-tau,-0.08,0.6));   // the rim thins out raggedly, low gas first; nothing reaches past the edge of the maps
-        float rg=(1.0-smoothstep(0.62,1.22,x))*rim;                          // gas: solid below its top, thinning to nothing through a soft layer above it
+        float rg=(1.0-smoothstep(0.62,1.22,x))*rim*(1.0-plGap);                          // gas: solid below its top, thinning to nothing through a soft layer above it
         float zb=0.80*tauE, zt=zb+1.15*C*(0.55+0.45*tau+0.5*nz);             // dust: cool dark cloud lying on the gas, rising with how much of it there is, in soft lumps
-        float rdu=smoothstep(0.06,0.50,C+0.15*nz)*smoothstep(zb-0.05,zb+0.22,av)*(1.0-smoothstep(mix(zb,zt,0.15),zt+0.1,av))*(1.0-smoothstep(0.94,1.08,r));
-        float rh=0.028*smoothstep(0.90,1.30,x)*exp(-max(av-tauE,0.0))*(0.5+0.5*tau)*smoothstep(0.12,0.30,r)*(1.0-smoothstep(1.02,1.14,r));   // haze: thin gas lifting off the top
+        float rdu=smoothstep(0.06,0.50,C+0.15*nz)*smoothstep(zb-0.05,zb+0.22,av)*(1.0-smoothstep(mix(zb,zt,0.15),zt+0.1,av))*(1.0-smoothstep(0.94,1.08,r))*(1.0-plGap);
+        float rh=0.028*smoothstep(0.90,1.30,x)*exp(-max(av-tauE,0.0))*(0.5+0.5*tau)*smoothstep(0.12,0.30,r)*(1.0-smoothstep(1.02,1.14,r))*(1.0-plGap);   // haze: thin gas lifting off the top
         gap=av-max(1.45*tauE, zt+0.1);                                       // how far this point stands clear of everything but haze (the march strides over empty space)
         gDeep=x<0.60?1.0:0.0;
         if(rg+rdu<1e-3&&rh<2e-3){ ext=rh; return; }                          // nothing here worth shading
@@ -744,9 +884,9 @@ function boot() {
         // into the gas instead: it is made as opaque as it is along a slanting ray, so its lit tops and shadowed hollows read as a surface with relief,
         // and the billow cells show: bright and hot at their crowns, dark and cooler in the creases between them, and lit on the side that faces the core.
         float mot=clamp(gMot*2.2,-0.8,1.0)*topK*wI, bump=clamp(gBump*6.0,-1.0,1.0)*topK*wI;
-        float lit=smoothstep(-0.25,0.25,av-Vs); lit=mix(1.0,lit,smoothstep(0.10,0.26,r));   // above the shadow line the core shines on the gas; the centre is the light itself
+        float lit=smoothstep(-0.25,0.25,av-Vs); lit=mix(1.0,lit,smoothstep(0.10,0.26,r)); lit*=1.0-0.9*plSh;   // above the shadow line the core shines on the gas; the centre is the light itself
         float E=(1.0-0.62*(1.0-smoothstep(0.03,0.18,r)))/(0.62+r);
-        float sh=-0.55*tmp*(0.45+1.1*r); sh=sh/(1.0+abs(sh)/0.26)*wI; sh-=0.08*mot+0.05*bump;
+        float sh=-0.55*tmp*(0.45+1.1*r); sh=sh/(1.0+abs(sh)/0.26)*wI; sh-=0.08*mot+0.05*bump+0.10*plWake+0.14*plHot;
         float deep=clamp(1.0-tau,-0.6,0.6)*wI;                               // troughs show deeper, hotter gas
         float fwd=max(dot(q/max(r,1e-3), -rd.xz/max(length(rd.xz),1e-3)),0.0); fwd*=fwd*(1.0-smoothstep(0.5,0.9,abs(rd.y)));   // looking toward the core through the gas: thin lit tops glow like the edges of backlit cloud
         vec3 sg=mix(closeC(r+sh+0.10*wI-0.10*deep)*(0.36+0.34*deep)*(1.0+0.7*topK), closeC(r+sh-0.07*wI)*1.45*(1.0+1.8*fwd*smoothstep(0.70,1.10,x)), lit)*E;   // in shadow only its own glow, cooler; lit, brighter and hotter
@@ -755,7 +895,7 @@ function boot() {
         float bet=0.40*sqrt(0.12/(r+0.12)); float dop=1.0/(1.0+bet*dot(vec3(-sin(th),0.0,cos(th)),rd)); float beam=0.75*(1.0-smoothstep(0.45,0.85,r));   // the fast inner gas is brighter on the side coming toward us
         sg*=mix(1.0,dop*dop*dop,beam); sg=mix(sg, sg*vec3(0.84,0.97,1.22), clamp((dop-1.0)*1.6,0.0,1.0)*beam);
         const float KG=1.5, KD=1.7;
-        sg*=max(1.0+0.30*mot+0.26*bump,0.5); float kS=1.0+1.4*smoothstep(0.45,0.90,abs(rd.y));
+        sg*=max(1.0+0.30*mot+0.26*bump,0.5)*(1.0+0.7*plWake+1.6*plHot)*(1.0-0.55*plGap); float kS=1.0+1.4*smoothstep(0.45,0.90,abs(rd.y));
         ext=(KG*rg+KD*rdu)*kS+rh; src=((KG*rg*sg+KD*rdu*sd)*kS+rh*sz)/max(ext,1e-4);
       }
       // ── The gas beside the star ──
@@ -780,6 +920,10 @@ function boot() {
       // drawn afterwards need to know (where the ray first lands, what lies in front of the core and of the swell over it). Returns the clear gap above the gas.
       float stepOpen(vec3 p,float r,float t,float dl,float h,vec3 rd,float fade,inout vec3 col,inout float Tr){
         if(!gGotS&&t>=gT0s){ gColS=col; gTrS=Tr; gGotS=true; }
+        if(!gGotP&&t>=gTP){ gColP=col; gTrP=Tr; gGotP=true; }
+        // A heavy companion and the star circle their common centre of mass, so the star, and the gas close round it, sit a little off-centre on the
+        // side away from the companion. (The gas further out circles the pair, and stays put.)
+        if(uStarO.z>0.0){ p.xz-=uStarO.xy*(1.0-smoothstep(0.35*uStarO.z,0.8*uStarO.z,r)); r=length(p.xz); }
         float th=atan(p.z,p.x); float far=exp(-max(t/uDz-0.9,0.0)*0.5*uHaze);   // (measured against the visitor's own distance, so moving in or out does not change the exposure)
         float ext,gap; vec3 src; openGas(p,r,th,rd,ext,src,gap);
         float a=(1.0-exp(-ext*(1.0-uBlue)*dl/h))*fade; float w=Tr*a;
@@ -793,7 +937,7 @@ function boot() {
         if(ro.y<0.0){ ro.y=-ro.y; rd.y=-rd.y; gMir=-1.0; }                   // the disk is the same above and below its plane, so a view from underneath is drawn as its mirror image from above
         const float VM=1.6; const float RMX=1.14; float kcM=1.0-uBlue;
         float VMt=mix(VM,2.7,kcM), VMb=mix(VM,0.8,kcM);                      // opening disk: the dust clouds stand well above the gas, and the gas is opaque long before the ray reaches its underside
-        vec3 col=vec3(0.0); float Tr=1.0, Tc=1.0; float tc=-dot(ro,rd); gTcl=tc;
+        vec3 col=vec3(0.0); float Tr=1.0, Tc=1.0; vec3 roS=ro-vec3(uStarO.x,0.0,uStarO.y); float tc=-dot(roS,rd); gTcl=tc;   // roS: the camera as seen from the star (which a heavy companion pulls a little off-centre)
         float sy=rd.y<0.0?-1.0:1.0; float ay=max(abs(rd.y),0.004); float ry=sy*ay;
         float tp=-ro.y/ry; vec3 pp=ro+rd*max(tp,0.0); float r0=length(pp.xz);
         gGx=dFdx(pp.xz)*uMip; gGy=dFdy(pp.xz)*uMip;                          // (uMip < 1: the maps are read finer than one gas pixel, because the averaging pass rebuilds the picture at a higher resolution from several frames)
@@ -803,15 +947,25 @@ function boot() {
         float jitO=bn(vec2(0.0));                                            // where the samples sit along the ray, moved every frame: each pixel steps through its offsets in an even sequence, so the frames average out cleanly
         // the swell over the core: where the ray enters and leaves its bounds (needed first, to know which gas lies in front of it)
         float cuB=(1.0-uBlue)*uSwell; const float BA=0.44; const float BC=0.16; const float HB=0.075; float t0s=1e6, t1s=-1.0;   // BA, BC: outer bounds only · HB: height of the swell at the centre
-        if(cuB>0.01){ float sc=BA/BC; vec3 ro2=vec3(ro.x,ro.y*sc,ro.z), rd2=vec3(rd.x,rd.y*sc,rd.z);
+        if(cuB>0.01){ float sc=BA/BC; vec3 ro2=vec3(roS.x,roS.y*sc,roS.z), rd2=vec3(rd.x,rd.y*sc,rd.z);
           float qa=dot(rd2,rd2), qb=dot(ro2,rd2), qc=dot(ro2,ro2)-BA*BA; float disc=qb*qb-qa*qc;
           if(disc>0.0){ float sq=sqrt(disc); t0s=max((-qb-sq)/qa,0.0); t1s=(-qb+sq)/qa; if(t1s<=t0s){ t0s=1e6; t1s=-1.0; } }
           if(t1s>t0s){                                                       // within those bounds the gas is a thin layer: keep only the stretch of the ray that passes through it, so every sample counts
-            float a2=dot(rd.xz,rd.xz); float tcx=a2>1e-8?clamp(-dot(ro.xz,rd.xz)/a2,t0s,t1s):t0s; float rc=length(ro.xz+rd.xz*tcx);
+            float a2=dot(rd.xz,rd.xz); float tcx=a2>1e-8?clamp(-dot(roS.xz,rd.xz)/a2,t0s,t1s):t0s; float rc=length(roS.xz+rd.xz*tcx);
             float ys=1.75*HB*(0.14+0.86*exp(-rc*rc/0.030))+0.004;             // (as tall as the gas stands at the ray's closest pass to the axis, where it is tallest)
             if(abs(rd.y)>1e-5){ float u1=(ys-ro.y)/rd.y, u2=(-ys-ro.y)/rd.y; t0s=max(t0s,min(u1,u2)); t1s=min(t1s,max(u1,u2)); } else if(abs(ro.y)>ys) t1s=-1.0;
             if(t1s<=t0s){ t0s=1e6; t1s=-1.0; } } }
         gT0s=t0s;
+        // The planet itself: a ball lit on the side that faces the star, with the glow of the gas round it on its night side and along its edge.
+        float tPl=1e6, plHalo=0.0; vec3 plC=vec3(0.0);
+        if(uPl.w>0.5){ vec3 oc=ro-uPlP; float bq=dot(oc,rd), hq=bq*bq-(dot(oc,oc)-uPl.z*uPl.z);
+          if(hq>0.0){ float ts=-bq-sqrt(hq);
+            if(ts>0.0){ tPl=ts; vec3 nP=normalize(oc+rd*ts); float day=smoothstep(-0.10,0.85,dot(nP,normalize(-uPlP))); float edge=pow(1.0-max(dot(nP,-rd),0.0),3.0);
+              vec3 amb=closeC(uPl.x); vec3 alb=uPlC*(0.90+0.10*sin(nP.y*17.0+2.0*sin(nP.y*41.0)));           // faint cloud bands
+              plC=alb*(uPal[2]*day*0.62/(0.3+uPl.x)+amb*0.07)+amb*0.30*edge+uPlE*(0.6+0.4*max(dot(nP,-rd),0.0)); } }
+          // a thin glow round it (gas it has caught, lit by the star), so that even a small planet can be found
+          float bI=dot(oc,oc)-bq*bq; plHalo=step(bq,0.0)*exp(-bI/(uPl.z*uPl.z*5.0))*(1.0-smoothstep(0.0,1.0,exp(-bI/(uPl.z*uPl.z*0.9)))); }
+        gTP=tPl;
         if(r0<RMX*1.6){
           // Where the ray first meets the top of the gas layer. The layer's top is a shallow bowl (it thickens outward), which a straight line
           // meets at the root of a quadratic; starting from the thickness there, not the thickness where the ray finally lands, keeps tall clouds from being cut off.
@@ -869,13 +1023,13 @@ function boot() {
             }
           }
         }
-        if(!gGotS){ gColS=col; gTrS=Tr; }
+        if(!gGotS){ gColS=col; gTrS=Tr; } if(!gGotP){ gColP=col; gTrP=Tr; }
         // Opening disk seen almost edge-on: a ray that only grazes the disk runs a long way through it, and stepping down through the layer's height
         // would leave gaps. Such rays are stepped along their own length instead, from where they enter the disk's outline to where they leave it.
         float wT=kcM>0.98?smoothstep(0.085,0.045,abs(rd.y)):0.0;
         if(wT>0.0){
-          vec3 colV=col, colSV=gColS; float TrV=Tr, tHitV=min(gTHit,50.0), TrSV=gTrS, TcOV=gTcO, rNV=gRN, rDV=gRD, tNV=gTN;
-          col=vec3(0.0); Tr=1.0; gTHit=1e6; gTrS=1.0; gTcO=1.0; gRN=0.0; gRD=0.0; gTN=0.0; gColS=vec3(0.0); gGotS=false; gHaveT=false;
+          vec3 colV=col, colSV=gColS, colPV=gColP; float TrV=Tr, tHitV=min(gTHit,50.0), TrSV=gTrS, TrPV=gTrP, TcOV=gTcO, rNV=gRN, rDV=gRD, tNV=gTN;
+          col=vec3(0.0); Tr=1.0; gTHit=1e6; gTrS=1.0; gTcO=1.0; gRN=0.0; gRD=0.0; gTN=0.0; gColS=vec3(0.0); gGotS=false; gColP=vec3(0.0); gTrP=1.0; gGotP=false; gHaveT=false;
           float a2=dot(rd.xz,rd.xz), b2=dot(ro.xz,rd.xz), c2=dot(ro.xz,ro.xz)-RMX*RMX, d2=b2*b2-a2*c2;
           if(d2>0.0&&a2>1e-8){ float sq=sqrt(d2); float tA=(-b2-sq)/a2, tB=(-b2+sq)/a2; const float YM=0.118;      // inside the disk's radius, and within the greatest height its gas reaches
             if(abs(rd.y)>1e-6){ float u1=(YM-ro.y)/rd.y, u2=(-YM-ro.y)/rd.y; tA=max(tA,min(u1,u2)); tB=min(tB,max(u1,u2)); } else if(ro.y>YM) tB=tA-1.0;
@@ -886,12 +1040,14 @@ function boot() {
                 if(r<RMX){ gIso=max(t*uPix*uMip,1e-5); stepOpen(p,r,t,dl,hgt(min(r,1.25)),rd,1.0,col,Tr); }
                 t+=dl; if(Tr<0.02) break; }
               gIso=0.0; } }
-          if(!gGotS){ gColS=col; gTrS=Tr; }
-          col=mix(colV,col,wT); Tr=mix(TrV,Tr,wT); gTHit=mix(tHitV,min(gTHit,50.0),wT); gColS=mix(colSV,gColS,wT); gTrS=mix(TrSV,gTrS,wT); gTcO=mix(TcOV,gTcO,wT); gRN=mix(rNV,gRN,wT); gRD=mix(rDV,gRD,wT); gTN=mix(tNV,gTN,wT);
+          if(!gGotS){ gColS=col; gTrS=Tr; } if(!gGotP){ gColP=col; gTrP=Tr; }
+          col=mix(colV,col,wT); Tr=mix(TrV,Tr,wT); gTHit=mix(tHitV,min(gTHit,50.0),wT); gColS=mix(colSV,gColS,wT); gTrS=mix(TrSV,gTrS,wT); gTcO=mix(TcOV,gTcO,wT); gRN=mix(rNV,gRN,wT); gRD=mix(rDV,gRD,wT); gTN=mix(tNV,gTN,wT); gColP=mix(colPV,gColP,wT); gTrP=mix(TrPV,gTrP,wT);
         }
+        if(tPl<1e5){ col=gColP+gTrP*plC; Tr=0.0; gTHit=min(gTHit,tPl); }           // the gas in front of the planet, then the planet; nothing behind it shows
+        else col+=gTrP*plHalo*0.22*(uPal[2]*0.5+closeC(uPl.x)+uPlE*2.0);
         // Central swell (opening disk only): a low dome of fast inner gas over the core, so the middle has height.
         // The gas inside it turns with the inner disk and leans upward as it goes, so some of it travels over the centre, not only around it.
-        if(t1s>t0s){
+        if(t1s>t0s&&tPl>t0s){
           float t0=t0s, t1=t1s;
           {
             {
@@ -902,7 +1058,7 @@ function boot() {
               vec3 colB=vec3(0.0); float TrB=1.0; float nS=clamp(ceil((t1-t0)/0.022),6.0,24.0); float dtb=(t1-t0)/nS;   // a sample about every 0.02 of the disk's radius: 6 to 24 of them
               float tt=t0+dtb*bn(vec2(23.0,41.0));
               for(int i=0;i<24;i++){ if(float(i)>=nS) break;
-                vec3 p=ro+rd*tt; float r=length(p.xz); float m2=(r*r)/(BA*BA)+(p.y*p.y)/(BC*BC);
+                vec3 p=roS+rd*tt; float r=length(p.xz); float m2=(r*r)/(BA*BA)+(p.y*p.y)/(BC*BC);
                 if(m2<1.0){
                   // a gradual rise rather than a ball: the height of the gas tapers smoothly with distance from the centre and merges into the flat disk
                   float hl=HB*(0.14+0.86*exp(-r*r/0.030));                          // a bell-shaped rise: tallest over the core, sloping away on every side
@@ -964,33 +1120,35 @@ function boot() {
             }
           }
         }
-        float tcl=max(tc,0.0); float bb=length(ro+rd*tcl);
+        float tcl=max(tc,0.0); float bb=length(roS+rd*tcl);
         float front=smoothstep(-0.02,0.02,tc);
         float cu2=1.0-uBlue;
         vec3 core=mix(vec3(1.0,0.95,0.84),SM(vec3(0.62,0.80,1.0)),cu2)*(0.00042/(bb*bb+0.00003)) + mix(vec3(1.0,0.74,0.40),SM(vec3(0.40,0.62,1.0)),cu2)*0.24*exp(-bb*bb/0.004);
         core+=vec3(1.0,0.80,0.52)*0.16*exp(-bb*bb/0.016)*uBlue;                // the bulge still glows from far away
-        col+=core*mix(mix(1.0,Tc,0.9),0.82*gTcO,kcM)*front;               // (opening: the star stands clear of the gas round it, but the disk's own near side can hide it when seen edge-on)
+        float plF=tPl<max(tc,0.0)?0.0:1.0;                                 // the planet passing in front of the star hides it
+        col+=core*mix(mix(1.0,Tc,0.9),0.82*gTcO,kcM)*front*plF;               // (opening: the star stands clear of the gas round it, but the disk's own near side can hide it when seen edge-on)
         // The star lights the gas around it. Nothing is painted over the gas: its own swirls stay visible and simply turn blue,
         // strongest beside the star and falling away with distance the way light does. Most of the pool lies in the disk's plane,
         // so it is foreshortened into an ellipse like everything else on the disk.
-        { float rV=mix(r0, gRN/max(gRD,1e-4), smoothstep(0.0,0.4,gRD)*kcM);   // how far from the core the gas this pixel shows actually is
+        { float rV=mix(length(pp.xz-uStarO.xy), gRN/max(gRD,1e-4), smoothstep(0.0,0.4,gRD)*kcM);   // how far from the core the gas this pixel shows actually is
           float pool=1.0/(1.0+(rV*rV)/(0.115*0.115)); pool*=sqrt(pool); float near=exp(-bb*bb/0.0020)*mix(1.0,gTcO,kcM);
           float w=cu2*front*clamp(0.80*pool+0.40*near,0.0,0.94);
           vec3 tint=mix(SM(vec3(0.34,0.66,1.0))*1.12, SM(vec3(0.06,0.34,1.0))*1.0, clamp(pool*pool*0.9+0.5*near,0.0,1.0));
           col=mix(col, col*tint, w); }
         // the dwarf star at the exact centre: a small neon-blue sphere, white-hot face-on and deep blue at its limb, with a mottled surface
-        if(cu2>0.01){ const float RS=0.012; float bq=dot(ro,rd), cq=dot(ro,ro)-RS*RS, hq=bq*bq-cq;
+        if(cu2>0.01){ const float RS=0.012; float bq=dot(roS,rd), cq=dot(roS,roS)-RS*RS, hq=bq*bq-cq;
           if(hq>0.0){ float ts=-bq-sqrt(hq);
-            if(ts>0.0){ vec3 n=normalize(ro+rd*ts); float mu=clamp(dot(n,-rd),0.0,1.0);
+            if(ts>0.0){ vec3 n=normalize(roS+rd*ts); float mu=clamp(dot(n,-rd),0.0,1.0);
               float ca=cos(uGT*0.25), sa=sin(uGT*0.25); vec3 nr=vec3(ca*n.x-sa*n.z, n.y*gMir, sa*n.x+ca*n.z);
               float gran=tx(nr*0.9+0.5).r*0.6+tx(nr*2.6+0.2).g*0.4;
               vec3 sc=mix(SM(vec3(0.0,0.28,1.0))*1.0, SM(vec3(0.08,0.58,1.0))*1.35, pow(mu,1.1)); sc*=0.90+0.20*gran; sc+=SM(vec3(0.40,0.85,1.0))*0.75*pow(mu,5.0);   // icy cyan face with a white-cyan heart, electric blue at its edge
-              col=mix(col, sc, cu2*smoothstep(0.0, RS*RS*0.85, hq)*gTcO); } } }                       // soft edge: it melts into its own glow instead of showing a hard outline
+              col=mix(col, sc, cu2*smoothstep(0.0, RS*RS*0.85, hq)*gTcO*plF); } } }                       // soft edge: it melts into its own glow instead of showing a hard outline
         col+=(ign(gl_FragCoord.xy+17.0)-0.5)/400.0;                       // dither against banding
         // Alongside the colour, how far away what this pixel shows is (0: empty sky, -1: not known), so the running average can follow it when the view moves.
         float tRep=-1.0;
         if(kcM>0.5){ float tg=gRD>1e-4?gTN/gRD:0.0, tz=hzW>1e-5?hzT/hzW:0.0; tRep=gRD>0.3?tg:(tz>0.0?tz:tg);
-          if(swA>0.05&&swW>1e-7){ float rg=gRD>1e-4?gRN/gRD:r0; if(swA>0.5*gRD*smoothstep(0.15,0.30,rg)) tRep=swT/swW; } }   // near the star the fast gas over the core is what moves: follow that
+          if(swA>0.05&&swW>1e-7){ float rg=gRD>1e-4?gRN/gRD:r0; if(swA>0.5*gRD*smoothstep(0.15,0.30,rg)) tRep=swT/swW; }
+          if(tPl<1e5) tRep=tPl; }   // near the star the fast gas over the core is what moves: follow that
         gl_FragColor=vec4(max(col,0.0)*uGain,tRep);
       }`,
   });
@@ -1150,7 +1308,7 @@ function boot() {
   }
   // newborn stars: they ignite inside the gas, shine, and fade, carried round by the same rotation as the disk
   const NB = SMALL ? 320 : 900;
-  const nbU = { uGT: volU.uGT, uGM: volU.uGM, uT: spU.uT, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms, uVis: { value: 1 }, uDpr: { value: DPR }, uSpin: volU.uSpin };
+  const nbU = { uGT: volU.uGT, uGM: volU.uGM, uT: spU.uT, uW: volU.uW, uPat: volU.uPat, uArms: volU.uArms, uVis: { value: 1 }, uDpr: { value: DPR }, uSpin: volU.uSpin, uPlW: plWU };
   {
     const aP = new Float32Array(NB * 4), aS = new Float32Array(NB * 3), pos = new Float32Array(NB * 3);
     for (let i = 0; i < NB; i++) {
@@ -1179,7 +1337,7 @@ function boot() {
           vCol=mix(vec3(1.0,0.72,0.42), vCol, smoothstep(0.02,0.11,ph));            // a touch warm as it first shows, whitening as it comes up
           float near=smoothstep(0.6,7.0,dist);                                      // do not smear across the lens when the camera flies through
           float graze=mix(0.35,1.0,smoothstep(0.03,0.22,abs(normalize(cameraPosition-P).y)));   // thin out where the disk is seen edge-on
-          vA=(0.55+0.45*fract(seed*9.7))*(env+1.3*flash)*near*graze*uVis;
+          vA=(0.55+0.45*fract(seed*9.7))*(env+1.3*flash)*near*graze*uVis*plOcc(cameraPosition,P);
           vFlash=flash;
           gl_PointSize=aS.y*(0.65+0.6*env)*uDpr*clamp(78.0/dist,0.22,1.9);
           gl_Position=projectionMatrix*mv;
@@ -1203,11 +1361,12 @@ function boot() {
       a.set([Math.pow(Math.random(), 4.5) * 2.4 + 1.15, Math.random()], i * 2);
     }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(a, 2));
-    const u = { uT: { value: 0 }, uGain: { value: 1 }, uDpr: { value: DPR }, uOcc: { value: 0 } };
+    const u = { uT: { value: 0 }, uGain: { value: 1 }, uDpr: { value: DPR }, uOcc: { value: 0 }, uPlW: plWU };
     const m = new THREE.ShaderMaterial({ uniforms: u, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
-      vertexShader: `attribute vec2 aA; uniform float uT,uDpr,uOcc; varying float vA; varying float vS;
+      vertexShader: `attribute vec2 aA; uniform float uT,uDpr,uOcc; uniform vec4 uPlW; varying float vA; varying float vS;
         void main(){ vS=aA.y; vA=(0.5+0.5*aA.y)*(0.8+0.2*sin(uT*(0.6+aA.y*2.0)+aA.y*80.0));
-          { vec3 d=normalize((modelMatrix*vec4(position,0.0)).xyz); float occ=1.0; if(d.y*cameraPosition.y<0.0){ float t=-cameraPosition.y/d.y; occ=smoothstep(1.0,1.12,length(cameraPosition.xz+d.xz*t)/100.0); } vA*=mix(occ,1.0,uOcc); }
+          { vec3 d=normalize((modelMatrix*vec4(position,0.0)).xyz); float occ=1.0; if(d.y*cameraPosition.y<0.0){ float t=-cameraPosition.y/d.y; occ=smoothstep(1.0,1.12,length(cameraPosition.xz+d.xz*t)/100.0); } vA*=mix(occ,1.0,uOcc);
+            if(uPlW.w>0.0){ vec3 oc=cameraPosition-uPlW.xyz; float b=dot(oc,d), h=b*b-(dot(oc,oc)-uPlW.w*uPlW.w); if(h>0.0&&-b-sqrt(h)>0.0) vA=0.0; } }   // (and nothing shows through the planet)
           gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
       fragmentShader: `uniform float uGain; varying float vA; varying float vS;
         ${GAL}
@@ -1262,6 +1421,12 @@ function boot() {
   // for the star, its glow and the gas it lights follows along in proportion to how blue it was.
   const SN = [-1.012146, -0.161943, 1.174089];
   const starCol = (v, r, g, b) => { const q = SN[0] * r + SN[1] * g + SN[2] * b; return v.set(Math.max(0, r + (palNow[27] - PAL_B0[0]) * q), Math.max(0, g + (palNow[28] - PAL_B0[1]) * q), Math.max(0, b + (palNow[29] - PAL_B0[2]) * q)); };
+  { const rc = new THREE.Raycaster(), v2 = new THREE.Vector2(), hv = V(0, 0, 0), wp = V(0, 0, 0), plane = new THREE.Plane(V(0, 1, 0), 0);
+    diskAt = (cx, cy) => { v2.set(cx / innerWidth * 2 - 1, -(cy / innerHeight * 2 - 1)); rc.setFromCamera(v2, gCam); if (!rc.ray.intersectPlane(plane, hv)) return null;
+      return { r: Math.hypot(hv.x, hv.z) / R, phi: Math.atan2(hv.z, hv.x) - orb.az }; };                 // (angles are kept in the disk's own frame, which the visitor's spin turns)
+    plScreen = () => { if (!planet.on) return null; const a = planet.phi + orb.az; wp.set(Math.cos(a) * planet.rp * R, 0, Math.sin(a) * planet.rp * R); const d = wp.distanceTo(gCam.position);
+      wp.project(gCam); if (wp.z > 1) return null;
+      return { x: (wp.x * 0.5 + 0.5) * innerWidth, y: (-wp.y * 0.5 + 0.5) * innerHeight, rad: planet.kind.rb * R / (d * Math.tan(gCam.fov * Math.PI / 360)) * innerHeight / 2 }; }; }
   let gt = 0, gm = 0, coreVis = 0, coreHot = 0;                      // gt: the opening disk's clock · gm: the Milky Way's
   const setOp = (el, o) => { el.style.opacity = o.toFixed(3); el.style.visibility = o < 0.004 ? 'hidden' : 'visible'; el.classList.toggle('on', o > 0.5); };
   // one camera move: in over the disk, skimming past the core, straight on out the far side and away, turning to look back as the galaxy recedes
@@ -1313,8 +1478,23 @@ function boot() {
     if (Math.abs(p - glideP) > 0.15) glideT = p >= 0.999 ? GLIDE : GLIDE * sst(0.30, 0.99, sF);       // position was set from outside (skip, replay, test hook)
     glideP = p; if (sF < 0.30) glideT = 0; else glideT = Math.min(GLIDE, glideT + dt);
     const wT = ease(glideT / GLIDE);                                                                 // drives both the sideways drift and the roll
-    { const dg = RM ? 0 : dt; gt += dg * 1.3 * (1 - kw); gm += dg * 0.2 * kw; }                     // each picture keeps its own clock (the opening disk's sets how fast its Kepler orbits play), so neither jumps while one turns into the other
-    volU.uGT.value = gt; volU.uGM.value = gm; volU.uT.value = spU.uT.value = time; volU.uPat.value = 0;
+    const dgt = (RM ? 0 : dt) * 1.3 * (1 - kw); gt += dgt; gm += (RM ? 0 : dt) * 0.2 * kw;          // each picture keeps its own clock (the opening disk's sets how fast its Kepler orbits play), so neither jumps while one turns into the other
+    let sTx = 0, sTz = 0;                                                                             // where the star is pulled to
+    if (planet.on) { const k = planet.kind, TAU = 6.283185307179586;                                 // the planet: carried round its orbit, drifting inward, its wake and its gap growing
+      if (!planet.held) planet.phi = (planet.phi + omK(planet.rp) * dgt) % TAU;
+      if (!RM && !planet.held && planet.rp > PL_RMIN) planet.rp = Math.max(PL_RMIN, planet.rp * (1 - dgt * omK(planet.rp) / (TAU * k.mig)));   // migration: one e-fold in `mig` orbits
+      const ph = plPhys(k, planet.rp), omP = omK(planet.rp); planet.age += dgt;
+      planet.gap += (ph.depth - planet.gap) * (RM ? 1 : 1 - Math.exp(-dt / 0.5)); planet.wake += (ph.wake - planet.wake) * (RM ? 1 : 1 - Math.exp(-dt / (planet.held ? 0.3 : 1.2)));
+      const ref = 0.5 * (Math.abs(omK(Math.max(0.05, planet.rp - 0.5 * ph.half)) - omP) + Math.abs(omK(planet.rp + 0.5 * ph.half) - omP));   // how fast gas at the gap's shoulders passes the planet
+      const a = planet.phi + orb.az, cx = Math.cos(a) * planet.rp, cz = Math.sin(a) * planet.rp, on = kw < 0.5 ? 1 : 0;
+      volU.uPl.value.set(planet.rp, a % TAU, k.rb, on); volU.uPlG.value.set(ph.half, planet.gap, planet.wake, ph.h); volU.uPlP.value.set(cx, 0, cz); volU.uPlH.value = Math.max(ph.hill, k.rb * 1.6);
+      volU.uPlT.value.set(planet.age, TAU / (k.lap * 1.3 * ref), ref * k.co, Math.max(0.004, Math.min(2.5 * ph.hill, 0.45 * ph.half)));
+      volU.uPlX.value.set(k.ecc, 0.7 + 0.004 * gt, k.tad * Math.exp(-planet.age / 52), omP); volU.uPlA.value.set(k.arm2[0], k.arm2[1]);
+      volU.uPlC.value.fromArray(k.col); volU.uPlE.value.fromArray(k.emit); plWU.value.set(cx * R, 0, cz * R, on ? k.rb * R : 0);
+      if (on) { const m = k.q / (1 + k.q); sTx = -m * cx; sTz = -m * cz; volU.uStarO.value.z = planet.rp; } }
+    else { volU.uPl.value.w = 0; plWU.value.w = 0; }
+    { const e2 = RM ? 1 : 1 - Math.exp(-dt / 0.7), so = volU.uStarO.value; so.x += (sTx - so.x) * e2; so.y += (sTz - so.y) * e2;      // the star eases to where the companion pulls it
+      plOld.depth *= RM ? 0 : Math.exp(-dt / 3.5); volU.uPlO.value.set(plOld.r, plOld.half, kw < 0.5 ? plOld.depth : 0); }    volU.uGT.value = gt; volU.uGM.value = gm; volU.uT.value = spU.uT.value = time; volU.uPat.value = 0;
     for (let k = 0; k < SH_N; k++) { const sIn = SH0 * Math.exp(k * SHQ);                              // the shells of gas beside the star: how far each has turned, and where each is in its cycle of renewal
       volU.uShA.value[k] = (omK(sIn * 2.2) * gt) % 6.283185307179586; volU.uShE.value[k] = (gt * omK(sIn) / 4.5 + 0.618 * k) % 1; }
     for (let k = 0; k < 11; k++) volU.uBandA.value[k] = (omK(0.15 * Math.pow(1.22, k + 0.5)) * gt) % 6.283185307179586;      // the bands of billow cells seen from above: how far each has turned
@@ -1362,6 +1542,7 @@ function boot() {
     tmp.set(0, 0, 0).project(gCam); coreVis = tmp.z < 1 ? 1 : 0;
     enterBtn.style.transform = 'translate(' + ((tmp.x * 0.5 + 0.5) * W).toFixed(1) + 'px,' + ((-tmp.y * 0.5 + 0.5) * H).toFixed(1) + 'px)';
     enterBtn.style.opacity = (mode === 'idle' ? sst(0.75, 1, e) : 0).toFixed(3);
+    tmp.set(volU.uStarO.value.x * R, 0, volU.uStarO.value.y * R).project(gCam);                       // (the lens flare sits on the star, wherever a companion has pulled it)
     LU.uCore.value.set(tmp.x * 0.5 + 0.5, tmp.y * 0.5 + 0.5); starCol(LU.uTint.value, 0.42, 0.6, 1.0); starCol(LU.uGlowC.value, 0.0, 0.22, 1.0);
     LU.uFlare.value = (1.0 + 1.3 * glare + 0.5 * coreHot + 0.05 * Math.sin(time * 1.7)) * (1 - 0.9 * kw) * coreVis;
     LU.uTime.value = time; LU.uCool.value = 1 - kw; LU.uCA.value = 0.008; LU.uVig.value = mix(0.42, 0.42, kw); LU.uExp.value = 1 + 0.25 * glare;

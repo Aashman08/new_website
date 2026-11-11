@@ -1460,11 +1460,11 @@ function boot() {
   const renderPass = new RenderPass(gScene, gCam); composer.addPass(renderPass);
   const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.4, 0.85, 0.9); composer.addPass(bloom);
   const lensU = { tDiffuse: { value: null }, uCore: { value: new THREE.Vector2(0.5, 0.5) }, uFlare: { value: 0 }, uCA: { value: 0.012 }, uVig: { value: 0.5 }, uAspect: { value: 1 }, uTint: { value: new THREE.Vector3(0.45, 0.62, 1.0) }, uGlowC: { value: new THREE.Vector3(0.0, 0.22, 1.0) }, uExp: { value: 1 }, uTime: { value: 0 }, uCool: { value: 1 },
-    uGl: { value: new THREE.Vector4(0, 0, 1, 1) }, uGlK: { value: 0 }, uGlHot: { value: 0 }, uGlS: { value: 1 }, uRes: { value: new THREE.Vector2(1, 1) } };   // uGl: the glass's centre and half-size, in CSS pixels · uGlK: how far it has faded in · uGlHot: the pointer is over it · uRes: the page's size in CSS pixels
+    uGl: { value: new THREE.Vector4(0, 0, 1, 1) }, uGlK: { value: 0 }, uGlHot: { value: 0 }, uGlS: { value: 1 }, uGlLens: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } };   // uGl: the glass's centre and half-size, in CSS pixels · uGlK: how far it has faded in · uGlHot: the pointer is over it · uRes: the page's size in CSS pixels
   const lens = new ShaderPass({ uniforms: lensU,
     vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
     fragmentShader: /* glsl */`
-      uniform sampler2D tDiffuse; uniform vec2 uCore; uniform float uFlare,uCA,uVig,uAspect,uExp,uTime,uCool; uniform vec3 uTint,uGlowC; uniform vec4 uGl; uniform vec2 uRes; uniform float uGlK,uGlHot,uGlS; varying vec2 vUv;
+      uniform sampler2D tDiffuse; uniform vec2 uCore; uniform float uFlare,uCA,uVig,uAspect,uExp,uTime,uCool; uniform vec3 uTint,uGlowC; uniform vec4 uGl; uniform vec2 uRes; uniform float uGlK,uGlHot,uGlS,uGlLens; varying vec2 vUv;
       float gh(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
       // Standard filmic (ACES) tone curve, identical to the renderer's built-in one.
       vec3 fit(vec3 v){ vec3 a=v*(v+0.0245786)-0.000090537; vec3 b=v*(0.983729*v+0.4329510)+0.238081; return a/b; }
@@ -1484,17 +1484,22 @@ function boot() {
       // g: centre and half-size in CSS pixels · K: how far it has faded in · hot: the pointer is on it · S: how thick the glass is (1 on the opening view's
       // gas; thinner over the galaxy's star field, where a thick rim would draw every star at the edge out into a streak).
       const float GL_TH=0.9, GL_BASE=0.25;                                 // thickness of the rim's rise, and of the slab under it, in bevel widths
-      void glass(vec2 px,vec4 g,float K,float hot,float S,vec2 lamp,inout vec2 bR,inout vec2 bG,inout vec2 bB,inout vec3 add,inout float mul){
+      // lens: 0 for a slab with a narrow rounded rim (the Enter pill, which lies on bright gas and stays crisp); 1 for a piece that is rounded
+      // right across, like a glass rod lying on the picture (the menu). There the surface slopes over the whole height, not only at the rim, so
+      // everything that passes behind it is visibly bent: squeezed toward the middle, more and more toward the edges, with colour fringes.
+      void glass(vec2 px,vec4 g,float K,float hot,float S,float lens,vec2 lamp,inout vec2 bR,inout vec2 bG,inout vec2 bB,inout vec3 add,inout float mul){
         if(K<0.003) return; vec2 P=px-g.xy; float rr=g.w;
         vec2 qd=vec2(abs(P.x)-g.z+rr, abs(P.y)); float sd=(qd.x>0.0?length(qd):qd.y)-rr;               // distance to the capsule's edge (negative inside)
         if(sd>22.0) return;
         vec2 n=qd.x>0.0?normalize(qd)*vec2(P.x<0.0?-1.0:1.0,P.y<0.0?-1.0:1.0):vec2(0.0,P.y<0.0?-1.0:1.0);   // which way is out
         vec2 tl=lamp-px; float dl=length(tl); vec2 L2=dl>1.0?tl/dl:vec2(0.0,-1.0); float face=dot(n,L2);    // toward the lamp · how squarely this part of the rim faces it
         if(sd>0.0){ mul*=1.0-K*0.26*exp(-sd/6.5)*(0.55-0.45*face); return; }                              // outside: its shadow, deeper on the side away from the lamp
-        float e=min(rr*0.9,24.0), x=clamp(-sd/e,0.0,1.0), u=1.0-x, u4=u*u*u*u, rise=pow(max(1.0-u4,1e-4),0.25);   // x: 0 at the rim, 1 where the bevel meets the flat · rise: height of the surface there
-        float sl=min(u*u*u/pow(max(1.0-u4,1e-4),0.75),3.2)*GL_TH; vec3 N=normalize(vec3(n*sl,1.0));     // the surface's slope, and the way it faces
-        float th=(rise*GL_TH+GL_BASE)*e*K*S; vec3 I=vec3(0.0,0.0,-1.0);
-        vec3 r1=refract(I,N,1.0/1.47), r2=refract(I,N,1.0/1.50), r3=refract(I,N,1.0/1.53);
+        float e=mix(min(rr*0.9,24.0),rr,lens), x=clamp(-sd/e,0.0,1.0), u=1.0-x;                          // x: 0 at the rim, 1 where the bevel meets the flat (for the rod, the middle)
+        float pw=mix(4.0,2.3,lens), up=pow(u,pw), rise=pow(max(1.0-up,1e-4),1.0/pw);                       // the cross-section is a superellipse: nearly square-shouldered for the slab, nearly round for the rod · rise: height of the surface there
+        float sl=min(pow(u,pw-1.0)*pow(max(1.0-up,1e-4),1.0/pw-1.0),mix(3.2,2.4,lens))*GL_TH; vec3 N=normalize(vec3(n*sl,1.0));   // the surface's slope, and the way it faces
+        float th=(rise*GL_TH+GL_BASE)*e*K*S; vec3 I=vec3(0.0,0.0,-1.0); float dsp=mix(0.03,0.055,lens);
+        vec3 r1=refract(I,N,1.0/(1.50-dsp)), r2=refract(I,N,1.0/1.50), r3=refract(I,N,1.0/(1.50+dsp));
+        mul*=1.0+0.10*lens*K*rise;                                                                         // a thick piece of glass gathers a little light
         bR+=r1.xy/max(-r1.z,0.25)*th; bG+=r2.xy/max(-r2.z,0.25)*th; bB+=r3.xy/max(-r3.z,0.25)*th;
         float aa=clamp(-sd/0.9,0.0,1.0), u2=u*u, u8=u2*u2*u2*u2, edge=u8*u8*aa;                             // a line about a pixel wide at the very rim
         float lit=edge*(0.05+0.85*pow(max(face,0.0),1.5)+0.22*pow(max(-face,0.0),2.5));                  // (nothing is lit inside the rim: a glow on the inner slope showed as a stray bar of light across the glass)
@@ -1503,7 +1508,7 @@ function boot() {
       void main(){ vec2 d=vUv-0.5; float r2=dot(d,d); vec2 off=d*r2*uCA;
         vec2 bR=vec2(0.0), bG=vec2(0.0), bB=vec2(0.0); vec3 gAdd=vec3(0.0); float gMul=1.0;
         if(uGlK>0.003){ vec2 px=vec2(vUv.x,1.0-vUv.y)*uRes, lamp=vec2(uCore.x,1.0-uCore.y)*uRes;   // this pixel and the lamp (the star or the core), in CSS pixels, y down
-          glass(px,uGl,uGlK,uGlHot,uGlS,lamp,bR,bG,bB,gAdd,gMul); }
+          glass(px,uGl,uGlK,uGlHot,uGlS,uGlLens,lamp,bR,bG,bB,gAdd,gMul); }
         vec2 px2uv=vec2(1.0,-1.0)/uRes;
         vec3 col=vec3(texture2D(tDiffuse,vUv+off+bR*px2uv).r, texture2D(tDiffuse,vUv+bG*px2uv).g, texture2D(tDiffuse,vUv-off+bB*px2uv).b);
         col=col*gMul+gAdd;
@@ -1711,7 +1716,7 @@ function boot() {
         gk = glassK; }
       else { glassSet = false; glassK = 0;
         if (capK > 0.004) { const r = capEl.getBoundingClientRect(); LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); gk = capK; } }   // (it rides with the star, so it is looked up every frame)
-      LU.uGlK.value = gk; LU.uGlHot.value = nm ? 0 : coreHot; LU.uGlS.value = nm ? 0.42 : 1; }
+      LU.uGlK.value = gk; LU.uGlHot.value = nm ? 0 : coreHot; LU.uGlS.value = 1; LU.uGlLens.value = nm ? 1 : 0; }   // (the menu is the rounded rod, the Enter pill the slab: see glass())
     if (audio.on && audio.ctx) { const t = audio.ctx.currentTime; audio.filter.frequency.setTargetAtTime(300 + 1000 * vis(p, 0.06, 0.18, 0.22, 0.5), t, 0.3); audio.master.gain.setTargetAtTime(0.16, t, 0.25); }
   }
 

@@ -1475,7 +1475,8 @@ function boot() {
     arcS = Math.min(ARC_T, arcS + speedAt(arcS) * dt); prog = arcS >= ARC_T - 0.05 ? 1 : Math.max(0.05, pAtArc(arcS)); progSeen = prog; };
 
   const GLIDE = 5.2; let glideT = 0, glideP = -1;
-  const LIFT = 0.08, ROLL = 0.12;                              // the settled frame: how far above the middle the galaxy's core sits (as a fraction of the frame's height) · how far the camera has rolled by then
+  const FOV_END = 30.8;                                        // the settled frame's field of view on wide screens: narrow enough that the galaxy's arms nearly reach the top and bottom of the frame
+  const LIFT = 0.095, LIFT_TALL = 0.08, ROLL = 0.12;                              // the settled frame: how far above the middle the galaxy's core sits, as a fraction of the frame's height (wide screens · tall ones) · how far the camera has rolled by then
   function update(p, e, time, dt) {
     { const k = 30, c = 10; ptr.vx += ((ptr.x - ptr.sx) * k - ptr.vx * c) * dt; ptr.vy += ((ptr.y - ptr.sy) * k - ptr.vy * c) * dt; ptr.sx += ptr.vx * dt; ptr.sy += ptr.vy * dt; }
     const W = innerWidth, H = innerHeight, ee = ease(e), pr = W < H;
@@ -1537,12 +1538,12 @@ function boot() {
     if (settle > 0) { pos.applyAxisAngle(up, settle * (0.035 * Math.sin(time * 0.05) + psx * 0.012)); pos.multiplyScalar(1 + settle * (0.012 * Math.sin(time * 0.071) - psy * 0.008)); }
     tmp.set(Math.cos(az), 0, -Math.sin(az)).multiplyScalar(pr ? 2 : 4); tmp.y = pr ? -4 : 3;            // hero: the whole disk, centred, sitting a little below the middle
     look.set(0, 0.4, 0).lerp(tmp, 1 - sst(0.05, 0.13, p));
-    const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = mix(f1, pr ? 50 : 38, sst(0.35, 0.72, sFof(p)));
+    const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = mix(f1, pr ? 50 : FOV_END, sst(0.35, 0.72, sFof(p)));
     gCam.position.copy(pos); gCam.up.copy(upv); gCam.lookAt(look); gCam.updateMatrixWorld(true);
     // the galaxy stays in the middle of the frame as it recedes: it only rises a little, so its core settles just above the name
     if (wT > 0) { const D = pos.length(), fh = 2 * D * Math.tan(gCam.fov * Math.PI / 360);
       up3.setFromMatrixColumn(gCam.matrixWorld, 1);
-      look.addScaledVector(up3, -LIFT * fh * wT); gCam.lookAt(look); }
+      look.addScaledVector(up3, -(pr ? LIFT_TALL : LIFT) * fh * wT); gCam.lookAt(look); }
     gCam.rotateZ(-0.085 * (1 - sst(0.05, 0.14, p)) + ROLL * wT);
     gCam.updateProjectionMatrix(); gCam.updateMatrixWorld(true);
     gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = mix(1.7, 1.15, kw); gStars.userData.u.uOcc.value = kw;

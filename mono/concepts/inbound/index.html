@@ -7,7 +7,7 @@
 <meta name="description" content="Concept — Inbound. A personal site for Aashman Rastogi, AI Engineer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -16,7 +16,7 @@
   --bg:#030208; --ink:#f4efe6; --dim:rgba(244,239,230,.66); --faint:rgba(244,239,230,.34);
   --line:rgba(244,239,230,.14); --amber:#ffb24a; --hot:#fff1d6; --blue:#8fc4ff; --indigo:#14123a;
   --pad:clamp(18px,3.2vw,44px); --lb:0px;
-  --display:"Syne",system-ui,sans-serif; --body:"Manrope",system-ui,sans-serif;
+  --display:"Syne",system-ui,sans-serif; --body:"Manrope",system-ui,sans-serif; --site:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 *{box-sizing:border-box}
 html{background:var(--bg);-webkit-text-size-adjust:100%}
@@ -96,15 +96,24 @@ html.orbiting,html.orbiting *{cursor:grabbing!important;user-select:none;-webkit
 #enter .ring::after{animation-delay:1.4s}
 @keyframes ringp{from{transform:scale(1);opacity:.9}to{transform:scale(2.4);opacity:0}}
 #enter .dot{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:rgba(14,9,4,.92);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
-#enter .cap{position:absolute;top:52px;left:0;transform:translateX(-50%);white-space:nowrap;font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;color:#fff;
-  background:rgba(8,5,3,.86);border:1px solid rgba(255,241,214,.28);border-radius:99px;padding:11px 18px 11px 21px;box-shadow:0 8px 30px rgba(0,0,0,.45);transition:background .3s,color .3s,letter-spacing .5s cubic-bezier(.2,.8,.2,1),transform .5s cubic-bezier(.2,.8,.2,1)}
+/* The Enter pill is the same glass as the landing menu (see .menubar): bent at the rim by the lens shader, lit along its edge, and completely clear:
+   nothing is laid over the gas inside it. Its lettering is white or near-black, whichever reads better against the gas behind it at that moment (see capInk). */
+#enter .cap{position:absolute;top:52px;left:0;transform:translateX(-50%) scale(var(--cs,1));white-space:nowrap;font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;
+  color:#fff;text-shadow:0 0 6px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.4);
+  border-radius:99px;padding:12px 19px 12px 22px;
+  background:none;                                                /* fully clear: no fill, no blur, no change of colour. The gas shows through as it is. Its bent rim, its rim light and its shadow are drawn in the lens shader (see glass()) */
+  transition:transform .45s cubic-bezier(.22,1,.36,1),color .35s,text-shadow .35s}
+#enter .cap.ink{color:#0b0806;text-shadow:0 0 6px rgba(255,255,255,.4),0 1px 1px rgba(255,255,255,.25)}
+#enter .cap::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:rgba(255,255,255,.13);   /* a hairline that keeps the edge crisp */
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+html.nogl #enter .cap{background:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.2),0 8px 22px -8px rgba(0,0,0,.4)}   /* no shader to draw the glass: a plain stand-in */
 #enter:hover .ring,#enter:focus-visible .ring{transform:scale(1.3);box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 0 9px rgba(14,9,4,.16)}
 #enter:hover .dot,#enter:focus-visible .dot{transform:scale(1.9)}
-#enter:hover .cap,#enter:focus-visible .cap{background:#fff;color:#0c0703;letter-spacing:.36em;transform:translateX(-50%) translateY(4px)}
+#enter:hover .cap,#enter:focus-visible .cap{--cs:1.05}   /* under the pointer the glass lifts a little, and its rim catches more light (uGlHot) */
 #enter:active .ring{transform:scale(.9)}
-#enter:active .cap{transform:translateX(-50%) translateY(6px) scale(.97)}
+#enter:active .cap{--cs:.96}
 #enter:focus-visible{outline:none}
-#enter:focus-visible .cap{outline:2px solid var(--amber);outline-offset:4px}
+#enter:focus-visible .cap{outline:2px solid rgba(255,255,255,.8);outline-offset:4px}
 html.playing .links{opacity:.28;pointer-events:none}
 html:not(.playing) #skip{opacity:0;pointer-events:none}
 html:not(.playing) #rail{visibility:hidden}
@@ -118,8 +127,6 @@ html.done #after{display:block}
 #after .ph:hover{border-color:var(--amber);background:rgba(255,178,74,.05);transform:translateY(-3px)}
 #after .ph h3{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em;margin:0}
 #after .ph p{margin:6px 0 0;color:var(--dim);font-size:14px}
-#replay{display:inline-flex;align-items:center;gap:8px;margin-top:26px;align-self:flex-start;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:4px;transition:color .25s,border-color .25s}
-#replay:hover,#replay:focus-visible{color:var(--ink);border-color:var(--amber)}
 @media (max-width:820px){#after .grid{grid-template-columns:1fr}#enter .cap{font-size:10px}}
 
 .mark,.links a,.links button,#sound{transition:color .25s,border-color .25s,opacity .25s,transform .2s}
@@ -144,21 +151,60 @@ html.done #after{display:block}
 
 
 
-#stage #s-name{flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;opacity:1!important;visibility:hidden;
-  padding:96px var(--pad) 8vh 57.5%;background:linear-gradient(90deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.5) 62%,rgba(0,0,0,.62) 100%)}
-#s-name>*{opacity:0;transform:translateY(22px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1)}
-#s-name.show>*{opacity:1;transform:none}
-#s-name.show>*:nth-child(1){transition-delay:.05s}#s-name.show>*:nth-child(2){transition-delay:.2s}#s-name.show>*:nth-child(3){transition-delay:.4s}
-#s-name.show>*:nth-child(4){transition-delay:.58s}#s-name.show>*:nth-child(5){transition-delay:.8s}
-h1{font-family:var(--display);font-weight:800;margin:20px 0 0;font-size:clamp(30px,4.55vw,92px);line-height:.88;letter-spacing:-.04em;max-width:100%;text-transform:uppercase;text-shadow:0 2px 60px rgba(0,0,0,.6)}
-h1 span{display:block;white-space:nowrap}
-.tagline{font-family:var(--display);font-weight:600;font-size:clamp(17px,1.9vw,27px);letter-spacing:-.01em;margin:26px 0 0}
-.cta-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-start;margin-top:30px}
-.cta{display:inline-flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;text-decoration:none;color:var(--bg);background:var(--ink);padding:14px 22px;border-radius:99px;border:1px solid var(--ink);transition:background .25s,border-color .25s,color .25s,gap .25s,transform .15s}
-.cta:hover,.cta:focus-visible{background:var(--amber);border-color:var(--amber);gap:18px}
-.cta:active{transform:scale(.97)}
-.cta.ghost{background:rgba(3,2,8,.35);color:var(--ink);border-color:var(--faint)}
-.cta.ghost:hover,.cta.ghost:focus-visible{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+/* LANDING — the name, centred over the galaxy, in the existing site's own styling (Inter; sizes, spacing and breakpoints taken from its home page) */
+#stage #s-name{display:block;padding:0;opacity:1!important;visibility:hidden;font-family:var(--site);color:#fff;
+  background:radial-gradient(ellipse 46% 30% at 50% 62%,rgba(0,0,0,.42) 0%,rgba(0,0,0,.2) 55%,rgba(0,0,0,0) 100%)}
+#s-name .who{position:absolute;left:0;right:0;top:57%;transform:translateY(-50%);text-align:center;padding:0 16px}
+h1{font-family:var(--site);font-weight:600;font-size:1.5rem;line-height:1.3;letter-spacing:.2rem;text-transform:uppercase;color:#ddd;margin:0 0 .75rem;text-shadow:0 1px 24px rgba(0,0,0,.55)}
+#s-name .sub{font-weight:300;font-size:.75rem;line-height:1.75;letter-spacing:.15em;color:#fff;margin:0 0 2rem;text-shadow:0 1px 16px rgba(0,0,0,.6)}
+#s-name .bar{position:absolute;left:0;right:0;bottom:9rem;display:flex;justify-content:center;padding:0 16px}
+/* The menu is a capsule of clear glass, and so is the Enter pill on the opening view. The glass itself is drawn in the lens shader (see glass()),
+   because what is behind it is our own picture and can be refracted for real: the picture bent through the rounded rim, the rim lit from where
+   the galaxy's core is, the shadow it throws. What is left here is its faint body, a hairline that keeps the edge crisp, and the lettering. */
+.menubar{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;border-radius:9999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.02) 45%,rgba(255,255,255,.045) 100%);
+  -webkit-backdrop-filter:saturate(1.6) brightness(1.08);backdrop-filter:saturate(1.6) brightness(1.08)}
+.menubar::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:rgba(255,255,255,.12);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.menubar button{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:9999px;font-family:var(--site);font-size:10px;line-height:1.5;font-weight:500;letter-spacing:.025em;color:#fff;white-space:nowrap;user-select:none;-webkit-user-select:none;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+.menubar button:focus-visible{outline:1.5px solid rgba(255,255,255,.6);outline-offset:0}
+/* One smaller capsule that glides to whichever item is under the pointer (or has the keyboard's focus), and gives a little when pressed.
+   It is built from three pieces, a left cap, a middle and a right cap, and each is moved only by a transform: the caps slide, the middle slides and
+   stretches. Transforms are animated by the browser's compositor, so the glide runs at the display's full rate whatever the galaxy's renderer is
+   doing, and the three, started together on the same curve, stay joined. (Moved by the page's own script it ran only as fast as the galaxy was
+   being drawn; with its width animated, the width and the position drifted apart.) */
+.menubar .lens{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;opacity:0;transform-origin:0 50%;transition:opacity .25s,transform .25s cubic-bezier(.22,1,.36,1)}
+.menubar .lens i{position:absolute;left:0;top:0;height:100%;display:block;will-change:transform;
+  background:linear-gradient(180deg,rgba(255,255,255,.15) 0%,rgba(255,255,255,.045) 55%,rgba(255,255,255,.08) 100%);
+  transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.menubar .lens .m{width:100px;transform-origin:0 50%;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.18)}
+.menubar .lens .l{border-radius:9999px 0 0 9999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.18),inset 1px 0 0 rgba(255,255,255,.14)}
+.menubar .lens .r{border-radius:0 9999px 9999px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.18),inset -1px 0 0 rgba(255,255,255,.14)}
+.menubar.lit .lens{opacity:1}
+.menubar.press .lens{transform:scaleY(.9)}
+.menubar.jump .lens i,html.rm .menubar .lens i{transition:none}
+html.rm .menubar .lens{transition:opacity .2s}
+html.nogl .menubar{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.2),0 12px 30px -10px rgba(0,0,0,.45)}   /* no shader to draw the glass: a plain stand-in */
+#replay{position:absolute;right:var(--pad);bottom:28px;font-size:12px;letter-spacing:.05em;font-weight:500;color:rgba(255,255,255,.55);text-decoration:none;padding:6px 2px;transition:color .3s}
+#replay:hover,#replay:focus-visible{color:#fff}
+@media (min-width:640px){
+  h1{font-size:2rem;letter-spacing:.35rem;margin-bottom:1rem}
+  #s-name .sub{font-size:.875rem;line-height:1.25rem}
+  #s-name .bar{bottom:7rem}
+  .menubar{padding:8px 12px}
+  .menubar button{padding:8px 16px;font-size:14px;line-height:20px;letter-spacing:.05em}
+}
+@media (min-width:768px){
+  h1{font-size:2.7rem;letter-spacing:.5rem}
+  #s-name .sub{font-size:1rem;line-height:1.5rem}
+  #s-name .bar{bottom:9rem}
+  .menubar button{padding:8px 20px}
+}
+@media (min-width:1024px){#s-name .bar{bottom:13rem}}
+/* it arrives as the galaxy settles: the name, then the line under it, then the menu */
+#s-name h1,#s-name .sub,#s-name .menubar,#replay{opacity:0;transform:translateY(14px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1.2s cubic-bezier(.2,.7,.2,1)}
+#s-name.show h1,#s-name.show .sub,#s-name.show .menubar,#s-name.show #replay{opacity:1;transform:none}
+#s-name.show .sub{transition-delay:.18s}#s-name.show .menubar{transition-delay:.4s}#s-name.show #replay{transition-delay:.7s}
 .phtag{display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--amber);border:1px dashed rgba(255,178,74,.6);padding:6px 12px;border-radius:4px}
 
 /* SKIP */
@@ -217,16 +263,11 @@ body.panel-open #panel{transform:none;visibility:visible}
   #s-hero .row{padding-right:0;flex-direction:column;align-items:flex-start;gap:16px}
   .scrollhint::after{height:22px}
   #s-hero{padding-top:18px!important;padding-right:120px}
-  h1{font-size:calc((100vw - 2*var(--pad))/8.6);margin-top:12px}
-  #stage #s-name{justify-content:flex-end;padding:0 var(--pad) 34px;background:linear-gradient(0deg,rgba(0,0,0,.86) 0%,rgba(0,0,0,.6) 34%,rgba(0,0,0,0) 56%)}
-  .tagline{margin-top:16px}
-  .cta{padding:12px 16px;font-size:11px;letter-spacing:.16em}
-  .cta-row{gap:8px;margin-top:22px}
   #skip{bottom:20px}
     }
 
 /* REDUCED MOTION / NO-GL */
-html.rm #s-name>*{transition:opacity .6s;transform:none}
+html.rm #s-name h1,html.rm #s-name .sub,html.rm #s-name .menubar,html.rm #replay{transition:opacity .6s;transform:none}
 html.rm #grain{animation:none}
 html.rm #enter .ring::before,html.rm #enter .ring::after{animation:none;opacity:0}
 html.rm #panel,html.rm #scrim,html.rm #toast{transition:none}
@@ -259,14 +300,19 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
   </section>
 
   <section id="s-name">
-    <div class="label eyebrow">AI Engineer &middot; Kindo AI</div>
-    <h1><span>Aashman</span><span>Rastogi</span></h1>
-    <p class="tagline">Nothing escapes curiosity.</p>
-    <div class="cta-row pe">
-      <a class="cta" href="#work" id="cta-work">Work <span aria-hidden="true">&rarr;</span></a>
-      <button type="button" class="cta ghost" data-open="about">About</button>
-      <button type="button" class="cta ghost" data-open="experiments">Experiments</button>
-      <button type="button" class="cta ghost" data-open="contact">Contact</button>
+    <div class="who">
+      <h1>Aashman Rastogi</h1>
+      <p class="sub">ENTREPRENEURSHIP, AI AND SPACE</p>
+    </div>
+    <div class="bar">
+      <div class="menubar pe" role="group" aria-label="Sections">
+        <span class="lens" aria-hidden="true"><i class="l"></i><i class="m"></i><i class="r"></i></span>
+        <button type="button" data-open="about">ABOUT ME</button>
+        <button type="button" id="cta-work">PROJECTS</button>
+        <button type="button" data-open="contact">CONTACT</button>
+        <button type="button" data-soon="Research">RESEARCH</button>
+        <button type="button" data-soon="Art">ART</button>
+      </div>
     </div>
     <a href="#top" id="replay" class="pe">&#8634; Replay intro</a>
   </section>
@@ -441,6 +487,26 @@ const workMsg = 'Projects continue from here';
 const ensureLanded = () => { if (mode !== 'done') land(true); };
 $('#cta-work').addEventListener('click', (e) => { e.preventDefault(); const a = $('#after'); if (a) a.scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); toast(workMsg); });
 document.querySelectorAll('nav [data-open]').forEach((b) => b.addEventListener('click', ensureLanded));
+/* the menu's sliding piece of glass */
+{ const bar = $('.menubar'), lens = bar.querySelector('.lens'), [iL, iM, iR] = lens.children; let cur = null, hov = null;
+  const go = (b) => { if (!b) { cur = null; bar.classList.remove('lit', 'press'); return; }
+    const dpr = window.devicePixelRatio || 1, snap = (v) => Math.round(v * dpr) / dpr;                    // the three pieces meet on whole device pixels, or a hairline seam shows where they join
+    const first = !cur; cur = b; const h = b.offsetHeight, r = snap(h / 2), x = snap(b.offsetLeft), w = snap(b.offsetLeft + b.offsetWidth) - x;
+    if (first) bar.classList.add('jump');                                                              // it appears where it is wanted; only later moves glide
+    const br = bar.getBoundingClientRect(); lens.style.left = (snap(br.left) - br.left) + 'px';         // (the menu itself is centred and can sit on a fraction of a pixel: the pieces are measured from the nearest whole one)
+    lens.style.top = (snap(br.top + b.offsetTop) - br.top) + 'px'; lens.style.height = snap(h) + 'px'; iL.style.width = iR.style.width = r + 'px';
+    iL.style.transform = 'translateX(' + x + 'px)'; iM.style.transform = 'translateX(' + (x + r) + 'px) scaleX(' + Math.max(0, w - 2 * r) / 100 + ')'; iR.style.transform = 'translateX(' + (x + w - r) + 'px)';
+    if (first) { void lens.offsetWidth; bar.classList.remove('jump'); } bar.classList.add('lit'); };
+  const want = () => go(hov || (bar.contains(document.activeElement) && document.activeElement.matches(':focus-visible') ? document.activeElement : null));
+  bar.querySelectorAll('button').forEach((b) => {
+    b.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'touch') { hov = b; want(); } });
+    b.addEventListener('pointerdown', () => { hov = b; want(); bar.classList.add('press'); });
+    b.addEventListener('focus', want); b.addEventListener('blur', () => setTimeout(want, 0)); });
+  bar.addEventListener('pointerleave', () => { hov = null; bar.classList.remove('press'); want(); });
+  addEventListener('pointerup', (e) => { bar.classList.remove('press'); if (e.pointerType === 'touch') { hov = null; setTimeout(want, 350); } });
+  addEventListener('pointercancel', () => { bar.classList.remove('press'); hov = null; want(); });
+  addEventListener('resize', () => { if (cur) { const c = cur; cur = null; go(c); } }); }
+document.querySelectorAll('[data-soon]').forEach((b) => b.addEventListener('click', () => toast(b.dataset.soon + ' section to be built')));
 setMode(Q.get('skip') === '1' ? 'done' : 'idle'); if (mode === 'done') prog = 1;
 if (P_PARAM !== null) { prog = P_PARAM; introT = 1; setMode(prog >= 1 ? 'done' : prog <= 0 ? 'idle' : 'paused'); }
 scrollTo(0, 0);
@@ -1174,7 +1240,7 @@ function boot() {
   const ACC_MAX = 7.5e6;
   const erf = (x) => { const t = 1 / (1 + 0.3275911 * x); return 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); };
   let perfMul = 1, perfT = 0;                                          // see the frame loop: keeps the opening view smooth by drawing the gas smaller when frames run long
-  let wideOn = 0, moveMul = 1, restMul = 1, accFresh = true, gasTick = 0, gasW = 2, gasH = 2, accW = 2, accH = 2, gasFr = 0, resStep = 0, stillK = 0, lastR = 0, pOx = 0, pOy = 0;      // wideOn: 0 opening (still) · 3 dive (moving, close) · 1 pull-back (moving, wide) · 2 settled (still)
+  let wideOn = 0, moveMul = 1, restMul = 1, accFresh = true, gasTick = 0, gasW = 2, gasH = 2, accW = 2, accH = 2, gasFr = 0, resStep = 0, resPend = false, stillK = 0, lastR = 0, pOx = 0, pOy = 0;      // wideOn: 0 opening (still) · 3 dive (moving, close) · 1 pull-back (moving, wide) · 2 settled (still)
   const mkAcc = () => new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
   const accA = mkAcc(), accB = mkAcc(); let accCur = accA, accPrev = accB, pGT = 0, pGM = 0;
   const kGas = () => Math.min(1, Math.max(0.3, kOpen() * perfMul));                                       // opening disk: the size the cost model suggests, trimmed or raised by how the frame rate is actually holding up
@@ -1382,11 +1448,12 @@ function boot() {
   const composer = new EffectComposer(renderer, rt);
   const renderPass = new RenderPass(gScene, gCam); composer.addPass(renderPass);
   const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.4, 0.85, 0.9); composer.addPass(bloom);
-  const lensU = { tDiffuse: { value: null }, uCore: { value: new THREE.Vector2(0.5, 0.5) }, uFlare: { value: 0 }, uCA: { value: 0.012 }, uVig: { value: 0.5 }, uAspect: { value: 1 }, uTint: { value: new THREE.Vector3(0.45, 0.62, 1.0) }, uGlowC: { value: new THREE.Vector3(0.0, 0.22, 1.0) }, uExp: { value: 1 }, uTime: { value: 0 }, uCool: { value: 1 } };
+  const lensU = { tDiffuse: { value: null }, uCore: { value: new THREE.Vector2(0.5, 0.5) }, uFlare: { value: 0 }, uCA: { value: 0.012 }, uVig: { value: 0.5 }, uAspect: { value: 1 }, uTint: { value: new THREE.Vector3(0.45, 0.62, 1.0) }, uGlowC: { value: new THREE.Vector3(0.0, 0.22, 1.0) }, uExp: { value: 1 }, uTime: { value: 0 }, uCool: { value: 1 },
+    uGl: { value: new THREE.Vector4(0, 0, 1, 1) }, uGlK: { value: 0 }, uGlHot: { value: 0 }, uGlS: { value: 1 }, uRes: { value: new THREE.Vector2(1, 1) } };   // uGl: the glass's centre and half-size, in CSS pixels · uGlK: how far it has faded in · uGlHot: the pointer is over it · uRes: the page's size in CSS pixels
   const lens = new ShaderPass({ uniforms: lensU,
     vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
     fragmentShader: /* glsl */`
-      uniform sampler2D tDiffuse; uniform vec2 uCore; uniform float uFlare,uCA,uVig,uAspect,uExp,uTime,uCool; uniform vec3 uTint,uGlowC; varying vec2 vUv;
+      uniform sampler2D tDiffuse; uniform vec2 uCore; uniform float uFlare,uCA,uVig,uAspect,uExp,uTime,uCool; uniform vec3 uTint,uGlowC; uniform vec4 uGl; uniform vec2 uRes; uniform float uGlK,uGlHot,uGlS; varying vec2 vUv;
       float gh(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
       // Standard filmic (ACES) tone curve, identical to the renderer's built-in one.
       vec3 fit(vec3 v){ vec3 a=v*(v+0.0245786)-0.000090537; vec3 b=v*(0.983729*v+0.4329510)+0.238081; return a/b; }
@@ -1394,8 +1461,41 @@ function boot() {
         vec3 m=mat3(0.59719,0.07600,0.02840, 0.35458,0.90834,0.13383, 0.04823,0.01566,0.83777)*c;
         m=mat3(1.60475,-0.10208,-0.00327, -0.53108,1.10813,-0.07276, -0.07367,-0.00605,1.07602)*fit(m);
         return clamp(m,0.0,1.0); }
+      // ── Glass ──
+      // A piece of glass is a capsule lying flat on the picture: a flat slab with a rounded, convex rim (the rim's cross-section is a squircle,
+      // y = (1 - (1-x)^4)^(1/4), flat on top and falling away steeply at the edge). Looking straight down through it:
+      //   · refraction: the line of sight is bent at the glass's surface by Snell's law (refractive index 1.5, as for ordinary glass) and carries on
+      //     down to the picture underneath, so through the rim you see the picture from further in toward the middle. The flat middle bends nothing.
+      //     Blue is bent a little more than red (the index is taken as 1.47 / 1.50 / 1.53), which leaves a faint fringe of colour at the rim;
+      //   · light: the brightest thing in the scene (the star, or the galaxy's core) is the lamp. The rim that faces it catches a thin bright line,
+      //     and the far rim a fainter one from light that has crossed the glass. The lamp does not follow the pointer: nothing moves inside the glass;
+      //   · shadow: the glass throws a soft shadow on the picture, on the side away from the lamp.
+      // g: centre and half-size in CSS pixels · K: how far it has faded in · hot: the pointer is on it · S: how thick the glass is (1 on the opening view's
+      // gas; thinner over the galaxy's star field, where a thick rim would draw every star at the edge out into a streak).
+      const float GL_TH=0.9, GL_BASE=0.25;                                 // thickness of the rim's rise, and of the slab under it, in bevel widths
+      void glass(vec2 px,vec4 g,float K,float hot,float S,vec2 lamp,inout vec2 bR,inout vec2 bG,inout vec2 bB,inout vec3 add,inout float mul){
+        if(K<0.003) return; vec2 P=px-g.xy; float rr=g.w;
+        vec2 qd=vec2(abs(P.x)-g.z+rr, abs(P.y)); float sd=(qd.x>0.0?length(qd):qd.y)-rr;               // distance to the capsule's edge (negative inside)
+        if(sd>22.0) return;
+        vec2 n=qd.x>0.0?normalize(qd)*vec2(P.x<0.0?-1.0:1.0,P.y<0.0?-1.0:1.0):vec2(0.0,P.y<0.0?-1.0:1.0);   // which way is out
+        vec2 tl=lamp-px; float dl=length(tl); vec2 L2=dl>1.0?tl/dl:vec2(0.0,-1.0); float face=dot(n,L2);    // toward the lamp · how squarely this part of the rim faces it
+        if(sd>0.0){ mul*=1.0-K*0.26*exp(-sd/6.5)*(0.55-0.45*face); return; }                              // outside: its shadow, deeper on the side away from the lamp
+        float e=min(rr*0.9,24.0), x=clamp(-sd/e,0.0,1.0), u=1.0-x, u4=u*u*u*u, rise=pow(max(1.0-u4,1e-4),0.25);   // x: 0 at the rim, 1 where the bevel meets the flat · rise: height of the surface there
+        float sl=min(u*u*u/pow(max(1.0-u4,1e-4),0.75),3.2)*GL_TH; vec3 N=normalize(vec3(n*sl,1.0));     // the surface's slope, and the way it faces
+        float th=(rise*GL_TH+GL_BASE)*e*K*S; vec3 I=vec3(0.0,0.0,-1.0);
+        vec3 r1=refract(I,N,1.0/1.47), r2=refract(I,N,1.0/1.50), r3=refract(I,N,1.0/1.53);
+        bR+=r1.xy/max(-r1.z,0.25)*th; bG+=r2.xy/max(-r2.z,0.25)*th; bB+=r3.xy/max(-r3.z,0.25)*th;
+        float aa=clamp(-sd/0.9,0.0,1.0), u2=u*u, u8=u2*u2*u2*u2, edge=u8*u8*aa;                             // a line about a pixel wide at the very rim
+        float lit=edge*(0.05+0.85*pow(max(face,0.0),1.5)+0.22*pow(max(-face,0.0),2.5));                  // (nothing is lit inside the rim: a glow on the inner slope showed as a stray bar of light across the glass)
+        add+=vec3(1.0,0.985,0.96)*lit*K*(1.0+0.7*hot);
+        mul*=1.0-K*0.10*u*u*max(-face,0.0); }                                                             // the far side of the rim is a little darker: the glass has thickness
       void main(){ vec2 d=vUv-0.5; float r2=dot(d,d); vec2 off=d*r2*uCA;
-        vec3 col=vec3(texture2D(tDiffuse,vUv+off).r, texture2D(tDiffuse,vUv).g, texture2D(tDiffuse,vUv-off).b);
+        vec2 bR=vec2(0.0), bG=vec2(0.0), bB=vec2(0.0); vec3 gAdd=vec3(0.0); float gMul=1.0;
+        if(uGlK>0.003){ vec2 px=vec2(vUv.x,1.0-vUv.y)*uRes, lamp=vec2(uCore.x,1.0-uCore.y)*uRes;   // this pixel and the lamp (the star or the core), in CSS pixels, y down
+          glass(px,uGl,uGlK,uGlHot,uGlS,lamp,bR,bG,bB,gAdd,gMul); }
+        vec2 px2uv=vec2(1.0,-1.0)/uRes;
+        vec3 col=vec3(texture2D(tDiffuse,vUv+off+bR*px2uv).r, texture2D(tDiffuse,vUv+bG*px2uv).g, texture2D(tDiffuse,vUv-off+bB*px2uv).b);
+        col=col*gMul+gAdd;
         vec2 q=vUv-uCore; q.x*=uAspect; float ax=abs(q.x), ay=abs(q.y);
         float s1=exp(-ay*38.0)*exp(-ax*3.4)/(1.0+ax*2.0);
         float s2=exp(-ay*240.0)*exp(-ax*3.2);
@@ -1417,7 +1517,7 @@ function boot() {
 
   /* ── per-frame state ── */
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
-  const tmp = V(0, 0, 0), look = V(0, 0, 0), pos = V(0, 0, 0), rt3 = V(0, 0, 0), up3 = V(0, 0, 0), up = V(0, 1, 0), upv = V(0, 1, 0);
+  const tmp = V(0, 0, 0), look = V(0, 0, 0), pos = V(0, 0, 0), up3 = V(0, 0, 0), up = V(0, 1, 0), upv = V(0, 1, 0);
   // The star-colour map: it leaves white as white and takes the star's blue (PAL_B0) to the palette's star colour, so every blue the shaders use
   // for the star, its glow and the gas it lights follows along in proportion to how blue it was.
   const SN = [-1.012146, -0.161943, 1.174089];
@@ -1461,6 +1561,16 @@ function boot() {
     arcS = Math.min(ARC_T, arcS + speedAt(arcS) * dt); prog = arcS >= ARC_T - 0.05 ? 1 : Math.max(0.05, pAtArc(arcS)); progSeen = prog; };
 
   const GLIDE = 5.2; let glideT = 0, glideP = -1;
+  const FOV_END = 30.8;                                        // the settled frame's field of view on wide screens: narrow enough that the galaxy's arms nearly reach the top and bottom of the frame
+  // The lens narrows from 50 degrees to that as the camera pulls back, and how far it has narrowed depends only on how far the camera is from the
+  // galaxy. Zooming in works against pulling back, so a zoom timed on its own slowed the galaxy's shrinking for a second in the middle of the
+  // move and then let it pick up again, which read as a pause. Tied to distance, the galaxy shrinks at a rate that only ever falls.
+  const ZOOM_D0 = 28, ZOOM_D1 = gPath.getPoint(1).length(), ZOOM_T0 = Math.tan(25 * Math.PI / 180), ZOOM_T1 = Math.tan(FOV_END * Math.PI / 360);
+  const zoomFov = (p, d) => { if (p < 0.18) return 50; const u = clamp(Math.log(Math.max(d, ZOOM_D0) / ZOOM_D0) / Math.log(ZOOM_D1 / ZOOM_D0), 0, 1), h = u * u * (2 - u);   // (eases in, so the zoom starts without a jolt)
+    return 2 * Math.atan(ZOOM_T0 * Math.pow(ZOOM_T1 / ZOOM_T0, h)) * 180 / Math.PI; };
+  const glassEl = $('.menubar'), capEl = $('#enter-cap'); let glassSet = false, glassK = 0, capK = 0, capLum = 0; window.__capLum = () => capLum;   // (test hook: brightness measured behind the Enter pill's lettering) addEventListener('resize', () => { glassSet = false; });
+  let pkS = 0;                                                 // how much the settled frame answers the pointer: eased in when control passes to the visitor, so the frame does not jump
+  const LIFT = 0.095, LIFT_TALL = 0.08, ROLL = 0.12;                              // the settled frame: how far above the middle the galaxy's core sits, as a fraction of the frame's height (wide screens · tall ones) · how far the camera has rolled by then
   function update(p, e, time, dt) {
     { const k = 30, c = 10; ptr.vx += ((ptr.x - ptr.sx) * k - ptr.vx * c) * dt; ptr.vy += ((ptr.y - ptr.sy) * k - ptr.vy * c) * dt; ptr.sx += ptr.vx * dt; ptr.sy += ptr.vy * dt; }
     const W = innerWidth, H = innerHeight, ee = ease(e), pr = W < H;
@@ -1468,17 +1578,17 @@ function boot() {
       for (let i = 0; i < 9; i++) volU.uPal.value[i].set(palNow[i * 3], palNow[i * 3 + 1], palNow[i * 3 + 2]);
       const dx = palNow[27] - PAL_B0[0], dy = palNow[28] - PAL_B0[1], dz = palNow[29] - PAL_B0[2];
       volU.uStarM.value.set(1 + dx * SN[0], dx * SN[1], dx * SN[2], dy * SN[0], 1 + dy * SN[1], dy * SN[2], dz * SN[0], dz * SN[1], 1 + dz * SN[2]); }
-    const pk = mode === 'done' ? 1 : 0, psx = ptr.sx * pk, psy = ptr.sy * pk;
+    pkS += ((mode === 'done' ? 1 : 0) - pkS) * (RM ? 1 : 1 - Math.exp(-dt * 1.6)); const psx = ptr.sx * pkS, psy = ptr.sy * pkS;
     // only the opening fades up from black; everything after is one shot
     if (!(mode === 'done' && fadeEl.style.transition)) { fadeEl.style.transition = ''; fadeEl.style.background = '#000'; fadeEl.style.opacity = ((1 - sst(0.0, 0.7, e)) * (p < 0.04 ? 1 : 0)).toFixed(3); }
 
     const sF = sFof(p), kw = ease(sst(0.19, 0.31, sF)),                                      // the switch to the galaxy's own colours happens inside the glare of the core, so the camera comes out of the light already looking at the Milky Way
           glare = vis(p, 0.095, 0.17, 0.185, 0.25), settle = sst(0.62, 1, p);
-    // the drift to the left is timed, not tied to distance: it begins as the camera leaves the light and spreads over the whole pull-back,
+    // the last adjustment of the frame is timed, not tied to distance: it begins as the camera leaves the light and spreads over the whole pull-back,
     // so it is part of the same glide rather than a second move at the end
     if (Math.abs(p - glideP) > 0.15) glideT = p >= 0.999 ? GLIDE : GLIDE * sst(0.30, 0.99, sF);       // position was set from outside (skip, replay, test hook)
     glideP = p; if (sF < 0.30) glideT = 0; else glideT = Math.min(GLIDE, glideT + dt);
-    const wT = ease(glideT / GLIDE);                                                                 // drives both the sideways drift and the roll
+    const wT = ease(glideT / GLIDE);                                                                 // drives both the small rise and the roll
     const dgt = (RM ? 0 : dt) * 1.3 * (1 - kw); gt += dgt; gm += (RM ? 0 : dt) * 0.2 * kw;          // each picture keeps its own clock (the opening disk's sets how fast its Kepler orbits play), so neither jumps while one turns into the other
     let sTx = 0, sTz = 0;                                                                             // where the star is pulled to
     if (planet.on) { const k = planet.kind, TAU = 6.283185307179586;                                 // the planet: carried round its orbit, drifting inward, its wake and its gap growing
@@ -1505,7 +1615,7 @@ function boot() {
     tmp.set(Math.sin(az) * hd * back, (pr ? 36 : hd * 0.2004) * back + Math.sin(time * 0.11) * 0.6, Math.cos(az) * hd * back);
     // carry the idle drift's offset into the move and let it fade
     orb.e0 = Math.atan2(tmp.y, Math.hypot(tmp.x, tmp.z));                                           // the opening view's own tilt
-    gPath.getPoint(gUat(p), pos); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));
+    gPath.getPoint(gUat(p), pos); const dPath = pos.length(); pos.addScaledVector(tmp.sub(PATH_A), 1 - sst(0.05, 0.12, p));
     // The visitor's own view of the opening disk. While it sits idle they can turn it, tilt it and move in or out; once Enter is pressed the tilt and
     // distance ease back to nothing, so the camera slides from wherever they left it onto the shot's own path. (The spin is applied to the scene, not here.)
     if (mode === 'idle') { if (!orb.drag) { orb.az += orb.vaz * dt; orb.el += orb.vel * dt; const f = Math.exp(-dt * 7); orb.vaz *= f; orb.vel *= f; orbWrap(); }
@@ -1522,13 +1632,13 @@ function boot() {
     if (settle > 0) { pos.applyAxisAngle(up, settle * (0.035 * Math.sin(time * 0.05) + psx * 0.012)); pos.multiplyScalar(1 + settle * (0.012 * Math.sin(time * 0.071) - psy * 0.008)); }
     tmp.set(Math.cos(az), 0, -Math.sin(az)).multiplyScalar(pr ? 2 : 4); tmp.y = pr ? -4 : 3;            // hero: the whole disk, centred, sitting a little below the middle
     look.set(0, 0.4, 0).lerp(tmp, 1 - sst(0.05, 0.13, p));
-    const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = mix(f1, pr ? 50 : 38, sst(0.35, 0.72, sFof(p)));
+    const f1 = mix(pr ? 52 : 34, 50, sst(0.06, 0.17, p)); gCam.fov = pr ? mix(f1, 50, sst(0.35, 0.72, sFof(p))) : Math.min(f1, zoomFov(p, dPath));
     gCam.position.copy(pos); gCam.up.copy(upv); gCam.lookAt(look); gCam.updateMatrixWorld(true);
-    // truck: the galaxy glides to the left of frame (to the top on portrait) and settles there
-    if (wT > 0) { const D = pos.length(), fh = 2 * D * Math.tan(gCam.fov * Math.PI / 360), fw = fh * gCam.aspect;
-      rt3.setFromMatrixColumn(gCam.matrixWorld, 0); up3.setFromMatrixColumn(gCam.matrixWorld, 1);
-      look.addScaledVector(rt3, (pr ? 0.02 : 0.235) * fw * wT).addScaledVector(up3, (pr ? -0.215 : 0.035) * fh * wT); gCam.lookAt(look); }
-    gCam.rotateZ(-0.085 * (1 - sst(0.05, 0.14, p)) + (pr ? 0.16 : 0.30) * wT);
+    // the galaxy stays in the middle of the frame as it recedes: it only rises a little, so its core settles just above the name
+    if (wT > 0) { const D = pos.length(), fh = 2 * D * Math.tan(gCam.fov * Math.PI / 360);
+      up3.setFromMatrixColumn(gCam.matrixWorld, 1);
+      look.addScaledVector(up3, -(pr ? LIFT_TALL : LIFT) * fh * wT); gCam.lookAt(look); }
+    gCam.rotateZ(-0.085 * (1 - sst(0.05, 0.14, p)) + ROLL * wT);
     gCam.updateProjectionMatrix(); gCam.updateMatrixWorld(true);
     gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = mix(1.7, 1.15, kw); gStars.userData.u.uOcc.value = kw;
     volU.uCam.value.copy(pos).multiplyScalar(1 / R); volU.uRot.value.setFromMatrix4(gCam.matrixWorld); volU.uTan.value = Math.tan(gCam.fov * Math.PI / 360); volU.uPix.value = 2 * volU.uTan.value * texelU.value.y;
@@ -1552,6 +1662,13 @@ function boot() {
 
     setOp(S.hero, sst(0.5, 0.95, e) * (1 - sst(0.045, 0.07, p)));
     const nm = p >= 0.74 ? 1 : 0; S.name.style.visibility = nm ? 'visible' : 'hidden'; S.name.classList.toggle('show', !!nm); S.name.classList.toggle('on', mode === 'done');
+    // the glass (the Enter pill on the opening view, the menu on the landing: never both at once): where it is and how far it has faded in, read from the page so the bending arrives and moves exactly with it
+    { let gk = 0; capK += ((mode === 'idle' ? sst(0.75, 1, e) : 0) - capK) * (RM ? 1 : 1 - Math.exp(-dt * 7));      // the Enter pill fades with the opening view
+      if (nm) { if (!glassSet || glassK < 1) { const r = glassEl.getBoundingClientRect(); glassK = RM ? 1 : +getComputedStyle(glassEl).opacity || 0; LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); glassSet = true; }
+        gk = glassK; }
+      else { glassSet = false; glassK = 0;
+        if (capK > 0.004) { const r = capEl.getBoundingClientRect(); LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); gk = capK; } }   // (it rides with the star, so it is looked up every frame)
+      LU.uGlK.value = gk; LU.uGlHot.value = nm ? 0 : coreHot; LU.uGlS.value = nm ? 0.42 : 1; }
     if (audio.on && audio.ctx) { const t = audio.ctx.currentTime; audio.filter.frequency.setTargetAtTime(300 + 1000 * vis(p, 0.06, 0.18, 0.22, 0.5), t, 0.3); audio.master.gain.setTargetAtTime(0.16, t, 0.25); }
   }
 
@@ -1566,6 +1683,9 @@ function boot() {
     if (!rest || accFresh || (gasTick & 1) === 0) {
       { gasFr++; const i = gasFr % 16 + 1; let hx = 0, hy = 0, f = 0.5, j = i; while (j > 0) { hx += f * (j & 1); j >>= 1; f *= 0.5; } f = 1 / 3; j = i; while (j > 0) { hy += f * (j % 3); j = Math.floor(j / 3); f /= 3; }   // this frame's sub-pixel shift: sixteen positions spread evenly over one gas pixel (Halton 2,3)
         volU.uFr.value = gasFr % 1024; volU.uJit.value.set(0, 0); }
+      // A change of resolution decided further down is made here, before the gas is drawn. Resizing the gas picture empties it, so doing it after
+      // the gas was drawn and before it was averaged in showed the galaxy black for a frame, once for each step.
+      if (resPend) { resPend = false; sizeVol(); }
       renderer.setRenderTarget(volRT); renderer.render(volScene, gCam);
       { const t = accCur; accCur = accPrev; accPrev = t; }                                              // write the new average into one target, read the last one from the other
       if (accCur.width !== accW || accCur.height !== accH) accCur.setSize(accW, accH);
@@ -1581,7 +1701,7 @@ function boot() {
       if (dCam > 0.2) accFresh = true;                                                                 // a jump (skip, replay): start the average again
       stillK += ((1 - sst(0.012, 0.16, mov)) - stillK) * 0.2;
       if (wideOn === 1) { sharpU.value = mix(0.4, 0.3, stillK);
-        const rs = Math.min(4, Math.floor(stillK * 5)); if (rs > resStep) { resStep = rs; sizeVol(); } }   // four small steps up to full resolution while the picture is still easing
+        const rs = Math.min(4, Math.floor(stillK * 5)); if (rs > resStep) { resStep = rs; resPend = true; } }   // four small steps up to full resolution while the picture is still easing (each takes effect on the next frame: see resPend)
       else if (wideOn !== 2 && resStep) resStep = 0;
       accU.uA.value = accFresh || RAW ? 1 : rest ? 0.16 : wideOn === 0 ? mix(0.24, 0.09, stillK) : mix(mix(wideOn === 1 ? 0.28 : 0.2, 0.125, stillK), 0.75, inGas); accFresh = false;
       renderer.setRenderTarget(accCur); renderer.render(accScene, gCam);
@@ -1590,7 +1710,20 @@ function boot() {
       blitU.tGas.value = accCur.texture;
     }
     composer.render();
+    capInk();
   }
+  // The Enter pill is clear glass, so its lettering has to suit whatever gas is behind it. About five times a second the finished picture is read
+  // back where the lettering sits, and the lettering is set near-black on bright gas and white on dark. Black wins as soon as the background is
+  // brighter than the point where the two would contrast equally (a luminance of 0.18); a margin either side stops it flickering between them.
+  let capInkT = 0, capDark = false; const capBuf = new Uint8Array(4 * 420 * 64);
+  function capInk() { const now = performance.now(); if (mode !== 'idle' || capK < 0.3 || (now - capInkT < 200 && !RM)) return; capInkT = now;
+    const g = LU.uGl.value, gl = renderer.getContext(), sc = renderer.domElement.width / innerWidth;
+    const w = Math.min(420, Math.max(1, Math.round(g.z * 1.5 * sc))), h = Math.min(64, Math.max(1, Math.round(g.w * 0.9 * sc)));
+    const x = Math.round(g.x * sc - w / 2), y = Math.round(renderer.domElement.height - g.y * sc - h / 2);
+    if (x < 0 || y < 0 || x + w > renderer.domElement.width || y + h > renderer.domElement.height) return;
+    renderer.setRenderTarget(null); gl.readPixels(x, y, w, h, gl.RGBA, gl.UNSIGNED_BYTE, capBuf);
+    let L = 0, n = 0; for (let i = 0; i < w * h * 4; i += 12) { L += 0.2126 * Math.pow(capBuf[i] / 255, 2.2) + 0.7152 * Math.pow(capBuf[i + 1] / 255, 2.2) + 0.0722 * Math.pow(capBuf[i + 2] / 255, 2.2); n++; } L /= n;
+    const dark = capDark ? L > 0.14 : L > 0.22; if (dark !== capDark) { capDark = dark; capEl.classList.toggle('ink', dark); } capLum = L; }
   /* ── loop ── */
   let last = performance.now(), time = 0, raf = 0, slow = 0, ftE = 0.016, warm = 0;
   frameOnce = () => { for (let k = 0; k < (RM ? 20 : 1); k++) { update(prog, introT, time + k / 60, k ? 0 : 0.016); render(); } };   // (with reduced motion there is no running loop to average the gas over time, so a still is built from twenty passes at once)

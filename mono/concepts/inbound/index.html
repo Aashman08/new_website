@@ -99,7 +99,7 @@ html.orbiting,html.orbiting *{cursor:grabbing!important;user-select:none;-webkit
 /* The Enter pill is the same glass as the landing menu (see .menubar): bent at the rim by the lens shader, lit along its edge, and completely clear:
    nothing is laid over the gas inside it. Its lettering is white or near-black, whichever reads better against the gas behind it at that moment (see capInk). */
 #enter .cap{position:absolute;top:52px;left:0;transform:translateX(-50%) scale(var(--cs,1));white-space:nowrap;font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;
-  color:#fff;text-shadow:0 0 6px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.4);
+  color:#fff;text-shadow:0 0 2px rgba(0,0,0,.7),0 1px 3px rgba(0,0,0,.6),0 0 9px rgba(0,0,0,.45);   /* white, held against bright gas by a tight dark edge and a soft halo: the glass itself stays clear */
   border-radius:99px;padding:12px 19px 12px 22px;
   background:none;                                                /* fully clear: no fill, no blur, no change of colour. The gas shows through as it is. Its bent rim, its rim light and its shadow are drawn in the lens shader (see glass()) */
   transition:transform .45s cubic-bezier(.22,1,.36,1),color .35s,text-shadow .35s}
@@ -1606,7 +1606,8 @@ function boot() {
   // back where the lettering sits, and the lettering is set near-black on bright gas and white on dark. Black wins as soon as the background is
   // brighter than the point where the two would contrast equally (a luminance of 0.18); a margin either side stops it flickering between them.
   let capInkT = 0, capDark = false; const capBuf = new Uint8Array(4 * 420 * 64);
-  function capInk() { const now = performance.now(); if (mode !== 'idle' || capK < 0.3 || (now - capInkT < 200 && !RM)) return; capInkT = now;
+  const CAP_AUTO = false;                                      // the lettering stays white. Set to true for near-black lettering on bright gas instead
+  function capInk() { const now = performance.now(); if (!CAP_AUTO || mode !== 'idle' || capK < 0.3 || (now - capInkT < 200 && !RM)) return; capInkT = now;
     const g = LU.uGl.value, gl = renderer.getContext(), sc = renderer.domElement.width / innerWidth;
     const w = Math.min(420, Math.max(1, Math.round(g.z * 1.5 * sc))), h = Math.min(64, Math.max(1, Math.round(g.w * 0.9 * sc)));
     const x = Math.round(g.x * sc - w / 2), y = Math.round(renderer.domElement.height - g.y * sc - h / 2);

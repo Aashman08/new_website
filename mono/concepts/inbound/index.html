@@ -7,7 +7,7 @@
 <meta name="description" content="Concept — Inbound. A personal site for Aashman Rastogi, AI Engineer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Playfair+Display:wght@400&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -22,7 +22,8 @@
 html{background:var(--bg);-webkit-text-size-adjust:100%}
 html,body{overflow:hidden}
 html.done,html.done body{overflow-x:hidden;overflow-y:auto}
-#track{display:none;height:400vh;pointer-events:none}
+#track{display:none;pointer-events:none}
+#track .gap{height:670vh}   /* how far the page scrolls: it ends as the last project's row arrives (see WORK_AT) */
 html.done #track{display:block}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
@@ -207,6 +208,85 @@ html.scrolled #s-name.show #cue{opacity:0;transition:opacity .4s}
   #about .hello{margin-bottom:16px} #about .hello::after{margin-top:14px}
   #about p.t{font-size:.92rem;line-height:1.6;margin-bottom:11px;text-align:left}   /* (a narrow column justified opens wide gaps between words) */
 }
+/* PROJECTS. After About has gone, the index of projects builds itself as the visitor scrolls: the heading, the framed picture, then the six
+   rows one after another, each arriving as the scroll reaches it. The page ends when the last row is in, so there is nothing left to scroll once
+   the list is complete. It stays put while it builds (it is a fixed layer, like About), with the camera travelling on through the gas clouds
+   behind. A project itself is not in the scroll: clicking its row opens it on a screen of its own (see #sheet). Same type as About. */
+#work{position:fixed;inset:0;z-index:9;visibility:hidden;font-family:var(--site);color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.6)}
+#work .wrap,#sheet .wrap{width:min(1180px,calc(100vw - 96px));margin:0 auto}
+.rv{--cut:-90px;opacity:0;transform:translateY(22px);transition:opacity .9s cubic-bezier(.2,.7,.2,1) var(--d,0s),transform 1.1s cubic-bezier(.2,.7,.2,1) var(--d,0s);
+  -webkit-mask-image:linear-gradient(to bottom,transparent var(--cut),#000 calc(var(--cut) + 46px));mask-image:linear-gradient(to bottom,transparent var(--cut),#000 calc(var(--cut) + 46px))}
+.rv.in{opacity:1;transform:none}
+html.rm .rv{opacity:1;transform:none;transition:none}
+#work .kicker,#sheet .kicker{font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,.5)}
+#work .hair,#sheet .hair{width:44px;height:1px;background:rgba(255,255,255,.34);margin:24px 0 24px}
+#work h2{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(2.5rem,4.4vw,4rem);line-height:1;letter-spacing:-.015em;margin:14px 0 0;color:#f5f5f5}
+.frame{position:relative;overflow:hidden;border-radius:16px;background:#0a0a0e;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.16)}
+.frame img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.86) brightness(.92)}
+#w-index{height:100%;display:flex;align-items:center;padding:max(13vh,104px) 0 4vh;pointer-events:auto}
+#w-index .rv{transition:none;-webkit-mask-image:none;mask-image:none}   /* (these are moved by the scroll itself: see WORK_AT) */
+#w-index .wrap{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,.68fr);column-gap:clamp(40px,6vw,96px);align-items:center}
+.plist{list-style:none;margin:0;padding:0;border-top:1px solid rgba(255,255,255,.1)}
+.plist a{display:grid;grid-template-columns:3rem 1fr auto;align-items:baseline;column-gap:6px;padding:11px 4px 12px;border-bottom:1px solid rgba(255,255,255,.1);text-decoration:none;color:inherit;transition:opacity .35s}
+.plist .n{font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.4);font-variant-numeric:tabular-nums}
+.plist .t{display:block;font-family:"Playfair Display",Georgia,serif;font-size:clamp(1.15rem,1.6vw,1.45rem);line-height:1.2;color:rgba(255,255,255,.88);transition:color .3s}
+.plist .s{display:block;font-size:.83rem;line-height:1.45;color:rgba(255,255,255,.5);margin-top:3px}
+.plist .ar{color:rgba(255,255,255,.35);transition:transform .4s cubic-bezier(.2,.8,.2,1),color .3s}
+.plist:hover a{opacity:.5}
+.plist a:hover,.plist a:focus-visible{opacity:1;outline:none}
+.plist a:hover .t,.plist a:focus-visible .t{color:#fff}
+.plist a:hover .ar,.plist a:focus-visible .ar{transform:translateX(6px);color:#fff}
+.pv{aspect-ratio:4/5}
+.pv img{position:absolute;inset:0;opacity:0;transform:scale(1.05);transition:opacity .7s,transform 1.6s cubic-bezier(.2,.7,.2,1)}
+.pv img.on{opacity:1;transform:none}
+.pv::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,0) 38%)}
+.pv .cap{position:absolute;left:20px;right:20px;bottom:18px;z-index:1;font-family:"Playfair Display",Georgia,serif;font-size:1.05rem;line-height:1.25;color:#fff}
+/* A project is not part of the scroll: clicking its row in the index opens it on a screen of its own, over the sky (which stays, dimmed and out
+   of focus, behind it). That screen scrolls by itself; the page underneath is held still until it is closed. */
+html.sheet-open,html.sheet-open body{overflow:hidden!important}
+#work,#stage,nav{transition:opacity .4s}
+html.sheet-open #work,html.sheet-open #stage,html.sheet-open nav{opacity:0}   /* (behind a project's screen there is only the sky: the page's own words and menu step back, or they show through as blurred ghosts) */
+#sheet{position:fixed;inset:0;z-index:40;font-family:var(--site);color:#fff;background:rgba(5,5,9,.7);-webkit-backdrop-filter:blur(22px) saturate(1.15);backdrop-filter:blur(22px) saturate(1.15);opacity:0;transition:opacity .45s cubic-bezier(.2,.7,.2,1)}
+#sheet[hidden]{display:none}
+#sheet.on{opacity:1}
+#sheet .sbody{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;transform:translateY(26px);transition:transform .7s cubic-bezier(.2,.8,.2,1);text-shadow:0 1px 10px rgba(0,0,0,.5)}
+#sheet.on .sbody{transform:none}
+#sheet .sbar{position:absolute;left:0;right:0;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:20px var(--pad);pointer-events:none}
+#sheet .sbar button{pointer-events:auto;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:rgba(255,255,255,.88);border:1px solid var(--faint);border-radius:99px;padding:9px 15px;background:rgba(0,0,0,.4);transition:background .25s,color .25s,border-color .25s}
+#sheet .sbar button:hover,#sheet .sbar button:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;outline:none}
+#sheet .snav{display:flex;align-items:center;gap:8px;pointer-events:none}
+#sheet #sheet-n{font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.6);font-variant-numeric:tabular-nums;padding:0 6px}
+#sheet #sheet-close{margin-left:10px}
+.proj{display:none;min-height:100%;align-items:center;padding:112px 0 72px}
+.proj.cur{display:flex}
+.proj .wrap{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);column-gap:clamp(40px,5.5vw,88px);align-items:start}
+.proj.alt .wrap{grid-template-columns:minmax(0,1.14fr) minmax(0,.86fr)}
+.proj.alt .pm{order:2}
+.pm{position:sticky;top:112px}
+.pm .frame{aspect-ratio:4/3}
+/* the fluid simulation's picture is a wide strip, so that project is laid out differently: the picture across the top, whole, and the words in two columns under it */
+.proj.wide .wrap,.proj.alt.wide .wrap{grid-template-columns:1fr;row-gap:34px}
+.proj.wide .pm{position:static;order:0}
+.proj.wide .pm .frame{aspect-ratio:2236/772}
+.proj.wide .pt{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);column-gap:clamp(40px,5.5vw,88px);align-items:start}
+.pm .meta{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:16px;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,.46)}
+.watch{flex:none;color:rgba(255,255,255,.9);text-decoration:none;border:1px solid rgba(255,255,255,.28);border-radius:99px;padding:8px 14px;transition:background .3s,color .3s,border-color .3s}
+.watch:hover,.watch:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;text-shadow:none}
+.proj h3{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(1.9rem,3.1vw,2.9rem);line-height:1.08;letter-spacing:-.012em;margin:14px 0 0;color:#f5f5f5}
+.proj .sum{font-weight:300;font-size:clamp(1rem,1.25vw,1.16rem);line-height:1.5;color:rgba(255,255,255,.9);margin:16px 0 0}
+.proj .intro{font-size:clamp(.92rem,1.04vw,.99rem);line-height:1.78;color:rgba(255,255,255,.68);text-align:justify;margin:0 0 28px}
+.feats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:22px 34px}
+.feats b{display:block;font-weight:500;font-size:.9rem;line-height:1.35;color:rgba(255,255,255,.95);margin-bottom:5px}
+.feats span{display:block;font-size:.84rem;line-height:1.66;color:rgba(255,255,255,.56)}
+.concl{font-family:"Playfair Display",Georgia,serif;font-style:italic;font-size:clamp(1rem,1.22vw,1.13rem);line-height:1.62;color:rgba(255,255,255,.84);margin:30px 0 0;padding-top:24px;border-top:1px solid rgba(255,255,255,.12)}
+#w-end{display:none}
+@media (max-width:900px),(orientation:portrait){
+  #work .wrap,#sheet .wrap{width:calc(100vw - 44px)}
+  #w-index .wrap,.proj .wrap,.proj.alt .wrap{grid-template-columns:1fr;row-gap:28px}
+  .pv{display:none} .pm{position:static} .proj.alt .pm{order:0}
+  .feats{grid-template-columns:1fr} .proj .intro{text-align:left}
+  .proj.wide .pt{grid-template-columns:1fr}
+}
 #replay{position:absolute;right:var(--pad);bottom:28px;font-size:12px;letter-spacing:.05em;font-weight:500;color:rgba(255,255,255,.55);text-decoration:none;padding:6px 2px;transition:color .3s}
 #replay:hover,#replay:focus-visible{color:#fff}
 @media (min-width:640px){
@@ -298,8 +378,8 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
     <div class="bar">
       <div class="menubar pe" role="group" aria-label="Sections">
         <span class="lens" aria-hidden="true"><i class="l"></i><i class="m"></i><i class="r"></i></span>
-        <button type="button">ABOUT ME</button>
-        <button type="button">PROJECTS</button>
+        <button type="button" data-go="about">ABOUT ME</button>
+        <button type="button" data-go="projects">PROJECTS</button>
         <button type="button">CONTACT</button>
         <button type="button">RESEARCH</button>
         <button type="button">ART</button>
@@ -318,8 +398,170 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
     <p class="t">I graduated from <b><a href="https://www.ucla.edu/" target="_blank" rel="noopener">UCLA</a></b> with a degree in <b>Statistics and Data Science</b> and a minor in <b>Data Science Engineering</b>. If you&rsquo;re building something ambitious&mdash;or just want to talk AI, startups, or space&mdash;I&rsquo;d love to connect.</p>
   </div>
 </section>
-<div id="track" aria-hidden="true"></div>
+<div id="track">
+  <div class="gap" aria-hidden="true"></div>
+  <div id="work">
+    <section id="w-index" aria-labelledby="w-title"><div class="wrap">
+      <div>
+        <div class="kicker rv">Selected work</div>
+        <h2 id="w-title" class="rv">Projects</h2>
+        <div class="hair rv"></div>
+        <ol class="plist">
+          <li class="rv"><a href="#p-quantumviz"><span class="n">01</span><span class="b"><span class="t">QuantumViz</span><span class="s">AI-powered quantum circuit generator using natural language and 3D visualization</span></span><span class="ar" aria-hidden="true">&rarr;</span></a></li>
+          <li class="rv"><a href="#p-ai-engineering-deloitte"><span class="n">02</span><span class="b"><span class="t">Generative AI for Code &amp; Data</span><span class="s">GPT-powered coding assistant and natural language data analysis platform at Deloitte</span></span><span class="ar" aria-hidden="true">&rarr;</span></a></li>
+          <li class="rv"><a href="#p-actuals"><span class="n">03</span><span class="b"><span class="t">AI for SMB Acquisitions</span><span class="s">Founding Engineer at an AI startup streamlining business acquisitions</span></span><span class="ar" aria-hidden="true">&rarr;</span></a></li>
+          <li class="rv"><a href="#p-drone-ndvi"><span class="n">04</span><span class="b"><span class="t">Drone-Mounted IR System for Vegetation Monitoring</span><span class="s">Enhancing environmental monitoring using drone technology</span></span><span class="ar" aria-hidden="true">&rarr;</span></a></li>
+          <li class="rv"><a href="#p-satellite-fire"><span class="n">05</span><span class="b"><span class="t">Satellite-Based Fire Detection</span><span class="s">Visualizing fire, water, and land cover using Copernicus data from ESA</span></span><span class="ar" aria-hidden="true">&rarr;</span></a></li>
+          <li class="rv"><a href="#p-lattice-boltzmann"><span class="n">06</span><span class="b"><span class="t">Lattice Boltzmann Fluid Simulation</span><span class="s">Computational fluid dynamics simulation of flow past a cylinder using the LBM method</span></span><span class="ar" aria-hidden="true">&rarr;</span></a></li>
+        </ol>
+      </div>
+      <div class="pv frame rv" aria-hidden="true">
+        <img src="img/quantumn.webp" alt="" loading="lazy">
+        <img src="img/deloitte.webp" alt="" loading="lazy">
+        <img src="img/actuals.webp" alt="" loading="lazy">
+        <img src="img/drone.webp" alt="" loading="lazy">
+        <img src="img/fire.webp" alt="" loading="lazy">
+        <img src="img/fluid_output.png" alt="" loading="lazy">
+        <span class="cap"></span>
+      </div>
+    </div></section>
+    <div id="w-end" aria-hidden="true"></div>
+  </div>
+</div>
 
+<div id="sheet" role="dialog" aria-modal="true" aria-label="Project" hidden>
+  <div class="sbar">
+    <button type="button" id="sheet-back"><span aria-hidden="true">&larr;</span> All projects</button>
+    <div class="snav"><button type="button" id="sheet-prev" aria-label="Previous project">&larr;</button><span id="sheet-n">01 / 06</span><button type="button" id="sheet-next" aria-label="Next project">&rarr;</button><button type="button" id="sheet-close">Close <span aria-hidden="true">&times;</span></button></div>
+  </div>
+  <div class="sbody">
+    <section class="proj" id="p-quantumviz" aria-labelledby="h-quantumviz"><div class="wrap">
+      <div class="pm rv">
+        <div class="frame"><img src="img/quantumviz.webp" alt="QuantumViz" loading="lazy"></div>
+        <div class="meta"><span>OpenAI &middot; IBM Qiskit &middot; Groq &middot; LlamaIndex</span><a class="watch" href="https://www.youtube.com/watch?v=OuZSJU72B7s" target="_blank" rel="noopener">Watch the demo &#8599;</a></div>
+      </div>
+      <div class="pt">
+        <div class="kicker rv">01 &mdash; Project</div>
+        <h3 id="h-quantumviz" class="rv">QuantumViz</h3>
+        <p class="sum rv">AI-powered quantum circuit generator using natural language and 3D visualization</p>
+        <div class="hair rv"></div>
+        <p class="intro rv">QuantumViz transforms ideas into quantum circuits using natural language. Built to address a critical gap in quantum computing tools, it simplifies circuit design through AI-powered generation, interactive 3D visualization, and a RAG-powered chatbot trained on quantum documentation and research papers.</p>
+        <ul class="feats">
+          <li class="rv"><b>Natural Language Interface</b><span>Generate circuit designs using text or speech input via OpenAI, making quantum computing accessible without extensive coding knowledge.</span></li>
+          <li class="rv"><b>3D Qubit Visualization</b><span>Interactive Bloch sphere visualizations powered by IBM Qiskit, allowing users to explore qubit states before writing any code.</span></li>
+          <li class="rv"><b>Code &amp; LaTeX Generation</b><span>Automatically generates executable Python/Qiskit code and exports circuit diagrams to LaTeX for research documentation.</span></li>
+          <li class="rv"><b>RAG-Powered Chatbot</b><span>Custom conversational agent built with Groq and LlamaIndex, trained on 100s of research papers and Qiskit documentation.</span></li>
+          <li class="rv"><b>Research Paper Parsing</b><span>Automatically extracts quantum circuit images from arXiv using Selenium and Scrapy, converting them directly to Qiskit code.</span></li>
+        </ul>
+        <p class="concl rv">Endorsed by quantum researchers at UCLA, Google Quantum AI, and AWS, QuantumViz aims to reduce barriers to entry in quantum computing and accelerate research by saving time on circuit design and documentation.</p>
+      </div>
+    </div></section>
+    <section class="proj alt" id="p-ai-engineering-deloitte" aria-labelledby="h-ai-engineering-deloitte"><div class="wrap">
+      <div class="pm rv">
+        <div class="frame"><img src="img/deloitte.webp" alt="Generative AI for Code &amp; Data" loading="lazy"></div>
+        <div class="meta"><span>Deloitte &middot; GPT-3.5 Turbo &middot; PandasAI</span><a class="watch" href="https://www.youtube.com/watch?v=5SxYQvWsMCw" target="_blank" rel="noopener">Watch the demo &#8599;</a></div>
+      </div>
+      <div class="pt">
+        <div class="kicker rv">02 &mdash; Project</div>
+        <h3 id="h-ai-engineering-deloitte" class="rv">Generative AI for Code &amp; Data</h3>
+        <p class="sum rv">GPT-powered coding assistant and natural language data analysis platform at Deloitte</p>
+        <div class="hair rv"></div>
+        <p class="intro rv">Developed two enterprise AI solutions at Deloitte: a GPT-powered coding assistant to democratize software development, and an intelligent data analysis platform using PandasAI to make DataFrame analysis accessible to non-technical users through natural language queries.</p>
+        <ul class="feats">
+          <li class="rv"><b>AI Coding Assistant</b><span>GPT-3.5 Turbo fine-tuned with prompt engineering, featuring moderation checks, self-evaluation, and conversational memory for follow-up questions.</span></li>
+          <li class="rv"><b>Natural Language Data Analysis</b><span>Upload datasets and ask questions in plain English&mdash;get textual explanations, interactive visualizations, and actionable insights.</span></li>
+          <li class="rv"><b>Smart Data Operations</b><span>Intelligent DataFrame merging, missing data interpolation, and RSS minimization for numerical columns.</span></li>
+          <li class="rv"><b>Interactive Visualizations</b><span>HTML/JavaScript-powered plots that go beyond standard Python visualizations for enhanced user experience.</span></li>
+        </ul>
+        <p class="concl rv">Both tools achieved 90%+ accuracy rates and were designed to empower users to leverage AI without deep technical expertise, transforming how teams interact with code and data.</p>
+      </div>
+    </div></section>
+    <section class="proj" id="p-actuals" aria-labelledby="h-actuals"><div class="wrap">
+      <div class="pm rv">
+        <div class="frame"><img src="img/actuals.webp" alt="AI for SMB Acquisitions" loading="lazy"></div>
+        <div class="meta"><span>Actuals &middot; backed by F7 Ventures</span></div>
+      </div>
+      <div class="pt">
+        <div class="kicker rv">03 &mdash; Project</div>
+        <h3 id="h-actuals" class="rv">AI for SMB Acquisitions</h3>
+        <p class="sum rv">Founding Engineer at an AI startup streamlining business acquisitions</p>
+        <div class="hair rv"></div>
+        <p class="intro rv">Joined Actuals as a Founding Software Engineer, an AI startup backed by F7 Ventures, aimed at streamlining the acquisition process for Small and Medium Businesses (SMBs) across the United States.</p>
+        <ul class="feats">
+          <li class="rv"><b>AI-Powered Deal Flow</b><span>Built intelligent systems to analyze and qualify potential acquisition targets, reducing manual screening time significantly.</span></li>
+          <li class="rv"><b>Due Diligence Automation</b><span>Developed automated tools to extract and analyze key financial metrics from business documents.</span></li>
+          <li class="rv"><b>Full-Stack Development</b><span>Contributed to the entire product stack from frontend interfaces to backend data pipelines.</span></li>
+          <li class="rv"><b>Startup Experience</b><span>Gained hands-on experience in early-stage product development, rapid iteration, and working directly with founders.</span></li>
+        </ul>
+        <p class="concl rv">This venture into entrepreneurship provided invaluable experience in building AI products from the ground up and understanding the SMB acquisition landscape.</p>
+      </div>
+    </div></section>
+    <section class="proj alt" id="p-drone-ndvi" aria-labelledby="h-drone-ndvi"><div class="wrap">
+      <div class="pm rv">
+        <div class="frame"><img src="img/drone.webp" alt="Drone-Mounted IR System for Vegetation Monitoring" loading="lazy"></div>
+        <div class="meta"><span>Edge of Space Academy &middot; Raspberry Pi &middot; Python</span></div>
+      </div>
+      <div class="pt">
+        <div class="kicker rv">04 &mdash; Project</div>
+        <h3 id="h-drone-ndvi" class="rv">Drone-Mounted IR System for Vegetation Monitoring</h3>
+        <p class="sum rv">Enhancing environmental monitoring using drone technology</p>
+        <div class="hair rv"></div>
+        <p class="intro rv">During the summer of 2022, I interned at the Edge of Space Academy at the University of Iowa, focusing on spaceflight instrumentation and mission design. As Project Manager for the Ashton Prairie Near Infrared Sensing team, I explored drone technology&rsquo;s potential in land and ecology management.</p>
+        <ul class="feats">
+          <li class="rv"><b>Custom Hardware</b><span>Built the imaging system from scratch: two cameras, two Raspberry Pi units, a battery pack, and a 3D-printed container&mdash;all within a $1000 budget.</span></li>
+          <li class="rv"><b>NDVI Analysis</b><span>Developed Python scripts for post-processing aerial images, extracting relevant pixel values from RGB and IR images to assess vegetation health.</span></li>
+          <li class="rv"><b>False-Color Imaging</b><span>Created false-color images to visualize vegetation stress based on NDVI values during heatwave conditions.</span></li>
+          <li class="rv"><b>3D Modeling</b><span>Provided proof of concept for rendering 3D models of vegetation height using structure from motion photogrammetric techniques.</span></li>
+        </ul>
+        <p class="concl rv">This project presents an affordable and viable alternative for small-scale farmers worldwide, enabling them to carry out land assessment and management independently.</p>
+      </div>
+    </div></section>
+    <section class="proj" id="p-satellite-fire" aria-labelledby="h-satellite-fire"><div class="wrap">
+      <div class="pm rv">
+        <div class="frame"><img src="img/fire.webp" alt="Satellite-Based Fire Detection" loading="lazy"></div>
+        <div class="meta"><span>Sentinel-2 &middot; Copernicus &middot; ESA</span></div>
+      </div>
+      <div class="pt">
+        <div class="kicker rv">05 &mdash; Project</div>
+        <h3 id="h-satellite-fire" class="rv">Satellite-Based Fire Detection</h3>
+        <p class="sum rv">Visualizing fire, water, and land cover using Copernicus data from ESA</p>
+        <div class="hair rv"></div>
+        <p class="intro rv">For this project, I utilized Sentinel-2 satellite data obtained from the open-source Copernicus hub, courtesy of the European Space Agency. The Sentinel-2 satellite records images across 12 unique spectral bands, each revealing distinct features at varying wavelengths.</p>
+        <ul class="feats">
+          <li class="rv"><b>NDVI (B4 &amp; B8)</b><span>Normalized Differential Vegetation Index assesses dryness and health of vegetation, identifying areas susceptible to fires.</span></li>
+          <li class="rv"><b>NDWI (B3 &amp; B8)</b><span>Normalized Difference Water Index detects and monitors open water surfaces like lakes, rivers, and flood extents.</span></li>
+          <li class="rv"><b>BAI (B11 &amp; B8)</b><span>Burn Area Index monitors wildfire impact, providing information about extent and severity of burn scars&mdash;piercing through smoke.</span></li>
+          <li class="rv"><b>Study Region</b><span>Analysis conducted on Northern California, in the vicinity of Yosemite National Park and Lake Tahoe.</span></li>
+        </ul>
+        <p class="concl rv">Higher BAI values correspond to more severe burn scars. This index allows us to see through smoke and assess actual fire damage, providing valuable data for environmental monitoring and emergency response.</p>
+      </div>
+    </div></section>
+    <section class="proj alt wide" id="p-lattice-boltzmann" aria-labelledby="h-lattice-boltzmann"><div class="wrap">
+      <div class="pm rv">
+        <div class="frame"><img src="img/fluid_output.png" alt="Lattice Boltzmann Fluid Simulation" loading="lazy"></div>
+        <div class="meta"><span>D2Q9 lattice &middot; BGK collision</span></div>
+      </div>
+      <div class="pt">
+        <div class="pa">
+        <div class="kicker rv">06 &mdash; Project</div>
+        <h3 id="h-lattice-boltzmann" class="rv">Lattice Boltzmann Fluid Simulation</h3>
+        <p class="sum rv">Computational fluid dynamics simulation of flow past a cylinder using the LBM method</p>
+        <div class="hair rv"></div>
+        </div>
+        <div class="pb">
+        <p class="intro rv">A mesoscopic fluid dynamics simulation implementing the Lattice Boltzmann Method (LBM) to visualize flow past a cylindrical obstacle. This approach bridges the gap between molecular dynamics and continuum mechanics, offering computational efficiency while capturing complex fluid behaviors like vortex shedding.</p>
+        <ul class="feats">
+          <li class="rv"><b>D2Q9 Lattice Model</b><span>Implements a 2D lattice with 9 discrete velocity directions, balancing computational efficiency with accurate flow representation.</span></li>
+          <li class="rv"><b>BGK Collision Operator</b><span>Uses the Bhatnagar-Gross-Krook approximation for particle collisions, controlled by the relaxation parameter &tau; (tau) for kinematic viscosity.</span></li>
+          <li class="rv"><b>Streaming &amp; Collision</b><span>Two-step algorithm where particles stream to neighboring nodes, then undergo collision relaxation toward equilibrium distribution.</span></li>
+          <li class="rv"><b>Bounce-Back Boundary</b><span>Implements no-slip boundary conditions on the cylinder by reversing particle velocities upon collision with the obstacle.</span></li>
+        </ul>
+        <p class="concl rv">The simulation successfully captures the formation of von K&aacute;rm&aacute;n vortex streets&mdash;alternating vortices shed behind the cylinder&mdash;demonstrating the power of LBM for complex fluid dynamics visualization.</p>
+        </div>
+      </div>
+    </div></section>
+  </div>
+</div>
 <button type="button" id="enter" aria-label="Enter — play the opening sequence"><span class="hit"></span><span class="ring"></span><span class="dot"></span><span class="cap" id="enter-cap">Click to enter</span><span class="tip" aria-hidden="true">Drag to look around</span></button>
 
 <button type="button" id="skip">Skip &rarr;</button>
@@ -421,6 +663,33 @@ enterBtn.addEventListener('click', () => { if (orb.moved) { orb.moved = false; r
 skipBtn.addEventListener('click', () => land(RM));
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && (mode === 'playing' || mode === 'paused')) land(false); });
 $('#replay').addEventListener('click', (e) => { e.preventDefault(); replay(); });
+/* Projects: the index's picture follows the row under the pointer (or, while the list is building, the row that has just arrived); the menu jumps to places in the page */
+let projShow = null, projHover = false;
+{ const rows = [...document.querySelectorAll('.plist a')], pics = [...document.querySelectorAll('.pv img')], cap = $('.pv .cap');
+  const go = (y) => scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' }), topOf = (el) => el.getBoundingClientRect().top + scrollY;
+  const show = (i) => { pics.forEach((im, k) => im.classList.toggle('on', k === i)); cap.textContent = rows[i].querySelector('.t').textContent; };
+  projShow = show; $('.plist').addEventListener('pointerenter', () => { projHover = true; }); $('.plist').addEventListener('pointerleave', () => { projHover = false; });
+  rows.forEach((a, i) => { a.addEventListener('pointerenter', () => show(i)); a.addEventListener('focus', () => show(i));
+    a.addEventListener('click', (e) => { e.preventDefault(); openSheet(i, true); }); });
+  show(0);
+  // a project's own screen
+  const sheet = $('#sheet'), body = sheet.querySelector('.sbody'), secs = [...sheet.querySelectorAll('.proj')], held = [$('#stage'), $('#track'), document.querySelector('nav')]; let cur = -1, from = null, hideT = 0;
+  const pad = (n) => String(n).padStart(2, '0');
+  function openSheet(i, push) { i = (i + secs.length) % secs.length; const was = cur; cur = i; clearTimeout(hideT);
+    secs.forEach((sec, k) => sec.classList.toggle('cur', k === i)); $('#sheet-n').textContent = pad(i + 1) + ' / ' + pad(secs.length); body.scrollTop = 0;
+    const els = [...secs[i].querySelectorAll('.rv')]; els.forEach((el) => el.classList.remove('in')); requestAnimationFrame(() => requestAnimationFrame(() => els.forEach((el) => el.classList.add('in'))));   // its pieces arrive one after another each time it is opened
+    if (was < 0) { from = document.activeElement; sheet.hidden = false; root.classList.add('sheet-open'); held.forEach((el) => { el.inert = true; }); requestAnimationFrame(() => sheet.classList.add('on')); setTimeout(() => $('#sheet-close').focus({ preventScroll: true }), 60); }
+    const url = '#' + secs[i].id.slice(2); try { if (push && was < 0) history.pushState({ proj: i }, '', url); else history.replaceState({ proj: i }, '', url); } catch (e) {} }
+  function closeSheet() { if (cur < 0) return; cur = -1; sheet.classList.remove('on'); root.classList.remove('sheet-open'); held.forEach((el) => { el.inert = false; });
+    hideT = setTimeout(() => { sheet.hidden = true; }, RM ? 0 : 460); if (from && from.focus) from.focus({ preventScroll: true }); }
+  const leave = () => { if (history.state && history.state.proj != null) history.back(); else closeSheet(); };            // closing goes back in the browser's history, so its Back button closes a project too
+  addEventListener('popstate', (e) => { if (e.state && e.state.proj != null) openSheet(e.state.proj, false); else closeSheet(); });
+  $('#sheet-close').addEventListener('click', leave); $('#sheet-back').addEventListener('click', leave);
+  $('#sheet-prev').addEventListener('click', () => openSheet(cur - 1, false)); $('#sheet-next').addEventListener('click', () => openSheet(cur + 1, false));
+  addEventListener('keydown', (e) => { if (cur < 0 || e.metaKey || e.ctrlKey || e.altKey) return; if (e.key === 'Escape') { e.preventDefault(); leave(); } else if (e.key === 'ArrowRight') openSheet(cur + 1, false); else if (e.key === 'ArrowLeft') openSheet(cur - 1, false); });
+  try { if (location.hash) history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  document.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => go((b.dataset.go === 'about' ? 2.9 : 5.7) * innerHeight)));
+  document.querySelectorAll('#sheet .rv').forEach((el) => { const sib = [...el.parentElement.children].filter((c) => c.classList.contains('rv')); el.style.setProperty('--d', (Math.min(sib.indexOf(el), 6) * 0.07) + 's'); }); }
 /* the menu's sliding piece of glass */
 { const bar = $('.menubar'), lens = bar.querySelector('.lens'), [iL, iM, iR] = lens.children; let cur = null, hov = null;
   const go = (b) => { if (!b) { cur = null; bar.classList.remove('lit', 'press'); return; }
@@ -1383,41 +1652,53 @@ function boot() {
      the shadowing looks one short step toward each lamp, not all the way. */
   const cloudRT = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
   const skyU = { uSkyM: { value: new THREE.Matrix3() }, uDust: { value: 0 }, tCloud: { value: cloudRT.texture }, uInvRes: { value: new THREE.Vector2(1, 1) }, uGalDir: { value: new THREE.Vector3(0, 1, 0) }, uGlow: { value: 0 } };
-  const cloudU = { uN: { value: noiseTex }, uSkyM: skyU.uSkyM, uRot: volU.uRot, uTan: volU.uTan, uAspect: volU.uAspect, uGalDir: skyU.uGalDir, uCamC: { value: new THREE.Vector3() }, uForm: { value: 0 } };
+  const cloudU = { uN: { value: noiseTex }, uSkyM: skyU.uSkyM, uRot: volU.uRot, uTan: volU.uTan, uAspect: volU.uAspect, uGalDir: skyU.uGalDir, uCamC: { value: new THREE.Vector3() }, uForm: { value: 0 }, uCool: { value: 0 } };
   const cloudScene = new THREE.Scene(); let cloudTick = 0, cloudForm = 0, cloudBusy = false;
   { const m = new THREE.ShaderMaterial({ uniforms: cloudU, depthTest: false, depthWrite: false, glslVersion: THREE.GLSL3,
       vertexShader: `out vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
       fragmentShader: /* glsl */`precision highp float; precision highp sampler3D; in vec2 vUv; out vec4 outC;
-        uniform sampler3D uN; uniform mat3 uSkyM,uRot; uniform float uTan,uAspect,uForm; uniform vec3 uCamC,uGalDir;   // uForm: how far the clouds have formed (0 to 1)
+        uniform sampler3D uN; uniform mat3 uSkyM,uRot; uniform float uTan,uAspect,uForm,uCool; uniform vec3 uCamC,uGalDir;   // uForm: how far the clouds have formed (0 to 1)
         vec4 tx(vec3 p){ vec3 c=p*32.0; vec3 i=floor(c), f=fract(c); f=f*f*(3.0-2.0*f); return texture(uN,(i+f+0.5)/32.0); }
         // where the clouds are, in the resting view's own space (x right, y up, the camera looking down -z): two large complexes either side, a low bank and a high one
         const vec3 C1=vec3(-2.2,-0.5,-4.6), R1=vec3(0.95,0.9,1.3), C2=vec3(2.55,0.5,-5.3), R2=vec3(1.0,0.9,1.45), C3=vec3(1.3,-1.6,-4.0), R3=vec3(1.3,0.36,1.0), C4=vec3(-1.3,1.75,-5.8), R4=vec3(1.25,0.36,1.1);
         const vec3 L1=vec3(-2.0,-0.25,-4.9), L2=vec3(2.3,0.7,-5.6);       // the two stars that light them
         // The clouds are not faded in: they form. They start as a few thin wisps close round each star, where the gas is densest, and spread
         // outward and thicken from there, the stars brightening as the gas gathers round them.
-        float cmask(vec3 p){ float g=1.0/mix(0.42,1.0,uForm); vec3 a=(p-C1)/R1*g, b=(p-C2)/R2*g, c=(p-C3)/R3*g, e=(p-C4)/R4*g; return exp(-dot(a,a))+0.95*exp(-dot(b,b))+0.6*exp(-dot(c,c))+0.45*exp(-dot(e,e)); }
-        float dens(vec3 p,float fine){ float m=cmask(p); if(m<0.03) return 0.0;
+        // The same group of clouds comes round again every PER units of depth, turned over left for right or top for bottom so that it is not
+        // recognised (and the turbulence inside is not repeated in step, so each really is different). That lets the camera travel on through
+        // them for as long as the page scrolls. They are followed from just in front of the camera to FAR units ahead, fading in at the far end.
+        const float PER=5.6, OFF=7.9, NEAR=0.7, FAR=8.5;
+        vec3 cellF(float z){ float c=floor((z+OFF)/PER); return vec3(mod(c,2.0)<0.5?1.0:-1.0, mod(c,3.0)<0.5?1.0:-1.0, c); }   // which way this stretch of depth is turned (x, y), and its number
+        float cmask(vec3 p){ vec3 f=cellF(p.z); p=vec3(p.x*f.x,p.y*f.y,p.z-f.z*PER); float g=1.0/mix(0.42,1.0,uForm); vec3 a=(p-C1)/R1*g, b=(p-C2)/R2*g, c=(p-C3)/R3*g, e=(p-C4)/R4*g; return exp(-dot(a,a))+0.95*exp(-dot(b,b))+0.6*exp(-dot(c,c))+0.45*exp(-dot(e,e)); }
+        float dens(vec3 p,float fine){ float m=cmask(p); if(m<0.03) return 0.0; float dp=uCamC.z-p.z; m*=smoothstep(NEAR,NEAR+0.8,dp)*smoothstep(FAR,FAR-1.6,dp); if(m<0.03) return 0.0;
           vec3 q=p*0.085; q+=0.085*(tx(q*0.33+0.2).rgb-0.5);                 // a large, slow displacement first: it draws the gas out into streamers, as flows do
           float n=tx(q).r*0.5+tx(q*2.03+0.31).g*0.25;
           if(fine>0.5){ n+=tx(q*4.1+0.67).b*0.125+tx(q*8.3+0.13).a*0.0625+tx(q*16.9+0.4).r*0.031; float rg=1.0-abs(2.0*tx(q*2.6+0.55).a-1.0); n+=0.10*(rg*rg-0.35); }   // finer and finer structure, and thin sheets and filaments
           else n+=0.11;
           return max(exp(6.2*(n-0.61-0.13*(1.0-uForm)))-0.5,0.0)*min(m*1.5,1.0)*smoothstep(0.03,0.2,m)*smoothstep(0.0,0.5,uForm); }   // the exponential is what makes the spread of densities lognormal
         const float SIG=2.3, G=0.45;                                          // how strongly the dust blocks light · how forward its scattering is
-        vec3 lamp(vec3 p,vec3 v,float rho,vec3 L,float I,vec3 sc){ vec3 d=L-p; float r2=dot(d,d); vec3 h=d*inversesqrt(r2);
-          float f=I*smoothstep(0.0,0.75,uForm)/(r2+0.5)*exp(-dens(p+h*0.45,0.0)*0.9*SIG);   // (the gas is lit from the start of its forming: the glow comes up with the gas, not after it)              // the star's light here: weaker with distance, and shadowed by the cloud toward it
+        // uCool: 0 for a cloud of glowing hydrogen (deep red, with the star's warm light scattered by its dust); 1 for a reflection nebula, where
+        // there is little glowing gas and what is seen is a hot star's blue light scattered by dust.
+        vec3 lamp(vec3 p,vec3 v,float rho,vec3 L,float I,vec3 sc){ vec3 f=cellF(p.z); vec3 d=vec3(L.x*f.x,L.y*f.y,L.z+f.z*PER)-p; float r2=dot(d,d); vec3 h=d*inversesqrt(r2);
+          float fl=I*smoothstep(0.0,0.75,uForm)/(r2+0.5)*exp(-dens(p+h*0.45,0.0)*0.9*SIG);   // the star's light here: weaker with distance, and shadowed by the cloud toward it (the gas is lit from the start of its forming)
           float mu=dot(v,h), ph=0.5*(1.0-G*G)/pow(1.0+G*G-2.0*G*mu,1.5);
-          return (rho*rho*vec3(0.92,0.17,0.075)*0.30 + rho*ph*sc*0.16)*f; }  // glowing hydrogen (density squared) + the star's light scattered by dust
+          return (rho*rho*mix(vec3(0.92,0.17,0.075)*0.30,vec3(0.14,0.30,0.78)*0.07,uCool) + rho*ph*mix(sc,vec3(0.46,0.68,1.0),uCool)*mix(0.16,0.36,uCool))*fl; }  // glowing hydrogen (density squared) + the star's light scattered by dust
         void main(){ vec2 ndc=vUv*2.0-1.0; vec3 v=normalize(uRot*vec3(ndc.x*uTan*uAspect, ndc.y*uTan, -1.0))*uSkyM;
           if(v.z>-0.3){ outC=vec4(0.0,0.0,0.0,1.0); return; }
-          vec3 o=uCamC, gal=uGalDir*uSkyM; float tA=(-1.6-o.z)/v.z, tB=(-8.4-o.z)/v.z; const int N=36; float dt=(tB-tA)/float(N);
+          vec3 o=uCamC, gal=uGalDir*uSkyM; float tA=-NEAR/v.z, tB=-FAR/v.z; const int N=40; float dt=(tB-tA)/float(N);
           float t=tA+dt*fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(0.06711056,0.00583715))));
-          float tc1=dot(L1-o,v), tc2=dot(L2-o,v); vec3 col=vec3(0.0), T=vec3(1.0), T1=vec3(1.0), T2=vec3(1.0);
+          vec3 SP[4]; float tcS[4]; vec3 TS[4];                               // the stars that light them: the two in this stretch of depth and the two in the next
+          { float c0=floor((o.z-NEAR+OFF)/PER); for(int k=0;k<4;k++){ float c=c0-float(k/2); vec3 L=(k-(k/2)*2)==0?L1:L2; SP[k]=vec3(L.x*(mod(c,2.0)<0.5?1.0:-1.0), L.y*(mod(c,3.0)<0.5?1.0:-1.0), L.z+c*PER); tcS[k]=dot(SP[k]-o,v); TS[k]=vec3(1.0); } }
+          vec3 col=vec3(0.0), T=vec3(1.0);
           for(int i=0;i<N;i++){ vec3 p=o+v*t; float rho=dens(p,1.0);
             if(rho>0.004){ vec3 lit=lamp(p,v,rho,L1,1.0,vec3(1.0,0.50,0.24))+lamp(p,v,rho,L2,0.8,vec3(1.0,0.60,0.34));
               lit+=rho*vec3(0.42,0.52,0.85)*0.05*exp(-dens(p+gal*0.5,0.0)*1.0*SIG);        // the galaxy's light on their upper sides
               col+=T*lit*dt; T*=exp(-rho*SIG*vec3(0.72,1.0,1.38)*dt); }                       // dust dims what is behind it, blue more than red
-            if(t<tc1) T1=T; if(t<tc2) T2=T; t+=dt; if(T.g<0.02) break; }
-          { float sk=smoothstep(0.55,1.0,uForm); vec3 b=(o+v*tc1)-L1; col+=T1*vec3(1.0,0.66,0.42)*0.00016*sk/(dot(b,b)+0.00010); b=(o+v*tc2)-L2; col+=T2*vec3(1.0,0.78,0.58)*0.00012*sk/(dot(b,b)+0.00010); }   // (small, and last to appear: they come out inside gas that is already there. Shown first and large, they were two bare balls of light)   // the two stars themselves, seen through whatever cloud is in front of them
+            for(int k=0;k<4;k++) if(t<tcS[k]) TS[k]=T;
+            t+=dt; if(T.g<0.02) break; }
+          { float sk=smoothstep(0.55,1.0,uForm);                              // the stars themselves, seen through whatever cloud is in front of them (small, and last to appear: they come out inside gas that is already there)
+            for(int k=0;k<4;k++){ vec3 b=(o+v*tcS[k])-SP[k]; float dp=o.z-SP[k].z, w=sk*smoothstep(NEAR,NEAR+0.9,dp)*smoothstep(FAR,FAR-1.6,dp)*step(0.0,tcS[k]);
+              col+=TS[k]*mix((k-(k/2)*2)==0?vec3(1.0,0.66,0.42):vec3(1.0,0.78,0.58),vec3(0.80,0.90,1.0),uCool)*((k-(k/2)*2)==0?0.00016:0.00012)*w/(dot(b,b)+0.00010); } }
           outC=vec4(col,T.g); }` });
     const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), m); q.frustumCulled = false; cloudScene.add(q); }
   // the sky layer that goes into the main picture: the clouds' light, and the glow the galaxy leaves along the top of the frame
@@ -1586,6 +1867,10 @@ function boot() {
   let scS = 0, scStill = 9; const qB = new THREE.Quaternion(), qO = new THREE.Quaternion(), eO = new THREE.Euler(0, 0, 0, 'XYZ'), m4 = new THREE.Matrix4();
   const seg = (x, r) => ease(clamp((x - r[0]) / (r[1] - r[0]), 0, 1));
   const aboutEl = $('#about'), aboutBits = [...document.querySelectorAll('#about .col>*')], whoEl = $('#s-name .who');
+  const rvEls = [...document.querySelectorAll('#sheet .rv')], coolEl = $('#p-lattice-boltzmann'); let coolV = 0;
+  // The Projects index: where in the scroll each piece arrives. Heading first, then the picture, then the six rows, one every 0.3 of a screen.
+  const workEl = $('#work'), workBits = [...document.querySelectorAll('#w-index .rv')], workV = workBits.map(() => 0); let workRow = -1;
+  const WORK_AT = workBits.map((el, k) => el.tagName === 'LI' ? [3.85 + 0.3 * (k - 3), 4.15 + 0.3 * (k - 3)] : el.classList.contains('pv') ? [3.6, 3.95] : [3.4 + 0.06 * k, 3.7 + 0.06 * k]);
   const ABOUT_AT = [[1.3, 1.6], [0.92, 1.2], [1.65, 1.95], [2.0, 2.3], [2.35, 2.65]], aboutV = [0, 0, 0, 0, 0];                  // where in the scroll each piece arrives: the photo, the greeting (first), then the three paragraphs
   const GLIDE = 5.2; let glideT = 0, glideP = -1;
   const FOV_END = 30.8;                                        // the settled frame's field of view on wide screens: narrow enough that the galaxy's arms nearly reach the top and bottom of the frame
@@ -1680,13 +1965,23 @@ function boot() {
       // however fast the visitor scrolls they are seen to gather). Scrolling back up, they thin away again.
       { const want = sst(0.95, 1.5, scS), was = cloudForm; cloudForm += (want - cloudForm) * (RM ? 1 : 1 - Math.exp(-dt * (want > cloudForm ? 0.8 : 2.2))); if (Math.abs(want - cloudForm) < 0.002) cloudForm = want;
         cloudBusy = cloudForm !== was; cloudU.uForm.value = ease(cloudForm); skyU.uDust.value = Math.min(1, cloudForm * 5); } skyU.uGalDir.value.copy(pos).multiplyScalar(-1).normalize();
-      cloudU.uCamC.value.set(0.22 * Math.sin(time * 0.031), 0.12 * Math.sin(time * 0.023), -0.9 * clamp((scS - 1.0) / 2.0, 0, 1));   // the camera drifts a little through the clouds, and moves in among them as the page is read
+      cloudU.uCamC.value.set(0.22 * Math.sin(time * 0.031), 0.12 * Math.sin(time * 0.023), -0.9 * clamp((scS - 1.0) / 2.0, 0, 1) - 0.45 * Math.max(0, scS - 3.3));   // the camera drifts a little through the clouds, and moves in among them as the page is read
       // the words: the name leaves as the scroll begins; then the photo, the greeting and each paragraph arrive in turn, and stay
       const nameK = 1 - sst(0.02, 0.4, scS); whoEl.style.opacity = nameK.toFixed(3); S.name.style.setProperty('--scrim', nameK.toFixed(3)); whoEl.style.transform = 'translateY(calc(-50% - ' + (scS * 70).toFixed(1) + 'px))';
       // Each piece eases toward where the scroll says it should be over about half a second of its own time, so it never snaps in, however fast the page is scrolled.
-      let anyV = 0; aboutBits.forEach((el, k) => { const want = sst(ABOUT_AT[k][0], ABOUT_AT[k][1], scS); aboutV[k] += (want - aboutV[k]) * (RM ? 1 : 1 - Math.exp(-dt * 2.6)); if (Math.abs(want - aboutV[k]) < 0.002) aboutV[k] = want;
+      let anyV = 0; aboutBits.forEach((el, k) => { const want = sst(ABOUT_AT[k][0], ABOUT_AT[k][1], scS) * (1 - sst(3.0, 3.3, scS)); aboutV[k] += (want - aboutV[k]) * (RM ? 1 : 1 - Math.exp(-dt * (want < aboutV[k] ? 9 : 2.6)));   // (it leaves quickly, and is gone before Projects begins) if (Math.abs(want - aboutV[k]) < 0.002) aboutV[k] = want;
         const v = aboutV[k]; anyV = Math.max(anyV, v); el.style.opacity = v.toFixed(3); el.style.transform = 'translateY(' + ((1 - ease(v)) * 26).toFixed(1) + 'px)'; });
-      aboutEl.style.visibility = anyV > 0.003 ? 'visible' : 'hidden'; }
+      aboutEl.style.visibility = anyV > 0.003 ? 'visible' : 'hidden';
+      // Projects: each block is wiped away softly as it reaches the menu, and the clouds turn to cool blue while the fluid simulation is on screen
+      { let anyW = 0, top = -1; workBits.forEach((el, k) => { const want = sst(WORK_AT[k][0], WORK_AT[k][1], scS); workV[k] += (want - workV[k]) * (RM ? 1 : 1 - Math.exp(-dt * 7)); if (Math.abs(want - workV[k]) < 0.002) workV[k] = want;
+          const v = workV[k]; anyW = Math.max(anyW, v); if (el._v !== v) { el._v = v; el.style.opacity = v.toFixed(3); el.style.transform = 'translateY(' + ((1 - ease(v)) * 24).toFixed(1) + 'px)'; el.style.pointerEvents = v > 0.6 ? '' : 'none'; }
+          if (el.tagName === 'LI' && v > 0.5) top = k - 3; });
+        workEl.style.visibility = anyW > 0.003 ? 'visible' : 'hidden';
+        if (top !== workRow) { workRow = top; if (top >= 0 && !projHover && projShow) projShow(top); } }                 // while the list builds, the picture shows the row that has just arrived
+      // A project's own screen: its blocks are wiped away softly as they pass under its top bar, and the clouds turn to cool blue behind the fluid simulation
+      const open = root.classList.contains('sheet-open');
+      if (open) for (const el of rvEls) { if (!el.offsetParent) continue; const r = el.getBoundingClientRect(), c = r.bottom < 0 || r.top > 190 ? -90 : Math.round(clamp(84 - r.top, -90, r.height + 20)); if (el._c !== c) { el._c = c; el.style.setProperty('--cut', c + 'px'); } }
+      coolV += ((open && coolEl.classList.contains('cur') ? 1 : 0) - coolV) * (RM ? 1 : 1 - Math.exp(-dt * 1.3)); cloudU.uCool.value = coolV; }
     gCam.updateProjectionMatrix(); gCam.updateMatrixWorld(true);
     gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = mix(1.7, 1.15, kw); gStars.userData.u.uOcc.value = kw;
     volU.uCam.value.copy(pos).multiplyScalar(1 / R); volU.uRot.value.setFromMatrix4(gCam.matrixWorld); volU.uTan.value = Math.tan(gCam.fov * Math.PI / 360); volU.uPix.value = 2 * volU.uTan.value * texelU.value.y;
@@ -1716,7 +2011,7 @@ function boot() {
         gk = glassK; }
       else { glassSet = false; glassK = 0;
         if (capK > 0.004) { const r = capEl.getBoundingClientRect(); LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); gk = capK; } }   // (it rides with the star, so it is looked up every frame)
-      LU.uGlK.value = gk; LU.uGlHot.value = nm ? 0 : coreHot; LU.uGlS.value = 1; LU.uGlLens.value = nm ? 1 : 0; }   // (the menu is the rounded rod, the Enter pill the slab: see glass())
+      LU.uGlK.value = root.classList.contains('sheet-open') ? 0 : gk; LU.uGlHot.value = nm ? 0 : coreHot; LU.uGlS.value = 1; LU.uGlLens.value = nm ? 1 : 0; }   // (the menu is the rounded rod, the Enter pill the slab: see glass())
     if (audio.on && audio.ctx) { const t = audio.ctx.currentTime; audio.filter.frequency.setTargetAtTime(300 + 1000 * vis(p, 0.06, 0.18, 0.22, 0.5), t, 0.3); audio.master.gain.setTargetAtTime(0.16, t, 0.25); }
   }
 

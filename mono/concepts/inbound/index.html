@@ -64,7 +64,8 @@ html:not(.idle) #pal,html.nogl #pal{opacity:0;pointer-events:none;visibility:hid
 #pal-menu button .sw{width:56px;height:10px;flex:none}
 #pal-menu button[aria-checked="true"]{color:var(--ink)}
 #pal-menu button[aria-checked="true"]::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--amber);margin-left:auto}
-#pal-menu{max-height:calc(100vh - 84px);overflow:auto}
+#pal-menu{max-height:calc(100vh - 84px);overflow:auto;min-width:286px}
+#pal-menu button{white-space:nowrap}
 #pal-menu .pl{touch-action:none;cursor:grab}
 #pal-menu .pl .pd{width:14px;height:14px;border-radius:50%;flex:none;margin:0 21px;background:radial-gradient(circle at 34% 32%,var(--c1),var(--c2) 78%)}
 #pal-menu .pl small{margin-left:auto;font-size:11px;color:var(--dim)}

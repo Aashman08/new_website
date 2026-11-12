@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#030208;--site:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--pad:clamp(20px,4vw,56px);--col:clamp(24px,8.6vw,150px)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:#f5f5f5;font-family:var(--site);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.6s ease}
+#gl.on{opacity:1}
+#track{height:700vh}                                   /* the scroll length: the title's screen, then one screen for each of the six worlds */
+#back{position:fixed;left:var(--pad);top:20px;z-index:5;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:rgba(255,255,255,.88);text-decoration:none;
+  border:1px solid rgba(244,239,230,.34);border-radius:99px;padding:9px 15px;background:rgba(0,0,0,.4);transition:background .25s,color .25s,border-color .25s}
+#back:hover,#back:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;outline:none}
+#ui{position:fixed;inset:0;z-index:2;pointer-events:none}
+.stop{position:absolute;left:var(--col);top:50%;width:min(31rem,37vw);transform:translateY(-50%);opacity:0;visibility:hidden;text-shadow:0 1px 26px rgba(0,0,0,.7),0 0 2px rgba(0,0,0,.4)}
+.stop .n{display:block;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:rgba(255,255,255,.46);font-variant-numeric:tabular-nums}
+.stop h1,.stop h2{margin:0;font-family:"Playfair Display",Georgia,serif;font-weight:400;letter-spacing:-.012em;color:#f5f5f5;text-wrap:balance}
+.stop h1{font-size:clamp(2.7rem,5.2vw,4.9rem);line-height:1.02}
+.stop h2{margin-top:20px;font-size:clamp(1.9rem,3.3vw,3.15rem);line-height:1.1}
+.stop h1::after,.stop h2::after{content:"";display:block;width:44px;height:1px;background:rgba(255,255,255,.34);margin:24px 0 0}
+.stop p{margin:22px 0 30px;max-width:26rem;font-size:clamp(.95rem,1.1vw,1.04rem);line-height:1.72;letter-spacing:.003em;color:rgba(255,255,255,.7)}
+.stop a{display:inline-flex;align-items:center;gap:12px;pointer-events:auto;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,.9);text-decoration:none;
+  padding:0 0 9px;border-bottom:1px solid rgba(255,255,255,.3);transition:gap .3s,border-color .3s,color .3s}
+.stop a:hover,.stop a:focus-visible{gap:18px;border-color:#fff;color:#fff;outline:none}
+.cue{display:block;margin-top:34px;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:rgba(255,255,255,.46)}
+@media (max-width:700px){
+  .stop{left:24px;right:24px;width:auto;top:auto;bottom:8vh;transform:none}
+  .stop h1::after,.stop h2::after{margin-top:18px}
+  .stop p{margin:16px 0 22px}
+}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<a id="back" href="../?skip=1">&larr; Back</a>
+<main id="ui">
+  <section class="stop" data-at="0"><h1>Projects</h1><span class="cue">Scroll</span></section>
+  <section class="stop" data-at="1"><span class="n">01</span><h2>QuantumViz</h2><p>AI-powered quantum circuit generator using natural language and 3D visualization</p><a href="../?project=quantumviz">View project <span aria-hidden="true">&rarr;</span></a></section>
+  <section class="stop" data-at="2"><span class="n">02</span><h2>Generative AI for Code &amp; Data</h2><p>GPT-powered coding assistant and natural language data analysis platform at Deloitte</p><a href="../?project=ai-engineering-deloitte">View project <span aria-hidden="true">&rarr;</span></a></section>
+  <section class="stop" data-at="3"><span class="n">03</span><h2>AI for SMB Acquisitions</h2><p>Founding Engineer at an AI startup streamlining business acquisitions</p><a href="../?project=actuals">View project <span aria-hidden="true">&rarr;</span></a></section>
+  <section class="stop" data-at="4"><span class="n">04</span><h2>Drone-Mounted IR System for Vegetation Monitoring</h2><p>Enhancing environmental monitoring using drone technology</p><a href="../?project=drone-ndvi">View project <span aria-hidden="true">&rarr;</span></a></section>
+  <section class="stop" data-at="5"><span class="n">05</span><h2>Satellite-Based Fire Detection</h2><p>Visualizing fire, water, and land cover using Copernicus data from ESA</p><a href="../?project=satellite-fire">View project <span aria-hidden="true">&rarr;</span></a></section>
+  <section class="stop" data-at="6"><span class="n">06</span><h2>Lattice Boltzmann Fluid Simulation</h2><p>Computational fluid dynamics simulation of flow past a cylinder using the LBM method</p><a href="../?project=lattice-boltzmann">View project <span aria-hidden="true">&rarr;</span></a></section>
+</main>
+<div id="track"></div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   A tour outward through a planetary system, in the manner of a spacecraft fly-by.
+
+   How it is made. Each world's surface is worked out once, when the page loads, on the graphics card, into a
+   map of the whole globe (longitude by latitude). After that a frame costs almost nothing: every pixel finds
+   where its line of sight meets the globe (exactly, so the limb is smooth at any size), reads the map there and
+   lights it. The expensive part is the map, and that is where the physics is:
+
+   · Worlds with a deep atmosphere (2 to 5). A wind field is built from what is measured on the giant planets:
+     jets that blow along lines of latitude, alternately east and west; long-lived oval storms that sit between
+     two opposing jets and turn the way the shear there turns them; and small eddies, strongest in the belts.
+     Cloud is then carried through that wind for a length of time (each point of the map is traced back upstream
+     to where its air came from). Bands, chevrons, filaments and the spirals inside storms are not drawn: they
+     are what the wind does to the cloud.
+   · Worlds with no air (1 and 6). Craters are laid down with the size distribution counted on the Moon and
+     Mercury (the number larger than a given diameter falls as the inverse square of the diameter), with the
+     measured depths and rim heights for their size, flat floors and central peaks for the larger ones, soft
+     old craters and crisp young ones, bright rays from the youngest. Lava plains flood the lowest ground.
+   ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const QS = new URLSearchParams(location.search);
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+renderer.setPixelRatio(DPR); renderer.autoClear = false; renderer.setClearColor(0x000000, 0);
+const gl = renderer.getContext();
+const SMALL = Math.min(innerWidth, innerHeight) < 520 || renderer.capabilities.maxTextureSize < 8192;
+const MAPK = SMALL ? 0.5 : 1;                                     // phones get maps of half the size
+const ANISO = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+const fl = (x) => { const s = String(+x); return /[.e]/.test(s) ? s : s + '.0'; };
+const rad = (d) => d * Math.PI / 180;
+
+/* ── shared shader text ── */
+const VS = `out vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`;
+const NOISE = /* glsl */`
+  const float PI=3.14159265, TAU=6.2831853;
+  vec3 h33(vec3 p){ p=fract(p*vec3(0.1031,0.1030,0.0973)); p+=dot(p,p.yxz+33.33); return fract((p.xxy+p.yxx)*p.zyx); }
+  float gn(vec3 x){ vec3 i=floor(x), f=fract(x); vec3 u=f*f*f*(f*(f*6.0-15.0)+10.0);
+    float a=dot(h33(i)*2.0-1.0,f), b=dot(h33(i+vec3(1,0,0))*2.0-1.0,f-vec3(1,0,0)), c=dot(h33(i+vec3(0,1,0))*2.0-1.0,f-vec3(0,1,0)), d=dot(h33(i+vec3(1,1,0))*2.0-1.0,f-vec3(1,1,0));
+    float e=dot(h33(i+vec3(0,0,1))*2.0-1.0,f-vec3(0,0,1)), g=dot(h33(i+vec3(1,0,1))*2.0-1.0,f-vec3(1,0,1)), h=dot(h33(i+vec3(0,1,1))*2.0-1.0,f-vec3(0,1,1)), k=dot(h33(i+vec3(1,1,1))*2.0-1.0,f-vec3(1,1,1));
+    return mix(mix(mix(a,b,u.x),mix(c,d,u.x),u.y),mix(mix(e,g,u.x),mix(h,k,u.x),u.y),u.z)*1.6; }
+  float fbm(vec3 p,int n){ float a=0.5,s=0.0; for(int i=0;i<n;i++){ s+=a*gn(p); p=p*2.03+vec3(17.1,3.7,9.2); a*=0.5; } return s; }
+  // the same, but leaving out the detail that is finer than fp (so cloud that the wind has drawn out thinner than the map can hold fades instead of sparkling)
+  float fbmA(vec3 p,float fp,int n){ float a=0.5,s=0.0,f=1.0; for(int i=0;i<n;i++){ float w=1.0-smoothstep(0.18,0.5,fp*f); if(w<=0.0) break; s+=a*w*gn(p); p=p*2.03+vec3(17.1,3.7,9.2); a*=0.5; f*=2.03; } return s; }
+  // a point of the globe from its longitude and latitude. North is +y; longitude runs east (the way the globe turns), as on a map seen from outside.
+  vec3 sph(vec2 ll){ float c=cos(ll.y); return vec3(c*cos(ll.x), sin(ll.y), -c*sin(ll.x)); }
+  float wrapPi(float a){ return a-TAU*floor(a/TAU+0.5); }
+  float sq(float x){ return x*x; }`;
+
+const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2)); quad.frustumCulled = false;
+const qScene = new THREE.Scene(); qScene.add(quad); const qCam = new THREE.Camera();
+const mat = (fs, uniforms, extra) => new THREE.ShaderMaterial(Object.assign({ glslVersion: THREE.GLSL3, uniforms, vertexShader: VS, fragmentShader: fs, depthTest: false, depthWrite: false }, extra));
+function blit(m, target, y0 = 0, y1 = 1) {
+  quad.material = m;
+  if (target) { const a = Math.round(y0 * target.height), b = Math.round(y1 * target.height); target.scissorTest = true; target.scissor.set(0, a, target.width, b - a); }
+  renderer.setRenderTarget(target); renderer.render(qScene, qCam); renderer.setRenderTarget(null);
+}
+const mapTarget = (w, h) => { const t = new THREE.WebGLRenderTarget(w, h, { depthBuffer: false, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, generateMipmaps: true, wrapS: THREE.RepeatWrapping, wrapT: THREE.ClampToEdgeWrapping }); t.texture.anisotropy = ANISO; return t; };
+const floatTarget = (w, h, filter) => new THREE.WebGLRenderTarget(w, h, { depthBuffer: false, type: THREE.HalfFloatType, minFilter: filter, magFilter: filter, generateMipmaps: false, wrapS: THREE.RepeatWrapping, wrapT: THREE.ClampToEdgeWrapping });
+
+/* ═══════════════════════════════ worlds with a deep atmosphere ═══════════════════════════════
+   The wind. jet(lat) is the speed of the east-west wind at each latitude (1 is the fastest jet on the planet).
+   Where the wind's shear turns the same way as the planet (cyclonic) the cloud deck is thin and dark: a belt.
+   Where it turns against the planet (anticyclonic) air rises and bright cloud forms: a zone. So the bands'
+   colours are not chosen: they follow from the jets, and each band's edge is a jet. Long-lived ovals are
+   anticyclones; they can only live in a zone, between a westward jet on their equator side and an eastward one
+   on their pole side, rolling between the two like a ball bearing.                                              */
+const NV = 24;
+const jetsGLSL = (base, list) => `float jet(float lat){ float d=degrees(lat); float u=${base}; ${list.map(([c, a, w]) => `u+=${fl(a)}*exp(-sq((d-(${fl(c)}))/${fl(w)}));`).join(' ')} return u; }`;
+const GASC = (w) => /* glsl */`precision highp float; in vec2 vUv; out vec4 outC; uniform float uSeed; uniform vec4 uVa[${NV}]; uniform vec4 uVb[${NV}];
+  ${NOISE}
+  ${w.jet}
+  float belt(float lat){ float e=0.006; float sh=(jet(lat+e)-jet(lat-e))/(2.0*e); return smoothstep(-${fl(w.beltK)},${fl(w.beltK)},-tanh(lat*25.0)*sh); }
+  float vq(int i,vec2 ll){ vec4 a=uVa[i]; float dx=wrapPi(ll.x-a.x)*cos(a.y), dy=ll.y-a.y; return 0.5*(dx*dx/(a.z*a.z)+dy*dy/(a.w*a.w)); }
+  ${w.env}`;
+// the steady part of the wind: the jets, the slow drift toward the poles (if any), and the ovals
+const FS_STATIC = (w) => GASC(w) + /* glsl */`
+  void main(){ vec2 ll=(vUv-0.5)*vec2(TAU,PI); float cl=max(cos(ll.y),0.05); float u=jet(ll.y), v=merid(ll.y);
+    for(int i=0;i<${NV};i++){ vec4 a=uVa[i], b=uVb[i]; if(b.x==0.0) continue; float q=vq(i,ll); if(q>14.0) continue;
+      float dx=wrapPi(ll.x-a.x)*cos(a.y), dy=ll.y-a.y; float n=b.w;
+      float g=b.x*a.w*mix(1.65,0.93,n-1.0)*n*pow(max(q,1e-5),n-1.0)*exp(-pow(q,n));
+      u+=g*dy/(a.w*a.w); v-=g*dx/(a.z*a.z); }
+    outC=vec4(u/cl,v,0.0,1.0); }`;
+// the eddies: two independent fields of swirls of three sizes, each one the curl of a stream function so that it neither piles cloud up nor thins it out
+const FS_TURB = (w) => GASC(w) + /* glsl */`
+  float psi(vec3 p,float sd){ return (1.0/(1.2*${fl(w.F[0])}))*gn(p*${fl(w.F[0])}+sd)+(0.78/(1.2*${fl(w.F[1])}))*gn(p*${fl(w.F[1])}+sd*1.7+4.1)+(0.6/(1.2*${fl(w.F[2])}))*gn(p*${fl(w.F[2])}+sd*2.3+9.3); }
+  vec2 curlv(vec3 p,float sd){ const float e=0.0012; float c0=psi(p,sd); vec3 g=vec3(psi(p+vec3(e,0,0),sd)-c0,psi(p+vec3(0,e,0),sd)-c0,psi(p+vec3(0,0,e),sd)-c0)/e;
+    vec3 v=cross(p,g); vec3 ea=normalize(vec3(p.z,0.0,-p.x)); vec3 no=cross(p,ea); return vec2(dot(v,ea),dot(v,no)); }
+  void main(){ vec2 ll=(vUv-0.5)*vec2(TAU,PI); vec3 p=sph(ll); float cl=max(cos(ll.y),0.05);
+    vec2 a=curlv(p,uSeed), b=curlv(p,uSeed+37.0); outC=vec4(a.x/cl,a.y,b.x/cl,b.y)*tenv(ll); }`;
+// carrying the cloud: each point of the map is followed back upstream through the wind, then coloured by where its air started
+const FS_ADVECT = (w) => GASC(w) + /* glsl */`
+  uniform sampler2D tS,tT;
+  vec2 vel(vec2 p,float tt){ vec2 uv=vec2(p.x/TAU+0.5,p.y/PI+0.5); float ph=tt*${fl(w.unsteady)};
+    return textureLod(tS,uv,0.0).xy + textureLod(tT,uv+vec2(tt*${fl(w.drift)},0.0),0.0).xy*cos(ph) + textureLod(tT,uv-vec2(tt*${fl(w.drift)}+0.37,0.0),0.0).zw*sin(ph); }
+  ${w.shade}
+  void main(){ vec2 ll=(vUv-0.5)*vec2(TAU,PI); vec2 p=ll, pq=ll; const int N=${w.steps}; float dt=${fl(w.T)}/float(N);
+    for(int i=0;i<N;i++){ float tt=float(i)/float(N); vec2 v1=vel(p,tt); vec2 v2=vel(p-0.5*dt*v1,tt+0.5/float(N)); p-=dt*v2; p.y=clamp(p.y,-1.555,1.555); if(i==N/4) pq=p; }
+    vec3 P0=sph(p), PQ=sph(pq);
+    float fp=max(length(dFdx(P0)),length(dFdy(P0))), fq=max(length(dFdx(PQ)),length(dFdy(PQ)));
+    vec3 c=shade(p,pq,ll,P0,PQ,sph(ll),fp,fq);
+    outC=vec4(sqrt(clamp(c,0.0,1.0)),1.0); }`;
+
+/* ── world 3: a banded gas giant. Jets after Jupiter's measured profile (a broad eastward flow over the equator with peaks at about 7 degrees either side, then
+      alternating jets every 5 to 8 degrees, weakening toward the poles), mirrored north for south so that the fast jet and the great storm are not where Jupiter's are. ── */
+const JOVE = {
+  jet: jetsGLSL('0.62*exp(-sq(d/9.0))', [[7.5, 0.6, 3.2], [18.5, -0.5, 3.4], [26.5, 0.45, 2.6], [32, -0.2, 2.4], [36.5, 0.32, 2.3], [41, -0.1, 2.3], [45.5, 0.26, 2.3], [50.5, -0.06, 2.3], [56, 0.2, 2.5], [61.5, -0.05, 2.5], [67, 0.14, 3],
+    [-7.5, 0.55, 3.2], [-17.5, -0.3, 3.2], [-24, 1.05, 2.4], [-31.5, -0.22, 2.6], [-36.5, 0.32, 2.3], [-41, -0.12, 2.3], [-45.5, 0.24, 2.3], [-50.5, -0.08, 2.3], [-56, 0.18, 2.5], [-61.5, -0.06, 2.5], [-67, 0.13, 3]]),
+  beltK: 7, F: [20, 44, 96], T: 1.15, steps: 128, unsteady: 2.6, drift: 0.02, seed: 3.7,
+  env: /* glsl */`float merid(float lat){ return 0.0; }
+    float tenv(vec2 ll){ float al=abs(degrees(ll.y)); float e=0.02+0.11*belt(ll.y)*(1.0-smoothstep(46.0,64.0,al))+0.12*smoothstep(44.0,66.0,al);
+      float dx=wrapPi(ll.x-(uVa[0].x-0.55)), dy=ll.y-(uVa[0].y-0.125); e+=0.15*exp(-sq(dx/0.5)-sq(dy/0.06));     // the churned-up wake that trails west of the great storm, in the belt beside it
+      return e; }`,
+  shade: /* glsl */`
+    // one scale of cloud, from the highest and whitest ammonia ice down through cream and tan to the dark, deep cloud seen where the upper deck is missing
+    vec3 pal(float d){ vec3 c=mix(vec3(0.92,0.89,0.82),vec3(0.86,0.80,0.66),smoothstep(-0.25,0.1,d)); c=mix(c,vec3(0.74,0.58,0.40),smoothstep(0.1,0.45,d)); c=mix(c,vec3(0.54,0.35,0.21),smoothstep(0.45,0.8,d));
+      c=mix(c,vec3(0.38,0.23,0.14),smoothstep(0.8,1.15,d)); return mix(c,vec3(0.24,0.17,0.13),smoothstep(1.15,1.55,d)); }
+    vec3 shade(vec2 l0,vec2 lq,vec2 ln,vec3 P0,vec3 PQ,vec3 PN,float fp,float fq){
+      float n1=fbmA(P0*5.0+uSeed,fp*5.0,6), n1q=fbmA(PQ*7.0+uSeed*2.1,fq*7.0,5), n2=fbmA(PQ*22.0+uSeed*1.3,fq*22.0,5), n3=fbm(PN*150.0,3), n4=fbmA(P0*2.6+31.0,fp*2.6,4);
+      float wound=smoothstep(0.004,0.016,fp); float gl=length(vec2(dFdx(l0.y),dFdy(l0.y)))/abs(dFdy(ln.y)); float lat=mix(l0.y,ln.y,smoothstep(2.5,7.0,gl)); float dl=degrees(lat), al=abs(dl); float bi=belt(lat);     // (where the wind has wound the cloud tighter than the map can show, use where the air is now: the bands and ovals are steady, so that is the average of the winding)
+      float tint=gn(vec3(dl*0.16,4.2,uSeed));                                                    // each band its own shade
+      // how deep into the cloud we see here. Which band a parcel of air belongs to is set by the latitude it started from, so a band's edge is shaped only by what the wind did to it
+      float d=bi*mix(1.0,0.6,smoothstep(28.0,52.0,al))*(1.0+0.3*tint)+(0.10+0.18*bi)*n1+(0.06+0.34*bi)*n1q+(0.06+0.24*bi)*n2+0.04*n3;
+      vec3 c=pal(d);
+      float grey=clamp(0.75*smoothstep(18.0,48.0,al)+0.4*n4,0.0,1.0);                            // away from the equator the red-brown tint gives way to grey
+      c=mix(c,vec3(dot(c,vec3(0.34,0.36,0.30)))*vec3(0.98,1.0,1.03),0.7*grey);
+      c*=1.0+0.05*n2+0.03*n3;
+      c=mix(c,vec3(0.36,0.41,0.48),0.6*smoothstep(0.6,1.0,bi)*smoothstep(0.18,0.5,-n1-0.3*n2)*(1.0-smoothstep(22.0,38.0,al)));     // blue-grey clearings in the belts: dry, cloud-free air
+      c=mix(c,vec3(0.95,0.93,0.89),0.7*smoothstep(0.4,1.0,bi)*smoothstep(0.30,0.48,n2));             // white outbreaks of fresh convective cloud
+      c=mix(c,vec3(0.43,0.44,0.47)*(1.0+0.4*n2+0.25*n1),0.72*smoothstep(52.0,72.0,al));             // toward the poles the bands give way to a dusky mottle of small storms
+      for(int i=0;i<${NV};i++){ vec4 b=uVb[i]; if(b.z<=0.0) continue; float q=vq(i,ln); if(q>9.0) continue; float w=clamp(exp(-pow(q*1.2,b.w+0.5))*b.z*1.3,0.0,1.0);
+        vec3 vc=b.y<1.5 ? vec3(0.70,0.37,0.25)*(1.0+0.35*n2+0.3*n1) : (b.y<2.5 ? mix(c,vec3(0.94,0.92,0.88),0.75)*(1.0+0.2*n2) : vec3(0.33,0.22,0.16));
+        c=mix(c,vc,w);
+        if(b.y>1.5&&b.y<2.5) c*=1.0-0.22*exp(-sq((sqrt(2.0*q)-1.55)/0.28)); }                      // a thin dark collar round each white oval
+      return c; }`,
+  vort: (() => { const v = [[20, 22.4, 8.5, 4.8, 0.8, 1, 1, 0.95, 2]];                                 // lon, lat, half-length, half-height (degrees), speed at its rim, anticyclone?, kind (1 red, 2 white, 3 dark), how strongly it is tinted, how flat its calm centre is
+    [-150, -112, -80, -41, 5, 44, 96, 140].forEach((l, i) => v.push([l + 6 * Math.sin(i * 7), -34.2, 1.9, 1.45, 0.35, 1, 2, 0.9, 1.5]));
+    [-120, -30, 70, 160].forEach((l) => v.push([l, 34.3, 1.6, 1.2, 0.3, 1, 2, 0.85, 1.5]));
+    [-160, -60, 30, 110].forEach((l) => v.push([l, 43.4, 1.3, 1.0, 0.25, 1, 2, 0.8, 1.5]));
+    [-100, 20, 150].forEach((l) => v.push([l, -43.4, 1.3, 1.0, 0.25, 1, 2, 0.8, 1.5]));
+    [-130, -70, 120].forEach((l) => v.push([l, 13.2, 2.8, 1.0, 0.22, 0, 3, 0.8, 1]));
+    return v; })(),
+};
+/* ── world 4: a ringed gas giant. Saturn's wind is one very broad, very fast eastward stream over the equator and a few weaker jets nearer the poles, under a thick
+      haze that mutes everything to soft gold. The hemisphere tipped away from the star (here the south, which also lies under the rings' shadow) is bluer: its air is clearer. ── */
+const RINGED = {
+  jet: jetsGLSL('1.0*exp(-sq(sq(d/21.0)))-0.12*exp(-sq(d/5.0))', [[42, 0.33, 3.2], [56.5, 0.2, 3], [66, 0.22, 3], [76, 0.25, 2.5], [-41, 0.3, 3.2], [-55.5, 0.22, 3], [-66, 0.2, 3], [-75, 0.2, 2.5]]),
+  beltK: 2.5, F: [10, 24, 55], T: 1.6, steps: 80, unsteady: 2.0, drift: 0.015, seed: 8.3,
+  env: /* glsl */`float merid(float lat){ return 0.0; }
+    float tenv(vec2 ll){ float al=abs(degrees(ll.y)); return 0.006+0.016*belt(ll.y)+0.04*smoothstep(60.0,80.0,al); }`,
+  shade: /* glsl */`vec3 shade(vec2 l0,vec2 lq,vec2 ln,vec3 P0,vec3 PQ,vec3 PN,float fp,float fq){
+      float n1=fbmA(P0*5.0+uSeed,fp*5.0,5), n2=fbmA(PQ*22.0+uSeed,fq*22.0,4);
+      float lat=l0.y; float dl=degrees(lat); float bi=belt(lat);
+      float s1=gn(vec3(dl*0.22,1.7,uSeed)), s2=gn(vec3(dl*0.71,5.1,uSeed)), s3=gn(vec3(dl*2.1,8.3,uSeed));        // many narrow bands, each its own shade
+      float k=clamp(0.25+0.45*bi+0.35*s1+0.22*s2+0.10*s3+0.06*n1+0.03*n2,0.0,1.0);
+      vec3 c=mix(vec3(0.91,0.79,0.55),vec3(0.75,0.60,0.38),k);
+      c=mix(c,vec3(0.94,0.84,0.62),0.5*exp(-sq(dl/9.0)));                                    // the bright equatorial zone
+      c*=1.0+0.03*n1+0.03*n2;
+      c=mix(c,vec3(0.60,0.68,0.74)*(1.0+0.08*s2+0.04*n1),0.72*smoothstep(26.0,60.0,-dl));          // the winter hemisphere
+      c=mix(c,vec3(0.64,0.54,0.40),0.5*smoothstep(58.0,80.0,dl));
+      for(int i=0;i<${NV};i++){ vec4 b=uVb[i]; if(b.z<=0.0) continue; float q=vq(i,l0); if(q>9.0) continue; c=mix(c,vec3(0.95,0.90,0.78),clamp(exp(-pow(q,b.w))*b.z,0.0,1.0)); }
+      return c; }`,
+  vort: [[-60, 35.5, 1.6, 1.1, 0.12, 1, 2, 0.5, 1.5], [40, 35.8, 1.2, 0.9, 0.1, 1, 2, 0.45, 1.5], [130, -36.5, 1.5, 1.0, 0.12, 1, 2, 0.4, 1.5], [-10, 48.5, 1.3, 0.9, 0.1, 1, 2, 0.4, 1.5]],
+};
+/* ── world 5: an ice giant. Neptune's wind is one broad stream that blows backwards over the equator and forwards near the poles. Voyager 2 found a dark oval the
+      size of the Earth with white methane-ice cloud standing along its poleward rim, and thin bright streaks of the same cloud drawn out along lines of latitude. ── */
+const ICE = {
+  jet: `float jet(float lat){ float s=sin(lat); return 1.9*(s*s-0.1284); }`,
+  beltK: 3, F: [9, 20, 44], T: 1.1, steps: 64, unsteady: 2.0, drift: 0.01, seed: 5.9,
+  env: /* glsl */`float merid(float lat){ return 0.0; }
+    float tenv(vec2 ll){ return 0.02+0.05*exp(-vq(0,ll)*0.25); }`,
+  shade: /* glsl */`vec3 shade(vec2 l0,vec2 lq,vec2 ln,vec3 P0,vec3 PQ,vec3 PN,float fp,float fq){
+      float n1=fbmA(P0*4.0+uSeed,fp*4.0,5), n2=fbmA(PQ*18.0+uSeed,fq*18.0,4);
+      float dl=degrees(l0.y);
+      float s1=gn(vec3(dl*0.10,2.2,uSeed)), s2=gn(vec3(dl*0.33,6.1,uSeed));
+      vec3 c=vec3(0.27,0.49,0.82)*(1.0+0.07*s1+0.04*s2+0.06*n1+0.04*n2);
+      c*=1.0-0.12*exp(-sq((dl+55.0)/9.0));                                                   // a darker collar round the south
+      c=mix(c,vec3(0.40,0.60,0.86),0.3*exp(-sq((dl-5.0)/14.0)));
+      for(int i=0;i<${NV};i++){ vec4 b=uVb[i]; if(b.z<=0.0) continue; float q=vq(i,l0); if(q<9.0) c=mix(c,vec3(0.12,0.24,0.56),clamp(exp(-pow(q,b.w))*b.z,0.0,1.0));
+        // the white cloud that stands along the oval's poleward rim: it stays with the storm, the wind blows through it
+        vec4 a=uVa[i]; float dx=wrapPi(ln.x-a.x)*cos(a.y), dy=ln.y-a.y; float rr=sqrt(dx*dx/(a.z*a.z)+dy*dy/(a.w*a.w));
+        float arc=exp(-sq((rr-1.18)/0.10))*smoothstep(0.15,0.75,-sign(a.y)*dy/a.w*-1.0)*smoothstep(-0.2,0.35,fbm(vec3(dx/a.z*5.0,dy/a.w*9.0,uSeed+float(i)),3));
+        c=mix(c,vec3(0.94,0.96,1.0),clamp(arc*b.z*1.2,0.0,1.0)); }
+      float cl=degrees(ln.y);                                                                     // high methane cirrus: long, thin streaks lying along lines of latitude
+      float cir=fbm(vec3(cos(ln.x)*1.7,sin(ln.x)*1.7,ln.y*55.0)+uSeed,4)*(0.8+0.4*fbm(PN*36.0,3));
+      float env=exp(-sq((cl-27.0)/4.0))+0.8*exp(-sq((cl+34.0)/5.0))+0.6*exp(-sq((cl+70.0)/4.0));
+      c=mix(c,vec3(0.90,0.94,1.0),0.5*clamp(env,0.0,1.0)*smoothstep(0.14,0.44,cir));
+      return c; }`,
+  vort: [[10, -21, 11, 5.6, 0.45, 1, 4, 0.85, 1.6]],
+};
+/* ── world 2: a world wrapped in cloud. Venus's cloud tops circle the planet in four days, sixty times faster than the ground turns, at nearly the same speed at every
+      latitude out to about 50 degrees: so the higher latitudes complete a lap sooner, and any marking is drawn out into a chevron that trails back toward the poles.
+      A slow drift carries air poleward. In ordinary light the markings are very faint (they are strong only in ultraviolet); they are kept faint here. ── */
+const VEIL = {
+  jet: `float jet(float lat){ float al=abs(degrees(lat)); return -pow(max(cos(lat),0.0),0.25)*(1.0-0.75*smoothstep(52.0,88.0,al)); }`,
+  beltK: 3, F: [8, 18, 40], T: 5.0, steps: 96, unsteady: 2.0, drift: 0.01, seed: 2.1,
+  env: /* glsl */`float merid(float lat){ return 0.05*sin(2.0*lat); }
+    float tenv(vec2 ll){ return 0.02+0.06*exp(-sq(ll.y/0.45)); }`,
+  shade: /* glsl */`vec3 shade(vec2 l0,vec2 lq,vec2 ln,vec3 P0,vec3 PQ,vec3 PN,float fp,float fq){
+      float n1=fbmA(P0*3.0+uSeed,fp*3.0,6), n2=fbmA(PQ*13.0+uSeed,fq*13.0,4), n3=fbm(PN*70.0,3);
+      float al=abs(degrees(ln.y));
+      float d=0.5+0.95*n1+0.35*n2;                                                                // how much of the unknown absorber is in the cloud tops here
+      d*=1.0-0.8*smoothstep(38.0,60.0,al); d+=0.25*smoothstep(72.0,84.0,al);                      // bright bands at middle latitudes, a darker cap
+      d+=0.22*n3*exp(-sq(al/24.0));                                                          // the mottled, convecting cloud round the equator
+      return mix(vec3(0.95,0.92,0.83),vec3(0.75,0.65,0.46),clamp(d,0.0,1.0)); }`,
+  vort: [],
+};
+
+function bakeGas(w, W, H, jobs) {
+  const out = mapTarget(W, H); const vw = Math.min(2048, W), vh = Math.min(1024, H);
+  const va = [], vb = [];
+  for (let i = 0; i < NV; i++) { const v = w.vort[i]; if (!v) { va.push(new THREE.Vector4(0, 0, 1, 1)); vb.push(new THREE.Vector4(0, 0, 0, 1)); continue; }
+    const turn = (v[5] ? 1 : -1) * Math.sign(v[1]);                        // an anticyclone turns clockwise in the north and anticlockwise in the south
+    va.push(new THREE.Vector4(rad(v[0]), rad(v[1]), rad(v[2]), rad(v[3]))); vb.push(new THREE.Vector4(v[4] * turn, v[6], v[7], v[8])); }
+  const U = { uSeed: { value: w.seed }, uVa: { value: va }, uVb: { value: vb }, tS: { value: null }, tT: { value: null } };
+  let tS, tT, mS, mT, mA;
+  jobs.push(() => { tS = floatTarget(vw, vh, THREE.LinearFilter); mS = mat(FS_STATIC(w), U); blit(mS, tS); });
+  jobs.push(() => { tT = floatTarget(vw, vh, THREE.LinearFilter); mT = mat(FS_TURB(w), U); blit(mT, tT); U.tS.value = tS.texture; U.tT.value = tT.texture; mA = mat(FS_ADVECT(w), U); });
+  const STR = 12; for (let i = 0; i < STR; i++) jobs.push(() => blit(mA, out, i / STR, (i + 1) / STR));
+  jobs.push(() => { tS.dispose(); tT.dispose(); mS.dispose(); mT.dispose(); mA.dispose(); out.ready = true; });
+  return out;
+}
+
+/* ═══════════════════════════════ worlds with no air ═══════════════════════════════
+   Craters. For each of six sizes of crater (each half the size of the last) space is divided into boxes; a box that the surface passes through may hold one
+   crater. Halving the size quadruples the number of boxes on the surface, which is the measured rule: the number of craters larger than D goes as 1/D².
+   Shapes follow the fits made to lunar and Mercurian craters (Pike): small ones are bowls a fifth as deep as they are wide; above about 10 to 20 km they
+   have flat floors, a central peak, and a depth that grows only as D^0.3; the largest have a ring of peaks. Outside the rim the ejecta thins as distance^-3.  */
+const FS_ROCK = /* glsl */`precision highp float; in vec2 vUv; out vec4 outC;
+  uniform float uSeed,uRkm,uFresh; uniform float uDens[6]; uniform int uType; uniform vec4 uRay[8]; uniform vec4 uRayP[8]; uniform vec4 uIce;
+  ${NOISE}
+  float shape(float x,float Dk){
+    float depth=min(0.2*Dk,1.04*pow(Dk,0.30))/uRkm, rim=min(0.036*Dk,0.236*pow(Dk,0.40))/uRkm; float cx=smoothstep(8.0,28.0,Dk); float z;
+    if(x<1.0){ z=mix(-depth,rim,mix(x*x,pow(smoothstep(mix(0.0,0.52,cx),1.0,x),1.7),cx));
+      z+=cx*(1.0-smoothstep(110.0,170.0,Dk))*0.22*depth*exp(-x*x/0.022);                         // central peak
+      z+=smoothstep(130.0,220.0,Dk)*0.16*depth*exp(-sq((x-0.5)/0.075)); }                    // ring of peaks in the largest
+    else z=rim*pow(x,-3.3);
+    return z; }
+  float azim(vec3 p,vec3 c){ vec3 t1=normalize(cross(c,vec3(0.31,0.83,0.46))); vec3 t2=cross(c,t1); vec3 d=p-c; return atan(dot(d,t2),dot(d,t1)); }
+  vec2 voro(vec3 x){ vec3 i=floor(x), f=fract(x); float a=9.0,b=9.0; for(int z=-1;z<=1;z++) for(int y=-1;y<=1;y++) for(int w=-1;w<=1;w++){ vec3 g=vec3(w,y,z); vec3 r=g+h33(i+g)-f; float d=dot(r,r); if(d<a){ b=a; a=d; } else if(d<b) b=d; } return sqrt(vec2(a,b)); }
+  void main(){ vec2 ll=(vUv-0.5)*vec2(TAU,PI); vec3 p=sph(ll); float dl=degrees(ll.y);
+    float hb=0.0009*fbm(p*1.4+uSeed,5); float h=hb, alb=1.0, idx=0.5, plains=0.0, ice=0.0, dark=0.0, dI=9.0; float region=0.65+0.7*smoothstep(-0.3,0.3,fbm(p*1.9+uSeed*7.0,4));
+    if(uType==1&&uIce.w>0.0){ dI=acos(clamp(dot(p,uIce.xyz),-1.0,1.0))/(uIce.w*(1.0+0.26*fbm(p*2.6+uSeed*2.0,5)+0.07*fbm(p*11.0,4)+0.025*fbm(p*40.0,3))); ice=1.0-smoothstep(0.84,1.0,dI); }
+    for(int k=0;k<6;k++){ float s=0.5*exp2(-float(k));
+      if(k==2&&uType==0){ plains=smoothstep(0.05,0.45,-h*480.0+0.9*fbm(p*2.3+uSeed*3.0,5)); h=mix(h,min(h,-0.0006),plains*0.75); }    // lava has flooded the lowest ground and whatever craters were there
+      vec3 g=floor(p/s); float sd=uSeed+float(k)*13.7; float flood=uType==0 ? plains*(k<2?0.0:(k<4?0.86:0.55)) : 0.0;
+      for(int z=-1;z<=1;z++) for(int y=-1;y<=1;y++) for(int x=-1;x<=1;x++) for(int m=0;m<2;m++){
+        if(m==1&&k<1) break;
+        vec3 id=g+vec3(x,y,z); vec3 r1=h33(id+sd+float(m)*5.3); vec3 q=(id+r1)*s; float rq=length(q); if(abs(rq-1.0)>0.5*s) continue;
+        vec3 r2=h33(id*1.31+sd+7.7+float(m)*3.1); if(r2.x>uDens[k]*region) continue;
+        vec3 c=q/rq; float a=s*0.15*inversesqrt(1.0-r2.y*0.826); float xx=length(p-c)/a; if(xx>2.9) continue;
+        xx*=1.0+0.09*gn(p*(1.8/a)+r1*31.0)+0.05*gn(p*(5.0/a)+r2*17.0);                           // no rim is a perfect circle
+        float Dk=2.0*a*uRkm, age=pow(r2.z,1.4);
+        float amp=(1.0-flood)*(1.0-ice)*mix(1.0,0.55,smoothstep(250.0,500.0,Dk));                  // the great basins have relaxed and filled
+        float soft=-0.45*min(0.2*Dk,1.04*pow(Dk,0.30))/uRkm*sq(max(1.0-xx*xx*0.8,0.0));            // an old crater: its rim worn away, its bowl half filled
+        h+=mix(soft,shape(xx,Dk),smoothstep(0.15,0.75,age))*amp;
+        float fr=smoothstep(0.80,0.97,age)*(1.0-ice)*(1.0-flood);                                 // the youngest still show bright, freshly broken rock, thrown out in streaks
+        if(fr>0.0){ float az=azim(p,c); float st=0.4+0.6*smoothstep(-0.1,0.45,gn(vec3(cos(az),sin(az),r1.x*9.0)*3.2+r2*20.0));
+          alb+=uFresh*fr*(xx<1.0 ? 0.55+0.45*xx : exp(-(xx-1.0)/0.75)*st); }
+        if(uType==1) alb+=0.10*age*(1.0-ice)*exp(-sq((xx-0.95)/0.2))*smoothstep(20.0,50.0,abs(dl));      // frost on the rims at higher latitudes
+      } }
+    for(int i=0;i<8;i++){ vec4 rc=uRay[i]; if(rc.w<=0.0) continue; float a=rc.w, xx=length(p-rc.xyz)/a; if(xx>44.0) continue; float sd=uRayP[i].x;      // the few great ray systems
+      if(xx<3.0) h+=shape(xx*(1.0+0.06*gn(p*(1.8/a)+sd)),2.0*a*uRkm);
+      float az=azim(p,rc.xyz); vec3 cz=vec3(cos(az),sin(az),sd);
+      float r1n=gn(cz*2.3+sd), r2n=gn(cz*7.0+sd*2.0), r3n=gn(cz*19.0+sd*3.0);
+      float len=uRayP[i].z*(0.2+1.7*smoothstep(-0.3,0.5,r1n)*(0.5+max(r2n,0.0)));
+      float streak=smoothstep(0.0,0.42,r2n*0.7+r3n*0.55+r1n*0.25)*(1.0-smoothstep(0.25*len,len,xx))*(0.6+0.5*gn(p*(2.5/a)+sd));
+      alb+=uRayP[i].y*(xx<1.0 ? 0.6+0.4*xx : max(exp(-(xx-1.0)/0.9),streak*0.75)); }
+    h+=(0.00035*fbm(p*22.0+uSeed,5)+0.00016*fbm(p*90.0+uSeed,4)+0.00005*fbm(p*300.0,3))*(1.0-ice)*(1.0-0.65*plains);          // the ground between craters is itself worn, overlapping older craters too small to resolve
+    float u1=fbm(p*2.6+uSeed*5.0,5), u2=fbm(p*9.0+uSeed,4);
+    if(uType==0){ alb*=(1.0+0.2*u1+0.09*u2)*(1.0+0.08*plains); idx=clamp(0.45+0.45*plains+0.5*u1,0.0,1.0); }
+    else { float dn=fbm(p*2.0+uSeed*4.0,6), dn2=fbm(p*8.0+uSeed*6.0,5), lobes=0.5+0.5*sin(ll.x+3.75)+0.3*sin(ll.x*3.0+0.4);
+      dark=smoothstep(0.40,0.50,exp(-sq((dl+10.0)/15.0))*(0.55+0.5*lobes)*(0.85+1.0*dn+0.45*dn2))*smoothstep(1.0,1.35,dI);      // dark red-brown ground (organic tars made by sunlight) in broken patches along the equator
+      dark*=1.0-0.85*smoothstep(0.0002,0.0010,h-hb);                                              // it lies in the low ground; rims and heights stay bright with frost
+      float halo=(1.0-smoothstep(1.0,1.55+0.3*dn,dI))*(1.0-dark);                                  // bright frosted uplands beside the ice plain
+      float np=smoothstep(46.0,72.0,dl+16.0*dn+6.0*dn2);                                          // the pole: a diffuse dark red stain, gas that froze out there and was tanned by sunlight
+      dark*=0.75; alb=alb*mix(mix(mix(0.62,0.82,halo*0.7),0.30*(1.0+0.3*dn2),dark),0.30,np*0.85)*(1.0+0.20*u1+0.10*u2); idx=mix(mix(mix(0.5,0.8,halo*0.7),0.05,dark),0.0,np*0.9)+0.14*u2;
+      vec2 v=voro(p*30.0+uSeed); float cell=smoothstep(0.0,0.07,v.y-v.x);                         // the plain of nitrogen ice: no craters, a faint pattern of convection cells
+      float icy=smoothstep(0.25,0.75,ice); alb=mix(alb,0.86*mix(0.95,1.0,cell)*(1.0+0.08*u1+0.05*u2),icy); idx=mix(idx,0.88+0.08*u1,icy);
+      h=mix(h,-0.0005-0.00004*(1.0-cell),ice);
+      h+=0.0006*exp(-sq((dI-0.97)/0.05))*(0.5+fbm(p*40.0,4))*smoothstep(-0.1,0.2,dot(cross(uIce.xyz,vec3(0,1,0)),p-uIce.xyz));   // blocks of water-ice mountains along one shore
+    }
+    outC=vec4(h,alb,clamp(idx,0.0,1.0),1.0); }`;
+// second step: the slope of the ground east and north (which is what lighting needs), with brightness and tint
+const FS_ROCK2 = /* glsl */`precision highp float; in vec2 vUv; out vec4 outC; uniform sampler2D tH; uniform vec2 uTexel;
+  void main(){ float lat=(vUv.y-0.5)*3.14159265; float cl=max(cos(lat),0.03); float st=min(floor(1.0/cl),16.0); vec2 dx=vec2(uTexel.x*st,0.0), dy=vec2(0.0,uTexel.y);
+    float dE=(texture(tH,vUv+dx).r-texture(tH,vUv-dx).r)/(2.0*dx.x*6.2831853*cl), dN=(texture(tH,vUv+dy).r-texture(tH,vUv-dy).r)/(2.0*dy.y*3.14159265);
+    vec4 c=texture(tH,vUv); outC=vec4(clamp(vec2(dE,dN)*0.5+0.5,0.0,1.0),sqrt(clamp(c.g*0.5,0.0,1.0)),c.b); }`;
+const dir = (lonD, latD) => { const l = rad(lonD), b = rad(latD); return [Math.cos(b) * Math.cos(l), Math.sin(b), -Math.cos(b) * Math.sin(l)]; };
+function bakeRock(w, W, H, jobs) {
+  const out = mapTarget(W, H); let tH, m1, m2, m3; out.hgt = new THREE.WebGLRenderTarget(W, H, { depthBuffer: false, format: THREE.RedFormat, type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, generateMipmaps: false, wrapS: THREE.RepeatWrapping, wrapT: THREE.ClampToEdgeWrapping });
+  const rays = [], rayP = []; for (let i = 0; i < 8; i++) { const r = w.rays[i]; rays.push(r ? new THREE.Vector4(...dir(r[0], r[1]), r[2]) : new THREE.Vector4()); rayP.push(r ? new THREE.Vector4(r[3], r[4], r[5], 0) : new THREE.Vector4()); }
+  const U = { uSeed: { value: w.seed }, uRkm: { value: w.rkm }, uFresh: { value: w.fresh }, uDens: { value: w.dens }, uType: { value: w.type }, uRay: { value: rays }, uRayP: { value: rayP }, uIce: { value: new THREE.Vector4(...dir(w.ice[0], w.ice[1]), w.ice[2]) } };
+  jobs.push(() => { tH = floatTarget(W, H, THREE.NearestFilter); m1 = mat(FS_ROCK, U); });
+  const STR = 16; for (let i = 0; i < STR; i++) jobs.push(() => blit(m1, tH, i / STR, (i + 1) / STR));
+  jobs.push(() => { m2 = mat(FS_ROCK2, { tH: { value: tH.texture }, uTexel: { value: new THREE.Vector2(1 / W, 1 / H) } }); blit(m2, out);
+    m3 = mat(`precision highp float; in vec2 vUv; out vec4 outC; uniform sampler2D tH; void main(){ outC=vec4(texture(tH,vUv).r); }`, { tH: { value: tH.texture } }); blit(m3, out.hgt); tH.dispose(); m1.dispose(); m2.dispose(); m3.dispose(); out.ready = true; });
+  return out;
+}
+
+/* ── the rings: one strip from the inner edge to the outer, following the layout Cassini measured at Saturn (distances in planet radii).
+      C ring: thin and dusky, with a few denser plateaus. B ring: so dense it is opaque, structured at every scale. Cassini Division: nearly empty.
+      A ring: half-transparent, with the Encke gap near its outer edge. F ring: one narrow strand just beyond. ── */
+const RIN = 1.2, ROUT = 2.36;
+function ringTexture() {
+  const N = 4096, d = new Uint8Array(N * 4); let s = 1234567;
+  const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const tab = Float32Array.from({ length: 8192 }, rnd);
+  const vn = (x) => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return tab[i & 8191] * (1 - u) + tab[(i + 1) & 8191] * u; };
+  const fb = (x) => (vn(x) + 0.5 * vn(x * 2.3 + 91) + 0.25 * vn(x * 5.1 + 37) + 0.125 * vn(x * 11.7 + 13)) / 1.875;
+  const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  for (let i = 0; i < N; i++) { const r = RIN + (i + 0.5) / N * (ROUT - RIN); let tau = 0, c = [0.8, 0.76, 0.68];
+    if (r > 1.239 && r < 1.527) { tau = 0.05 + 0.05 * fb(r * 60) + 0.1 * ss(1.49, 1.527, r); if (r > 1.37 && fb(r * 95 + 400) > 0.6) tau += 0.28; if (Math.abs(r - 1.29) < 0.0025 || Math.abs(r - 1.452) < 0.003) tau = 0; c = [0.44, 0.41, 0.38]; }
+    else if (r >= 1.527 && r < 1.951) { const f = fb(r * 240), g = fb(r * 900 + 77);
+      tau = r < 1.655 ? 0.9 + 0.5 * f : r < 1.73 ? 1.4 + 2.4 * f : r < 1.87 ? 3.4 + 1.6 * f : 2.0 + 2.2 * f; tau *= 0.75 + 0.5 * g; tau *= ss(1.527, 1.534, r);
+      const k = ss(1.527, 1.75, r); c = [0.80 + 0.07 * k, 0.73 + 0.06 * k, 0.60 + 0.05 * k].map((v) => v * (0.80 + 0.2 * f) * (0.94 + 0.1 * g) * (0.84 + 0.3 * fb(r * 38 + 7))); }
+    else if (r >= 1.951 && r < 2.027) { tau = r < 1.959 ? 0 : 0.05 + 0.1 * fb(r * 300) + 0.25 * ss(2.008, 2.027, r); if (Math.abs(r - 1.99) < 0.002) tau = 0; c = [0.46, 0.43, 0.40]; }
+    else if (r >= 2.027 && r < 2.269) { tau = 0.48 + 0.3 * ss(2.12, 2.027, r) + 0.12 * ss(2.2, 2.269, r); tau *= 0.9 + 0.2 * fb(r * 500); if (r > 2.2135 && r < 2.219) tau = 0; if (r > 2.2645 && r < 2.2655) tau = 0; c = [0.64, 0.60, 0.53].map((v) => v * (0.92 + 0.1 * fb(r * 700 + 5)) * (0.9 + 0.2 * fb(r * 50 + 3))); }
+    tau += 0.05 * Math.exp(-Math.pow((r - 2.326) / 0.0015, 2));
+    d[i * 4] = 255 * Math.sqrt(c[0]); d[i * 4 + 1] = 255 * Math.sqrt(c[1]); d[i * 4 + 2] = 255 * Math.sqrt(c[2]); d[i * 4 + 3] = 255 * Math.min(0.99, 1 - Math.exp(-tau)); }
+  const t = new THREE.DataTexture(d, N, 1, THREE.RGBAFormat); t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; t.generateMipmaps = true; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.needsUpdate = true; return t;
+}
+
+/* ═══════════════════════════════ the six worlds ═══════════════════════════════
+   phase: the angle star-world-camera where the camera rests (0 would be the fully lit face, 90 exactly half lit, more than 90 a crescent)
+   size: the globe's radius as a fraction of half the frame's height · at: where its centre sits in the frame (-1..1) · axis: its spin axis · spin: degrees a second
+   kind 0, bare rock: the surface scatters light as lunar soil does (no darkening toward the limb at small phase: the full Moon looks flat) and shadows are black.
+   kind 1, atmosphere: a deep cloud deck that darkens toward the limb and fades smoothly into night, under a thin layer of clear gas that scatters blue and absorbs.  */
+// the spin axis that puts the star sunEl degrees above the ring plane and the resting camera camEl degrees above it
+const ringAxis = (phase, sunEl, camEl) => { const a = rad(phase), nx = -Math.sin(rad(sunEl)), nz = (Math.sin(rad(camEl)) + Math.cos(a) * nx) / Math.sin(a); return [nx, Math.sqrt(1 - nx * nx - nz * nz), nz]; };
+const WORLDS = [
+  { name: 'scorched rock', kind: 0, phase: 76, size: 0.62, at: [0.42, 0], axis: [0.04, 1, 0.10], spin: 0.5, face: -75, flat: 0, bump: 1.5, sun: 1.2, pen: 0.012,
+    pal: [[0.40, 0.39, 0.40], [0.50, 0.46, 0.42], [0.60, 0.54, 0.46]], mean: [0.5, 0.46, 0.42],
+    bake: (jobs) => bakeRock({ type: 0, seed: 4.2, rkm: 2440, fresh: 0.6, dens: [0.22, 0.4, 0.55, 0.65, 0.7, 0.8], ice: [0, 0, 0],
+      rays: [[-62, 18, 0.019, 3.1, 0.55, 30], [-118, -32, 0.013, 7.7, 0.5, 34], [-95, 55, 0.010, 1.3, 0.45, 26], [-20, -12, 0.016, 5.2, 0.5, 30], [40, 30, 0.012, 9.1, 0.5, 28], [110, -40, 0.015, 2.6, 0.5, 30], [160, 12, 0.011, 6.4, 0.45, 26], [-150, 5, 0.009, 8.8, 0.45, 30]] }, 4096 * MAPK, 2048 * MAPK, jobs) },
+  { name: 'cloud world', kind: 1, phase: 64, size: 0.62, at: [0.42, 0], axis: [-0.06, 1, 0.16], spin: -0.55, face: 0, flat: 0, sun: 0.72, minK: 0.9, scat: [0.010, 0.012, 0.018], absb: [0.004, 0.012, 0.035], mean: [0.9, 0.86, 0.75],
+    bake: (jobs) => bakeGas(VEIL, 2048 * MAPK, 1024 * MAPK, jobs) },
+  { name: 'banded giant', kind: 1, phase: 40, size: 0.66, at: [0.44, 0], axis: [0.17, 1, 0.12], spin: 1.1, face: 24, flat: 0.065, sun: 0.8, minK: 1.0, scat: [0.006, 0.010, 0.020], absb: [0.004, 0.008, 0.016], mean: [0.75, 0.68, 0.58],
+    bake: (jobs) => bakeGas(JOVE, 4096 * MAPK, 2048 * MAPK, jobs) },
+  { name: 'ringed giant', kind: 1, phase: 46, size: 0.40, at: [0.50, 0.02], axis: ringAxis(46, 13, 15), spin: 1.0, face: 0, flat: 0.098, ring: 1, sun: 0.9, minK: 1.0, scat: [0.005, 0.008, 0.016], absb: [0.003, 0.008, 0.018], mean: [0.82, 0.72, 0.52],
+    bake: (jobs) => bakeGas(RINGED, 2048 * MAPK, 2048 * MAPK, jobs) },
+  { name: 'ice giant', kind: 1, phase: 96, size: 0.62, at: [0.40, 0], axis: [-0.34, 1, -0.34], spin: 0.8, face: 2, flat: 0.017, sun: 1.0, minK: 0.85, scat: [0.006, 0.014, 0.034], absb: [0.060, 0.012, 0.002], mean: [0.33, 0.54, 0.83],
+    bake: (jobs) => bakeGas(ICE, 2048 * MAPK, 1024 * MAPK, jobs) },
+  { name: 'ice dwarf', kind: 0, phase: 58, size: 0.58, at: [0.42, 0], axis: [0.22, 0.8, 0.8], spin: 0.4, face: -92, flat: 0, bump: 1.3, sun: 0.92,
+    pal: [[0.52, 0.27, 0.17], [0.80, 0.71, 0.62], [0.97, 0.95, 0.92]], mean: [0.7, 0.6, 0.5],
+    bake: (jobs) => bakeRock({ type: 1, seed: 9.4, rkm: 1188, fresh: 0.3, dens: [0.14, 0.28, 0.36, 0.42, 0.45, 0.45], ice: [0, 0, 0] /* (a plain of nitrogen ice, as on Pluto, can be switched on here: lon, lat, radius. It is off: it did not look real.) */, rays: [[-118, 8, 0.02, 2.2, 0.3, 22], [-70, 40, 0.013, 6.1, 0.3, 24], [-150, -30, 0.016, 4.4, 0.28, 20]] }, 4096 * MAPK, 2048 * MAPK, jobs) },
+];
+const jobs = []; WORLDS.forEach((w) => { w.map = w.bake(jobs); w.N = new THREE.Vector3(...w.axis).normalize(); });
+const ringTex = ringTexture();
+
+/* ═══════════════════════════════ a frame ═══════════════════════════════ */
+const FOV = 32, TANY = Math.tan(rad(FOV / 2));
+const FS_WORLD = /* glsl */`precision highp float; in vec2 vUv; out vec4 outC;
+  uniform vec3 uRo,uL,uC0,uC1,uC2,uScat,uAbs,uMean,uFarC; uniform mat3 uCam,uPF; uniform vec2 uTan; uniform vec4 uFar;
+  uniform float uPx,uRot,uFlat,uKind,uRing,uBump,uSun,uMinK,uLL,uDotB,uOn,uPen,uMapW; uniform sampler2D tMap,tRing,tHgt;
+  const float PI=3.14159265, TAU=6.2831853, RIN=${fl(RIN)}, ROUT=${fl(ROUT)};
+  float sq(float x){ return x*x; }
+  // how much starlight the rings let through at radius r, for light crossing them at slope sl (and how wide a stretch dr of them this pixel's shadow covers)
+  vec4 ringAt(float r,float dr){ float u=(r-RIN)/(ROUT-RIN); vec4 t=textureGrad(tRing,vec2(u,0.5),vec2(dr/(ROUT-RIN),0.0),vec2(0.0)); t.a*=step(0.0,u)*step(u,1.0); return t; }
+  float tauOf(float a){ return -log(1.0-min(a,0.99)); }
+  void main(){ vec2 ndc=vUv*2.0-1.0; vec3 rdW=normalize(uCam*vec3(ndc*uTan,1.0));
+    vec3 ro=uPF*uRo, rd=uPF*rdW, L=uPF*uL; float kf=1.0/(1.0-uFlat); vec3 sc=vec3(1.0,kf,1.0);
+    // the globe is a sphere squashed along its spin axis (fast-spinning giants bulge at the equator: Saturn is a tenth wider than it is tall); stretch space so it becomes a unit sphere
+    vec3 ro2=ro*sc, rd2=rd*sc; float A=dot(rd2,rd2), B=dot(ro2,rd2), C=dot(ro2,ro2)-1.0;
+    float tc=-B/A; float dc=sqrt(max(dot(ro2,ro2)-B*B/A,0.0)); float px=uPx*max(tc,1e-3);
+    float cov=clamp(0.5+(1.0-dc)/px,0.0,1.0)*step(0.0,tc);                                      // how much of this pixel the globe covers (a smooth limb)
+    float disc=B*B-A*C; float tP=disc>0.0 ? (-B-sqrt(disc))/A : tc; vec3 q=normalize(ro2+rd2*tP);
+    vec3 col=vec3(0.0); float alpha=0.0;
+    // where the line from this point toward the star crosses the ring plane
+    vec3 X=q/sc; float sR=-X.y/L.y; float rS=length((X+L*sR).xz); float drS=fwidth(rS);
+    float tR=-ro.y/rd.y; float rr=length((ro+rd*tR).xz); float drr=fwidth(rr);
+    vec3 dqx=dFdx(q), dqy=dFdy(q);
+    if(cov>0.0&&uOn>0.5){
+      vec3 n=normalize(q*sc); float rxz=max(q.x*q.x+q.z*q.z,1e-5);
+      vec2 uv=vec2((atan(-q.z,q.x)-uRot)/TAU+0.5, asin(clamp(q.y,-1.0,1.0))/PI+0.5);
+      vec2 gx=vec2((-q.x*dqx.z+q.z*dqx.x)/rxz/TAU, dqx.y/sqrt(rxz)/PI), gy=vec2((-q.x*dqy.z+q.z*dqy.x)/rxz/TAU, dqy.y/sqrt(rxz)/PI);
+      vec4 t=textureGrad(tMap,uv,gx,gy);
+      float mu0=dot(n,L), mu=max(dot(n,-rd),0.015); vec3 c;
+      if(uKind<0.5){
+        // bare ground. Its slope tilts the surface toward or away from the star; a slope turned away from the star is in black shadow.
+        vec3 ea=normalize(vec3(q.z,0.0,-q.x)), no=cross(q,ea); vec2 sl=(t.rg*2.0-1.0)*uBump;
+        vec3 nb=normalize(n-sl.x*ea-sl.y*no); float m0=max(dot(nb,L),0.0), mb=max(dot(nb,-rd),0.03);
+        float I=(1.0-uLL)*m0+uLL*2.0*m0/(m0+mb);                                                // lunar soil: part ordinary matte surface, part the Lommel-Seeliger law of a dark, porous dust
+        I*=smoothstep(-0.012,0.03,mu0);
+        // shadows thrown by the relief: walk from this point toward the star and see whether any ground on the way stands above the line of sight to it
+        // (the ground also curves away, by s*s/2 over a distance s). The shadow's edge is as soft as the star is wide in this world's sky.
+        float fpx=max(length(gx),length(gy))*uMapW;
+        if(mu0<0.5&&mu0>-0.03&&fpx<4.0){ vec3 td=normalize(L-n*mu0); float te=mu0/sqrt(max(1.0-mu0*mu0,1e-4)); float h0=textureLod(tHgt,uv,0.0).r*uBump, s=0.0016, mn=1.0;
+          for(int i=0;i<18;i++){ vec3 qi=normalize(q+td*s); float hi=textureLod(tHgt,vec2((atan(-qi.z,qi.x)-uRot)/TAU+0.5,asin(clamp(qi.y,-1.0,1.0))/PI+0.5),0.0).r*uBump;
+            mn=min(mn,(h0+s*te+0.5*s*s-hi)/s); s*=1.3; }
+          I*=mix(1.0,smoothstep(-uPen,uPen,mn),1.0-smoothstep(1.5,4.0,fpx)); }
+        float al=t.b*t.b*2.0; vec3 base=t.a<0.5 ? mix(uC0,uC1,t.a*2.0) : mix(uC1,uC2,t.a*2.0-1.0);
+        c=base*al*I; c=mix(c,vec3(dot(c,vec3(0.3,0.5,0.2))),clamp((al-1.15)*0.5,0.0,0.4)*(1.0-uKind));
+      } else {
+        // a cloud deck. Minnaert's law, which fits the giant planets with an exponent close to 1: brightness falls with the cosine of the star's height (a soft terminator)
+        // and the limb is darkened. Above the deck a thin clear layer scatters a little blue light back and absorbs along the slanted path near the limb and terminator.
+        float m0=0.5*(mu0+sqrt(mu0*mu0+0.0007)); float I=pow(m0,uMinK)*pow(mu,uMinK-1.0);
+        float path=1.0/mu+1.0/(m0+0.04);
+        c=t.rgb*t.rgb*I*exp(-uAbs*path)+uScat*(m0/(m0+mu))*(1.0-exp(-path*0.6))*4.0;
+        if(uRing>0.5&&sR>0.0){ vec4 rg=ringAt(rS,drS); c*=exp(-tauOf(rg.a)/max(abs(L.y),0.02)); }   // the rings' shadow on the globe
+      }
+      col=c*uSun*cov; alpha=cov;
+    }
+    if(uRing>0.5&&tR>0.0&&uOn>0.5){ vec4 rg=ringAt(rr,drr);
+      if(rg.a>0.0){ float tau=tauOf(rg.a); float mu=max(abs(rd.y),0.02), mu0=max(abs(L.y),0.02); vec3 xr=ro+rd*tR;
+        // the rings are a sheet of ice boulders one layer thick. Seen from the lit side they shine by light scattered once back toward the camera; a denser ring is brighter
+        // until it becomes opaque. Seen from the dark side only the thin rings shine, by light that has passed through.
+        float refl=ro.y*L.y>0.0 ? mu0/(mu0+mu)*(1.0-exp(-tau*(1.0/mu+1.0/mu0))) : mu0/max(abs(mu0-mu),0.02)*abs(exp(-tau/mu0)-exp(-tau/mu))*0.6;
+        vec3 a2=xr*sc, b2=L*sc; float bb=dot(a2,b2), aa=dot(b2,b2); float tm=-bb/aa; float dm=sqrt(max(dot(a2,a2)-bb*bb/aa,0.0));
+        float sh=tm>0.0 ? smoothstep(1.0-0.004-uPx*tR*2.0,1.0+0.004+uPx*tR*2.0,dm) : 1.0;           // the globe's shadow across the rings
+        vec3 rc=rg.rgb*rg.rgb*refl*sh*uSun*1.6; float T=exp(-tau/mu);
+        if(disc>0.0&&tP<tR){ col+=(1.0-cov)*rc; alpha=cov+(1.0-cov)*(1.0-T); }
+        else { col=rc+col*T; alpha=1.0-(1.0-alpha)*T; } } }
+    // from far away a world is smaller than a pixel: draw it as a point with the right amount of light, and let the globe take over as it grows
+    float dist=length(uRo); float rpx=1.0/(dist*uPx); float sg=max(0.8,rpx*0.6); float dp=length(rdW+uRo/dist)/uPx;
+    float pt=exp(-0.5*dp*dp/(sg*sg))*rpx*rpx/(2.0*sg*sg)*step(0.0,dot(rdW,-uRo));
+    float wf=smoothstep(1.2,3.0,rpx); col=mix(uMean*uDotB*uSun*pt,col,wf); alpha*=wf;
+    if(uFar.w>0.0){ float fs=0.8; float fd=length(rdW-uFar.xyz)/uPx; col+=uFarC*exp(-0.5*fd*fd/(fs*fs))*uFar.w*uFar.w/(2.0*fs*fs); }
+    outC=vec4(col,alpha); }`;
+const WU = { uRo: { value: new THREE.Vector3() }, uL: { value: new THREE.Vector3(-1, 0, 0) }, uC0: { value: new THREE.Vector3() }, uC1: { value: new THREE.Vector3() }, uC2: { value: new THREE.Vector3() },
+  uScat: { value: new THREE.Vector3() }, uAbs: { value: new THREE.Vector3() }, uMean: { value: new THREE.Vector3() }, uFarC: { value: new THREE.Vector3() }, uCam: { value: new THREE.Matrix3() }, uPF: { value: new THREE.Matrix3() },
+  uTan: { value: new THREE.Vector2() }, uFar: { value: new THREE.Vector4() }, uPx: { value: 0.001 }, uRot: { value: 0 }, uFlat: { value: 0 }, uKind: { value: 0 }, uRing: { value: 0 }, uBump: { value: 1 }, uSun: { value: 1 },
+  uMinK: { value: 1 }, uLL: { value: 0.4 }, uDotB: { value: 1 }, uOn: { value: 0 }, uPen: { value: 0.01 }, uMapW: { value: 4096 }, tMap: { value: null }, tHgt: { value: null }, tRing: { value: ringTex } };
+const worldMat = mat(FS_WORLD, WU, { transparent: true, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor });
+
+/* ── the sky: the same field of point stars as the main page, coloured by temperature. (They do not twinkle: there is no air here.) ── */
+const sScene = new THREE.Scene(), sCam = new THREE.PerspectiveCamera(FOV, 1, 1, 9000);
+const starU = { uGain: { value: 1 }, uDpr: { value: DPR } };
+{ const n = SMALL ? 3200 : 8000, R = 4000, pos = new Float32Array(n * 3), a = new Float32Array(n * 2);
+  let s = 99; const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  for (let i = 0; i < n; i++) { const u = rnd() * 2 - 1, t = rnd() * 6.2831853, q = Math.sqrt(1 - u * u); pos.set([q * Math.cos(t) * R, u * R, q * Math.sin(t) * R], i * 3); a.set([Math.pow(rnd(), 4.5) * 2.4 + 1.15, rnd()], i * 2); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(a, 2));
+  const m = new THREE.ShaderMaterial({ uniforms: starU, glslVersion: THREE.GLSL3, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `in vec2 aA; uniform float uDpr; out float vA; out float vS; void main(){ vS=aA.y; vA=0.5+0.5*aA.y; gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader: `precision highp float; uniform float uGain; in float vA; in float vS; out vec4 outC;
+      vec3 starCol(float k){ vec3 c=mix(vec3(1.0,0.42,0.26),vec3(1.0,0.64,0.36),smoothstep(0.00,0.24,k)); c=mix(c,vec3(1.0,0.86,0.56),smoothstep(0.22,0.46,k)); c=mix(c,vec3(1.0,0.97,0.92),smoothstep(0.44,0.62,k));
+        c=mix(c,vec3(0.70,0.83,1.0),smoothstep(0.62,0.80,k)); c=mix(c,vec3(0.46,0.64,1.0),smoothstep(0.82,1.00,k)); return c; }
+      void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f; outC=vec4(starCol(fract(vS*7.3)),vA*f*uGain); }` });
+  const p = new THREE.Points(g, m); p.frustumCulled = false; sScene.add(p); }
+
+/* ── the picture is built in linear light, then given the main page's finish: the filmic (ACES) curve, a soft vignette and fine grain ── */
+const rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, depthBuffer: false });
+const postU = { tD: { value: rt.texture }, uTime: { value: 0 } };
+const postMat = mat(/* glsl */`precision highp float; in vec2 vUv; out vec4 outC; uniform sampler2D tD; uniform float uTime;
+  float gh(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
+  vec3 fit(vec3 v){ vec3 a=v*(v+0.0245786)-0.000090537; vec3 b=v*(0.983729*v+0.4329510)+0.238081; return a/b; }
+  vec3 tone(vec3 c){ c=max(c,0.0)/0.6; vec3 m=mat3(0.59719,0.07600,0.02840, 0.35458,0.90834,0.13383, 0.04823,0.01566,0.83777)*c;
+    m=mat3(1.60475,-0.10208,-0.00327, -0.53108,1.10813,-0.07276, -0.07367,-0.00605,1.07602)*fit(m); return clamp(m,0.0,1.0); }
+  void main(){ vec3 col=texture(tD,vUv).rgb; vec2 d=vUv-0.5; float v=length(d*vec2(1.0,1.12))*1.3; col*=1.0-0.42*smoothstep(0.3,1.05,v);
+    float gr=gh(gl_FragCoord.xy+floor(uTime*24.0)*37.0)-0.5; col+=gr*(0.012+0.05*sqrt(max(dot(col,vec3(0.299,0.587,0.114)),0.0)))*0.6;
+    vec3 c=tone(col); c=mix(pow(c,vec3(0.41666))*1.055-0.055,c*12.92,vec3(lessThanEqual(c,vec3(0.0031308))));
+    outC=vec4(c+vec3(0.012,0.008,0.031)*(1.0-c),1.0); }`, postU);
+
+/* ═══════════════════════════════ the journey ═══════════════════════════════
+   The star is far off along -x and is never in the frame: its light comes from the left. The worlds are strung outward along +x. The camera flies outward past each
+   one, as Voyager did: it sees a world first as a point of light ahead, nearly fully lit; the world grows, and as the camera draws level its lit face turns away
+   until the camera rests looking at it from the side. Leaving, the camera turns to look ahead again, and the world slides out of the frame as a thinning crescent.  */
+const GAP = 2400;                                                     // world radii between one world and the next
+const X = new THREE.Vector3(1, 0, 0), UP = new THREE.Vector3(0, 1, 0);
+let aspect = 1, narrow = false;
+const poses = [];                                                     // 0: the title's view, 1 to 6: the worlds
+function layout() {
+  const w = innerWidth, h = innerHeight; aspect = w / h; narrow = w <= 700;
+  renderer.setSize(w, h, false); const dw = Math.round(w * DPR), dh = Math.round(h * DPR); rt.setSize(dw, dh);
+  sCam.aspect = aspect; sCam.updateProjectionMatrix(); WU.uTan.value.set(TANY * aspect, TANY); WU.uPx.value = 2 * TANY / dh;
+  poses.length = 0;
+  WORLDS.forEach((wd, i) => { const size = Math.min(wd.size, (narrow ? 0.8 : 0.5) * aspect * (wd.ring ? 0.45 : 1)), dist = 1 / Math.sin(Math.atan(size * TANY)), a = rad(wd.phase);
+    const P = new THREE.Vector3((i + 1) * GAP, 0, 0), K = P.clone().add(new THREE.Vector3(-Math.cos(a), 0, Math.sin(a)).multiplyScalar(dist));
+    poses[i + 1] = { P, K, at: narrow ? [0, wd.ring ? 0.3 : 0.36] : wd.at, w: i }; });
+  poses[0] = { P: poses[1].P, K: poses[1].K.clone().add(new THREE.Vector3(-22, 0, 0)), at: poses[1].at, w: 0 };
+}
+const _m = new THREE.Matrix4(), _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _v = new THREE.Vector3(), _z = new THREE.Vector3(0, 0, -1);
+// the camera's attitude that puts the world at P at the point `at` of the frame
+function aim(C, P, at, out) { _m.lookAt(C, P, UP); out.setFromRotationMatrix(_m); _v.set(at[0] * TANY * aspect, at[1] * TANY, -1).normalize(); _q2.setFromUnitVectors(_z, _v).invert(); return out.multiply(_q2); }
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+// How far the camera has gone from a resting place, against scroll. While a world is in view it pulls away gently (as the square of the scroll), so the fly-past can be watched;
+// the long empty crossing to the next world, where there is nothing to see move, is over in a moment.
+const NEAR = 15;
+const ease = (t) => { const f = (x) => { const u = Math.max(0, x - 0.08) / 0.34, v = Math.min(1, Math.max(0, (x - 0.38) / 0.12)); return (NEAR * u * u + (GAP / 2 - NEAR * 1.526) * Math.pow(v, 5)) / GAP; }; return t < 0.5 ? f(t) : 1 - f(1 - t); };
+const camPos = new THREE.Vector3(), camQ = new THREE.Quaternion(), qa = new THREE.Quaternion(), qb = new THREE.Quaternion();
+let active = 0, farW = -1;
+function camera(p) {
+  const j = Math.min(5, Math.floor(p)), s = p - j, A = poses[j], B = poses[j + 1];
+  const t = Math.min(1, Math.max(0, (s - 0.1) / 0.8));                // the camera rests through the first and last tenth of each screen of scrolling
+  if (j === 0) { const e = t * t * (3 - 2 * t); camPos.lerpVectors(A.K, B.K, 1 - Math.pow(1 - e, 2.2)); aim(camPos, B.P, B.at, camQ); active = 0; farW = -1; return; }
+  camPos.lerpVectors(A.K, B.K, ease(s));
+  aim(camPos, A.P, A.at, qa); aim(camPos, B.P, B.at, qb); camQ.copy(qa).slerp(qb, smooth(0.31, 0.5, s));     // the turn from the world being left to the one ahead is over before the half-way point
+  if (s < 0.5) { active = A.w; farW = B.w; } else { active = B.w; farW = -1; }
+}
+
+/* ── per frame ── */
+const stops = [...document.querySelectorAll('.stop')];
+const clock = { last: performance.now(), t: 0 }; let pe = -1, shown = false; const spinT = WORLDS.map(() => 0); let lastActive = -1;
+const fpsLog = { n: 0, t0: performance.now(), fps: 0, worst: 0 };
+const camM = new THREE.Matrix4(), e1 = new THREE.Vector3(), e2 = new THREE.Vector3(), e3 = new THREE.Vector3(), rel = new THREE.Vector3();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.1, (now - clock.last) / 1000); clock.last = now; clock.t += dt;
+  fpsLog.n++; fpsLog.worst = Math.max(fpsLog.worst, dt); if (now - fpsLog.t0 > 1000) { fpsLog.fps = fpsLog.n * 1000 / (now - fpsLog.t0); fpsLog.n = 0; fpsLog.t0 = now; }
+  // the maps are worked out a strip at a time so the page never stalls
+  for (let k = 0; k < (shown ? 1 : 3) && jobs.length; k++) jobs.shift()();
+  if (!shown && WORLDS[0].map.ready) { shown = true; canvas.classList.add('on'); }
+
+  const p = Math.min(6, Math.max(0, scrollY / innerHeight));
+  pe = pe < 0 || RM ? p : pe + (p - pe) * (1 - Math.exp(-4 * dt));     // the scroll position, followed with some weight
+  if (Math.abs(p - pe) < 1e-4) pe = p;
+  camera(pe);
+  const w = WORLDS[active], P = poses[active + 1].P;
+  if (active !== lastActive) { spinT[active] = 0; lastActive = active; }        // each world starts from the same face each time the camera comes to it
+  spinT[active] += dt;
+  rel.copy(camPos).sub(P); WU.uRo.value.copy(rel);
+  camM.makeRotationFromQuaternion(camQ); camM.extractBasis(e1, e2, e3); e3.negate(); WU.uCam.value.set(e1.x, e2.x, e3.x, e1.y, e2.y, e3.y, e1.z, e2.z, e3.z);
+  // the world's own axes: y along its spin axis
+  const N = w.N; e1.crossVectors(N, _v.set(0, 0, 1)).normalize(); e2.crossVectors(e1, N).normalize();
+  WU.uPF.value.set(e1.x, e1.y, e1.z, N.x, N.y, N.z, e2.x, e2.y, e2.z);
+  WU.uRot.value = (rad(w.phase / 2 - 180 - 5 * Math.sign(w.spin) - w.face + w.spin * (RM ? 0 : spinT[active])) % (2 * Math.PI));
+  WU.uFlat.value = w.flat; WU.uKind.value = w.kind; WU.uRing.value = w.ring ? 1 : 0; WU.uBump.value = w.bump || 1; WU.uSun.value = w.sun; WU.uMinK.value = w.minK || 1;
+  if (w.pal) { WU.uC0.value.fromArray(w.pal[0]); WU.uC1.value.fromArray(w.pal[1]); WU.uC2.value.fromArray(w.pal[2]); }
+  if (w.scat) { WU.uScat.value.fromArray(w.scat); WU.uAbs.value.fromArray(w.absb); }
+  WU.uMean.value.fromArray(w.mean); WU.tMap.value = w.map.texture; WU.tHgt.value = (w.map.hgt || w.map).texture; WU.uPen.value = w.pen || 0.002; WU.uMapW.value = w.map.width; WU.uOn.value = w.map.ready ? 1 : 0;
+  const dist = rel.length(), cosA = -rel.x / dist, al = Math.acos(Math.min(1, Math.max(-1, cosA))), alD = al * 180 / Math.PI;      // the phase angle now
+  WU.uLL.value = Math.min(1, Math.max(0, 1 - 0.019 * alD + 2.42e-4 * alD * alD - 1.46e-6 * alD * alD * alD));                    // how lunar soil's scattering changes with phase (McEwen's fit to the Moon)
+  const lam = (a) => (Math.sin(a) + (Math.PI - a) * Math.cos(a)) / Math.PI * 0.667;                                               // the light of a whole matte globe at phase a
+  WU.uDotB.value = lam(al);
+  if (farW >= 0) { const f = WORLDS[farW]; _v.copy(poses[farW + 1].P).sub(camPos); const fd = _v.length(); _v.multiplyScalar(1 / fd);
+    const fa = Math.acos(Math.min(1, Math.max(-1, _v.x))); WU.uFar.value.set(_v.x, _v.y, _v.z, 1 / (fd * WU.uPx.value)); WU.uFarC.value.fromArray(f.mean).multiplyScalar(lam(fa) * f.sun); }
+  else WU.uFar.value.w = 0;
+  // a camera exposed for a sunlit world sees few stars: they dim as the world fills the frame
+  const rpx = 1 / (dist * WU.uPx.value), fill = Math.min(1, Math.PI * rpx * rpx * (0.5 + 0.5 * cosA) / (rt.width * rt.height) * 6);
+  starU.uGain.value = 1 - 0.55 * fill;
+
+  sCam.quaternion.copy(camQ);
+  renderer.setRenderTarget(rt); renderer.clear(); renderer.render(sScene, sCam);
+  quad.material = worldMat; renderer.render(qScene, qCam);
+  renderer.setRenderTarget(null); postU.uTime.value = clock.t;
+  quad.material = postMat; renderer.render(qScene, qCam);
+
+  // the words: each stop's text is fully gone before the next begins to appear
+  for (const el of stops) { const d = Math.abs(pe - +el.dataset.at); const o = 1 - smooth(0.13, 0.26, d);
+    if (el._o !== o) { el._o = o; el.style.opacity = o.toFixed(3); el.style.visibility = o > 0.001 ? 'visible' : 'hidden'; el.style.pointerEvents = o > 0.6 ? '' : 'none'; } }
+}
+layout(); addEventListener('resize', layout);
+if (QS.has('p')) { history.scrollRestoration = 'manual'; scrollTo(0, +QS.get('p') * innerHeight); }      // ?p=3 opens at the third world (for checking)
+window.__opt4 = { fpsLog, jobs, WORLDS, get pe() { return pe; } };
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

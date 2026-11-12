@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#030208;--site:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--serif:"Playfair Display",Georgia,serif;--pad:clamp(24px,6.6vw,104px)}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:rgba(255,255,255,.7);font-family:var(--site);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
+#gl{position:fixed;left:0;top:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.8s ease}
+#gl.on{opacity:1}
+#track{height:700vh}
+
+.back{position:fixed;left:var(--pad);top:22px;z-index:5;display:inline-flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:rgba(255,255,255,.88);text-decoration:none;border:1px solid rgba(244,239,230,.34);border-radius:99px;padding:9px 15px;background:rgba(0,0,0,.4);transition:background .25s,color .25s,border-color .25s}
+.back:hover,.back:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;outline:none}
+
+#title{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;text-align:center}
+#title h1{margin:0;font-family:var(--serif);font-weight:400;font-size:clamp(2.7rem,5.2vw,4.8rem);line-height:1.04;letter-spacing:-.012em;color:#f5f5f5;text-shadow:0 1px 28px rgba(0,0,0,.6)}
+#title h1::after{content:"";display:block;width:44px;height:1px;background:rgba(255,255,255,.34);margin:24px auto 0}
+#cue{position:fixed;left:0;right:0;bottom:9vh;display:flex;flex-direction:column;align-items:center;gap:12px;font-size:11px;letter-spacing:.32em;text-indent:.32em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,.6);pointer-events:none}
+#cue::after{content:"";width:1px;height:38px;background:linear-gradient(rgba(255,255,255,.8),rgba(255,255,255,0));animation:drip 2.2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+.stop{position:fixed;top:50%;width:min(30rem,35vw);transform:translateY(calc(-50% + var(--dy,0px)));opacity:0;pointer-events:none;text-shadow:0 1px 22px rgba(0,0,0,.75)}
+.stop.L{left:var(--pad)}
+.stop.R{right:var(--pad)}
+.stop.on{pointer-events:auto}
+.stop .n{display:inline-block;font-size:11px;letter-spacing:.32em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,.46);font-variant-numeric:tabular-nums}
+.stop h2{margin:18px 0 0;font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,3.05vw,2.95rem);line-height:1.1;letter-spacing:-.012em;color:#f5f5f5;text-wrap:balance}
+.stop .hair{width:44px;height:1px;background:rgba(255,255,255,.34);margin:24px 0 22px}
+.stop p{margin:0 0 30px;font-size:clamp(.95rem,1.1vw,1.04rem);line-height:1.72;letter-spacing:.003em;color:rgba(255,255,255,.7);max-width:26rem}
+.go{display:inline-flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.34);border-radius:99px;padding:14px 24px;background:rgba(255,255,255,.04);text-shadow:none;transition:background .3s,color .3s,border-color .3s,gap .3s}
+ #marks{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+#marks *{fill:none;stroke:#fff;stroke-width:1;vector-effect:non-scaling-stroke}
+#marks circle{stroke-opacity:.8}
+#marks polyline{stroke-opacity:.3}
+.go:hover,.go:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;gap:18px;outline:none}
+
+@media (max-width:760px),(max-aspect-ratio:9/10){
+  .back{top:16px}
+  .stop,.stop.L,.stop.R{top:auto;bottom:7vh;left:var(--pad);right:var(--pad);width:auto;transform:translateY(var(--dy,0px))}
+  .stop h2{font-size:clamp(1.55rem,7vw,2.1rem);margin-top:12px}
+  .stop .hair{margin:16px 0 14px}
+  .stop p{margin-bottom:20px;font-size:.93rem;line-height:1.6}
+  #title{align-items:flex-end;padding-bottom:30vh}
+}
+@media (prefers-reduced-motion:reduce){ #cue::after{animation:none} #gl{transition:none} }
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<a class="back" href="../?skip=1"><span aria-hidden="true">←</span> Back</a>
+
+<header id="title">
+  <h1>Projects</h1>
+  <div id="cue" aria-hidden="true">Scroll</div>
+</header>
+
+<main>
+  <article class="stop L" data-i="1">
+    <span class="n">01</span>
+    <h2>QuantumViz</h2>
+    <div class="hair"></div>
+    <p>AI-powered quantum circuit generator using natural language and 3D visualization</p>
+    <a class="go" href="../?project=quantumviz">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="stop L" data-i="2">
+    <span class="n">02</span>
+    <h2>Generative AI for Code &amp; Data</h2>
+    <div class="hair"></div>
+    <p>GPT-powered coding assistant and natural language data analysis platform at Deloitte</p>
+    <a class="go" href="../?project=ai-engineering-deloitte">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="stop L" data-i="3">
+    <span class="n">03</span>
+    <h2>AI for SMB Acquisitions</h2>
+    <div class="hair"></div>
+    <p>Founding Engineer at an AI startup streamlining business acquisitions</p>
+    <a class="go" href="../?project=actuals">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="stop R" data-i="4">
+    <span class="n">04</span>
+    <h2>Drone-Mounted IR System for Vegetation Monitoring</h2>
+    <div class="hair"></div>
+    <p>Enhancing environmental monitoring using drone technology</p>
+    <a class="go" href="../?project=drone-ndvi">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="stop R" data-i="5">
+    <span class="n">05</span>
+    <h2>Satellite-Based Fire Detection</h2>
+    <div class="hair"></div>
+    <p>Visualizing fire, water, and land cover using Copernicus data from ESA</p>
+    <a class="go" href="../?project=satellite-fire">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="stop R" data-i="6">
+    <span class="n">06</span>
+    <h2>Lattice Boltzmann Fluid Simulation</h2>
+    <div class="hair"></div>
+    <p>Computational fluid dynamics simulation of flow past a cylinder using the LBM method</p>
+    <a class="go" href="../?project=lattice-boltzmann">View project <span aria-hidden="true">→</span></a>
+  </article>
+</main>
+<svg id="marks" aria-hidden="true"><polyline points=""/><circle r="5.5"/></svg>
+<div id="track" aria-hidden="true"></div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ─────────────────────────────────────────────────────────────────────────────────────────────
+   One asteroid, one sun.
+
+   What is drawn is a rubble-pile asteroid about 500 m across, modelled on what OSIRIS-REx saw at Bennu and
+   Hayabusa2 at Ryugu. Lengths below are in units of the body's mean radius (1 unit = 250 m, so 1 m = 0.004).
+
+   · SHAPE     The surface is a height above a sphere, r(direction), built once when the page loads and kept in a
+               cube map (six square images, one per face of a cube around the body). It is made of: a lumpy
+               ellipsoid cut by flat facets (rubble piles are faceted, their outlines have straight runs), shallow
+               craters, boulders, and fine rubble. Boulders follow the measured size law: the number larger than
+               D falls as D^-2.5 (Bennu: -2.5 ± 0.1; Ryugu: -2.65), from a few ~50 m blocks down to under a metre.
+   · DRAWING   Each pixel's line of sight is stepped through that height field until it meets the ground.
+   · SHADOW    From the point it meets, a second line is stepped toward the sun. If ground is in the way the
+               point is in shadow. The sun is a disc 0.53° across (as seen from 1 au), so a shadow's edge is
+               soft over 0.53° as seen from the edge that casts it: sharp near the rock, a little wider far away.
+               Nothing else lights the shadows: at 4.4 % reflectance, light bounced off nearby ground is under
+               a fiftieth of direct sunlight, below what a camera exposed for the sunlit side records.
+   · SURFACE   Brightness follows the Lommel-Seeliger law used for dark, airless bodies:
+               brightness ∝ f(α) · cos i / (cos i + cos e), i and e the angles of the sun and of the viewer from
+               the surface's normal, α the angle sun-surface-viewer. It is why the face-on view is flat and bright
+               with no darkening at the edge, like the full Moon.
+               f = exp(-0.0436 α + 0.000269 α² - 0.00000099 α³), α in degrees. These three numbers are NOT taken from
+               a source that was read: they are recalled as the fit in Hergenrother et al. 2019 and could not be
+               confirmed. As a check, summed over the whole disc they dim the body by 0.040 to 0.046 magnitudes per
+               degree, against the 0.039 ± 0.001 that paper measured for Bennu: a little steep. Only how f changes
+               across one frame is visible, because the exposure follows the overall level.
+   · EXPOSURE  Set for the sunlit ground, like a spacecraft camera, and re-set as the angle to the sun changes.
+   ───────────────────────────────────────────────────────────────────────────────────────────── */
+
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const QS = new URLSearchParams(location.search);
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
+renderer.autoClear = false; renderer.setClearColor(0x000000, 1);
+const gl = renderer.getContext();
+const FLOAT_LIN = !!gl.getExtension('OES_texture_float_linear') && !!gl.getExtension('EXT_color_buffer_float');
+const SMALL = Math.min(screen.width, screen.height) < 700;
+const N = +QS.get('n') || (SMALL || !FLOAT_LIN ? 1024 : 2048);          // size of one face of the height cube map
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+const tri = new THREE.BufferGeometry(); tri.setAttribute('position', new THREE.BufferAttribute(new Float32Array([-1, -1, 0, 3, -1, 0, -1, 3, 0]), 3));
+const VS = `void main(){ gl_Position=vec4(position.xy,0.0,1.0); }`;
+const dummyCam = new THREE.Camera();
+const quad = (mat) => { const s = new THREE.Scene(); const m = new THREE.Mesh(tri, mat); m.frustumCulled = false; s.add(m); return s; };
+
+/* ── the ground, built once ── */
+const BAKE_FS = /* glsl */`
+precision highp float; precision highp int;
+uniform int uFace; uniform float uN;
+out vec4 outC;
+
+uvec3 pcg3(uvec3 v){ v=v*1664525u+1013904223u; v.x+=v.y*v.z; v.y+=v.z*v.x; v.z+=v.x*v.y; v^=v>>16u; v.x+=v.y*v.z; v.y+=v.z*v.x; v.z+=v.x*v.y; return v; }
+vec3 hc(ivec3 c, uint s){ return vec3(pcg3(uvec3(c)+uvec3(s*2654435761u, s*40503u+977u, s*69069u+31u))>>8u)*(1.0/16777216.0); }
+
+float gnoise(vec3 p){
+  vec3 i=floor(p), f=p-i, w=f*f*f*(f*(f*6.0-15.0)+10.0); ivec3 I=ivec3(i);
+  float a=dot(hc(I,1u)*2.0-1.0,f);
+  float b=dot(hc(I+ivec3(1,0,0),1u)*2.0-1.0,f-vec3(1,0,0));
+  float c=dot(hc(I+ivec3(0,1,0),1u)*2.0-1.0,f-vec3(0,1,0));
+  float d=dot(hc(I+ivec3(1,1,0),1u)*2.0-1.0,f-vec3(1,1,0));
+  float e=dot(hc(I+ivec3(0,0,1),1u)*2.0-1.0,f-vec3(0,0,1));
+  float g=dot(hc(I+ivec3(1,0,1),1u)*2.0-1.0,f-vec3(1,0,1));
+  float h=dot(hc(I+ivec3(0,1,1),1u)*2.0-1.0,f-vec3(0,1,1));
+  float k=dot(hc(I+ivec3(1,1,1),1u)*2.0-1.0,f-vec3(1,1,1));
+  return mix(mix(mix(a,b,w.x),mix(c,d,w.x),w.y),mix(mix(e,g,w.x),mix(h,k,w.x),w.y),w.z)*1.2;
+}
+
+vec3 faceDir(int f, vec2 s){
+  if(f==0) return vec3(1.0,-s.y,-s.x);
+  if(f==1) return vec3(-1.0,-s.y,s.x);
+  if(f==2) return vec3(s.x,1.0,s.y);
+  if(f==3) return vec3(s.x,-1.0,-s.y);
+  if(f==4) return vec3(s.x,-s.y,1.0);
+  return vec3(-s.x,-s.y,-1.0);
+}
+
+// the body before anything lands on it: a lumpy ellipsoid, slightly fatter at the equator
+float ell(vec3 d){ return 1.0/length(d/vec3(1.13,0.86,0.96)); }
+float baseR(vec3 d){
+  float r=ell(d);
+  r*=1.0+0.13*gnoise(d*1.25+vec3(3.1,7.7,1.3))+0.07*gnoise(d*2.6+vec3(11.0,2.0,5.0));
+  r+=0.02*exp(-pow(d.y/0.22,2.0));
+  return r;
+}
+// ...cut by flat facets: random planes a little inside the surface, blended where they meet
+float facet(vec3 d, float r0){
+  const float c=0.62, K=9.0;
+  float g=pow(1.0/r0,K);
+  ivec3 ci=ivec3(floor(d/c));
+  for(int z=-1;z<=1;z++)for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){
+    ivec3 cc=ci+ivec3(x,y,z);
+    vec3 q=(vec3(cc)+hc(cc,11u))*c; float ql=length(q);
+    if(abs(ql-1.0)>0.5*c) continue;
+    vec3 n=q/ql; vec3 r2=hc(cc,12u);
+    float o=ell(n)*mix(0.85,1.05,r2.x);
+    float w=smoothstep(1.0*c,0.72*c,length(q-d));
+    g+=w*pow(max(dot(d,n),0.0)/o,K);
+  }
+  return pow(g,-1.0/K);
+}
+
+// Craters. Each is a bowl whose depth is 0.05 to 0.17 of its width (Bennu's run from 0.02 to 0.19). Young ones keep a
+// sharp raised rim; old ones are soft dents with no rim. Some have collected fine material on their floors.
+void craters(vec3 p, float c, float prob, float dk, uint seed, inout float h, inout float pond){
+  ivec3 ci=ivec3(floor(p/c));
+  for(int z=-1;z<=1;z++)for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){
+    ivec3 cc=ci+ivec3(x,y,z);
+    vec3 q=(vec3(cc)+hc(cc,seed))*c; float ql=length(q);
+    if(abs(ql-1.0)>0.5*c) continue;
+    vec3 r2=hc(cc,seed+100u); if(r2.x>prob) continue;
+    float Rc=c*mix(0.17,0.43,r2.y*r2.y);
+    vec3 tq=(p-q/ql)/Rc; float rho=length(tq); if(rho>1.9) continue;
+    rho*=1.0+0.11*gnoise(tq*1.6+r2*20.0)+0.04*gnoise(tq*5.0+r2*7.0);     // no crater is a perfect circle
+    float age=r2.z;
+    float dep=Rc*mix(0.34,0.10,age)*dk;
+    float bowl=min(rho*rho-1.0,0.0);
+    float soft=-exp(-rho*rho*2.4);
+    float sh=mix(bowl,soft,smoothstep(0.25,0.8,age));
+    if(c>0.15 && fract(r2.x/prob*7.0)<0.3){                                 // fine material has run downhill and levelled the floor
+      float lvl=-mix(0.30,0.55,fract(r2.y*13.0)), k=0.25, e=clamp(0.5+0.5*(sh-lvl)/k,0.0,1.0);
+      pond=max(pond,smoothstep(0.75,0.15,e+0.25*gnoise(p*55.0+vec3(3.0))));
+      sh=mix(lvl,sh,e)+k*e*(1.0-e); }
+    float rim=0.16*(1.0-smoothstep(0.1,0.65,age))*exp(-pow((rho-1.0)/(rho<1.0?0.16:0.30),2.0));
+    h+=dep*(sh+rim)*(1.0-smoothstep(1.5,1.9,rho));
+  }
+}
+
+// Boulders. Each is an angular block: a many-sided outline, steep sides, a top cut by two tilted planes, part buried.
+void boulders(vec3 p, float c, float prob, float sink, uint seed, inout float hb, inout float alb){
+  ivec3 ci=ivec3(floor(p/c));
+  for(int z=-1;z<=1;z++)for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){
+    ivec3 cc=ci+ivec3(x,y,z);
+    vec3 q=(vec3(cc)+hc(cc,seed))*c; float ql=length(q);
+    if(abs(ql-1.0)>0.5*c) continue;
+    vec3 r2=hc(cc,seed+100u); if(r2.x>prob) continue;
+    vec3 cd=q/ql; vec3 t=p-cd;
+    float rb=c*mix(0.19,0.46,r2.y*r2.y*r2.y);
+    if(dot(t,t)>rb*rb*1.21) continue;
+    vec3 ax=normalize(cross(cd,abs(cd.y)<0.9?vec3(0.0,1.0,0.0):vec3(1.0,0.0,0.0))), ay=cross(cd,ax);
+    vec2 xy=vec2(dot(t,ax),dot(t,ay))/rb;
+    vec3 r3=hc(cc,seed+200u), r4=hc(cc,seed+300u);
+    float th=r3.x*6.2832, cs=cos(th), sn=sin(th); xy=vec2(cs*xy.x-sn*xy.y,sn*xy.x+cs*xy.y);
+    xy.x*=mix(1.0,1.8,r3.y);
+    vec3 wp=t/rb*1.4+r4*40.0;
+    xy+=0.17*vec2(gnoise(wp),gnoise(wp+vec3(17.0,3.0,9.0)));           // no two outlines alike
+    float rho=length(xy)*0.84;
+    for(int k=0;k<6;k++){ float fk=float(k);
+      float a=(fk+(fract(r4.x*(3.0+fk*7.13))-0.5)*0.8)*1.0472;
+      float s=mix(0.72,1.0,fract(r4.y*(5.0+fk*3.71)));
+      rho=max(rho,dot(xy,vec2(cos(a),sin(a)))/s); }
+    if(rho>=1.0) continue;
+    float H=rb*mix(0.45,1.05,r3.z);
+    float dome=pow(1.0-rho*rho*rho,0.45);
+    float t1=0.70+dot(xy,(r4.xy-0.5)*0.7), t2=0.92+dot(xy,(r4.zx-0.5)*1.1);
+    float lump=0.10*gnoise(t/rb*2.6+r3*30.0)+0.05*gnoise(t/rb*6.1+r3*11.0);
+    float h=H*(min(dome*1.05,min(t1,t2))+lump-(0.08+0.42*r2.z)-sink);
+    if(h>hb){ hb=h; float av=fract(r2.z*17.0); alb=mix(0.76,1.24,av); if(fract(r2.y*91.7)<0.035) alb=mix(1.35,1.7,av); }
+  }
+}
+
+void main(){
+  vec2 st=gl_FragCoord.xy/uN*2.0-1.0;
+  vec3 d=normalize(faceDir(uFace,st));
+  float R=facet(d,baseR(d));
+
+  // where fine material has pooled (smooth ground, few boulders), and how thickly boulders lie elsewhere
+  float pond=smoothstep(0.50,0.62,gnoise(d*1.9+vec3(40.0,3.0,8.0))+0.5*gnoise(d*4.1+vec3(1.0,9.0,22.0))+0.2*gnoise(d*19.0+vec3(6.0,2.0,2.0)));
+  float dens=mix(0.55,1.5,smoothstep(-0.35,0.35,gnoise(d*2.7+vec3(5.0,31.0,2.0))));
+
+  float cr=0.0;
+  craters(d,0.95,0.55,0.50,21u,cr,pond);
+  craters(d,0.42,0.45,0.70,22u,cr,pond);
+  craters(d,0.19,0.40,1.0,23u,cr,pond);
+  craters(d,0.085,0.30,1.0,24u,cr,pond);
+  craters(d,0.036,0.16,1.0,25u,cr,pond);
+  R+=cr;
+
+  // rolling ground, 40 m down to 10 m
+  float keep=1.0-0.7*pond;
+  R+=keep*(0.008*gnoise(d*7.0+vec3(2.0,5.0,9.0))+0.005*gnoise(d.yzx*14.0+vec3(7.0,1.0,3.0))+0.004*gnoise(d.zxy*28.0+vec3(4.0,8.0,6.0)));
+
+  // boulders, seven sizes each half the last. Number larger than D goes as D^-2.5: per size class, the share of
+  // ground cells that hold one rises by sqrt(2) each time the size halves.
+  float hb=0.0, albB=1.0; float c=0.24, pr=0.11;
+  for(int j=0;j<7;j++){ boulders(d,c,min(pr*dens*(1.0-(j<3?0.95:0.6)*pond),0.95),0.3*pond,40u+uint(j),hb,albB); c*=0.5; pr*=1.4142; }
+  float isB=step(1e-6,hb);
+  R+=hb;
+
+  // rubble below the size of the smallest boulder above: packed cobbles (rounded tops, sharp creases between)
+  float kf=mix(1.0,0.35,pond)*mix(1.0,0.5,isB)*mix(0.55,1.25,smoothstep(-0.3,0.3,gnoise(d*5.3+vec3(2.0,2.0,7.0))));
+  vec3 pf=d*56.0+vec3(9.0,4.0,1.0); float af=0.0030, fine=0.0;
+  fine+=af*gnoise(pf); pf=pf.yzx*2.03+vec3(17.3,5.1,9.7); af*=0.5;
+  fine+=af*(abs(gnoise(pf))*2.0-0.6); pf=pf.yzx*2.03+vec3(17.3,5.1,9.7); af*=0.52;
+  fine+=af*(abs(gnoise(pf))*2.0-0.6); pf=pf.yzx*2.03+vec3(17.3,5.1,9.7); af*=0.52;
+  fine+=af*(abs(gnoise(pf))*2.0-0.6);
+  R+=kf*fine;
+
+  // how much light the ground returns, relative to the average. Mottled, boulders each their own, a few bright.
+  float alb=1.0+0.15*gnoise(d*3.3+vec3(8.0,2.0,6.0))+0.10*gnoise(d*11.0+vec3(1.0,6.0,3.0))+0.08*gnoise(d*93.0+vec3(5.0,5.0,2.0));
+  if(isB>0.5) alb=albB*(1.0+0.06*gnoise(d*300.0));
+  alb*=mix(1.0,0.90,pond);
+  outC=vec4(R-1.0,clamp(alb/2.55,0.0,1.0),pond,isB);
+}`;
+const bakeMat = new THREE.ShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: { uFace: { value: 0 }, uN: { value: N } }, vertexShader: VS, fragmentShader: BAKE_FS, depthTest: false, depthWrite: false });
+const bakeScene = quad(bakeMat);
+const tmpRT = new THREE.WebGLRenderTarget(N, N, { format: THREE.RGBAFormat, type: THREE.FloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
+const hCube = new THREE.WebGLCubeRenderTarget(N, { format: THREE.RedFormat, type: FLOAT_LIN ? THREE.FloatType : THREE.HalfFloatType, magFilter: THREE.LinearFilter, minFilter: THREE.LinearMipmapLinearFilter, generateMipmaps: false, depthBuffer: false });
+const aCube = new THREE.WebGLCubeRenderTarget(N / 2, { format: THREE.RGBAFormat, type: THREE.UnsignedByteType, magFilter: THREE.LinearFilter, minFilter: THREE.LinearMipmapLinearFilter, generateMipmaps: false, depthBuffer: false });
+const copyMat = new THREE.ShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: { tSrc: { value: tmpRT.texture }, uInv: { value: 1 / N }, uMode: { value: 0 } }, vertexShader: VS, depthTest: false, depthWrite: false,
+  fragmentShader: `precision highp float; uniform sampler2D tSrc; uniform float uInv; uniform int uMode; out vec4 outC;
+    void main(){ vec4 s=texture(tSrc,gl_FragCoord.xy*uInv); outC=(uMode==0)?vec4(s.r,0.0,0.0,1.0):vec4(s.g,s.b,s.a,1.0); }` });
+const copyScene = quad(copyMat);
+
+const TILE = 512; const bakeJobs = [];
+for (let f = 0; f < 6; f++) { for (let y = 0; y < N; y += TILE) for (let x = 0; x < N; x += TILE) bakeJobs.push({ f, x, y }); bakeJobs.push({ f, copy: true }); }
+let bakeAt = 0, baked = false; const bakeStats = { min: 9, max: -9 };
+function bakeStep(budgetMs) {
+  const t0 = performance.now();
+  while (bakeAt < bakeJobs.length && performance.now() - t0 < budgetMs) {
+    const j = bakeJobs[bakeAt++];
+    if (!j.copy) {
+      bakeMat.uniforms.uFace.value = j.f; tmpRT.scissor.set(j.x, j.y, TILE, TILE); tmpRT.scissorTest = true;
+      renderer.setRenderTarget(tmpRT); renderer.render(bakeScene, dummyCam);
+    } else {
+      if (QS.has('dbg')) { const buf = new Float32Array(N * N * 4); renderer.readRenderTargetPixels(tmpRT, 0, 0, N, N, buf); for (let i = 0; i < buf.length; i += 4) { const v = buf[i]; if (v < bakeStats.min) bakeStats.min = v; if (v > bakeStats.max) bakeStats.max = v; } }
+      const last = j.f === 5; hCube.texture.generateMipmaps = last; aCube.texture.generateMipmaps = last;
+      copyMat.uniforms.uMode.value = 0; copyMat.uniforms.uInv.value = 1 / N; renderer.setRenderTarget(hCube, j.f); renderer.render(copyScene, dummyCam);
+      copyMat.uniforms.uMode.value = 1; copyMat.uniforms.uInv.value = 2 / N; renderer.setRenderTarget(aCube, j.f); renderer.render(copyScene, dummyCam);
+      gl.flush();
+    }
+  }
+  renderer.setRenderTarget(null);
+  if (bakeAt >= bakeJobs.length && !baked) { baked = true; hCube.texture.generateMipmaps = false; aCube.texture.generateMipmaps = false; tmpRT.dispose(); requestAnimationFrame(() => canvas.classList.add('on')); }
+}
+
+/* ── the picture ── */
+const ROCK_FS = /* glsl */`
+precision highp float; precision highp samplerCube;
+uniform samplerCube tH, tA;
+uniform vec3 uRo, uF, uR, uU, uSun;
+uniform vec2 uRes, uShift;
+uniform float uTan, uTexel, uRmax, uPix, uPhaseRef, uPickOn; uniform vec2 uPick;
+out vec4 outC;
+const float SUN_R=0.00465;                                   // the sun's angular radius seen from 1 au, in radians
+float Hh(vec3 d, float lod){ return 1.0+textureLod(tH,d,lod).r; }
+void main(){
+  vec2 ndc=mix(gl_FragCoord.xy/uRes*2.0-1.0,uPick,uPickOn);
+  vec3 rd=normalize(uF+uR*((ndc.x-uShift.x)*uTan*uRes.x/uRes.y)+uU*((ndc.y-uShift.y)*uTan));
+  float b=dot(uRo,rd), disc=b*b-(dot(uRo,uRo)-uRmax*uRmax);
+  if(disc<=0.0){ outC=vec4(0.0); return; }
+  float sq=sqrt(disc), t=max(-b-sq,0.0), tEnd=-b+sq, tPrev=t, h=1.0, best=1e9, tBest=t, lod=0.0, px=0.0; bool hit=false;
+  for(int i=0;i<110;i++){
+    vec3 p=uRo+rd*t; px=t*uPix; lod=max(log2(px/uTexel),0.0);
+    h=length(p)-Hh(p,lod);
+    if(h<px*0.03){ hit=true; break; }
+    float m=h/px; if(m<best){ best=m; tBest=t; }
+    tPrev=t; t+=max(h*0.55,px*0.7);
+    if(t>tEnd) break;
+  }
+  float cov=1.0;
+  if(hit){
+    float lo=tPrev, hi=t; for(int i=0;i<6;i++){ float mid=0.5*(lo+hi); vec3 p=uRo+rd*mid; if(length(p)-Hh(p,lod)<0.0) hi=mid; else lo=mid; } t=0.5*(lo+hi);   // close in on the exact point where the line of sight meets the ground
+  } else {
+    if(best>=1.0){ outC=vec4(0.0); return; }
+    t=tBest; cov=smoothstep(1.0,0.25,best);                 // the ray passed within a pixel of the ground: a partly covered edge pixel
+  }
+  px=t*uPix; lod=max(log2(px/uTexel),0.0);
+  vec3 d=normalize(uRo+rd*t);
+  float lodN=lod+0.5*log2(1.0/clamp(dot(d,-rd),0.12,1.0));   // ground seen edge-on is squeezed along the line of sight: read its slope from a coarser level so it does not turn to streaks
+  float e=uTexel*exp2(lodN);
+  vec3 ax=normalize(cross(d,abs(d.y)<0.9?vec3(0.0,1.0,0.0):vec3(1.0,0.0,0.0))), ay=cross(d,ax);
+  float hcn=Hh(d,lod);
+  float hx=Hh(d+ax*e,lodN)-Hh(d-ax*e,lodN), hy=Hh(d+ay*e,lodN)-Hh(d-ay*e,lodN);
+  vec3 n=normalize(d*hcn-(ax*hx+ay*hy)/(2.0*e));
+  vec3 P=d*hcn;
+  if(uPickOn>0.5){ outC=vec4(P,1.0); return; }
+
+  float mu0=dot(n,uSun), sh=0.0;
+  if(mu0>0.0){
+    sh=1.0; vec3 po=P+n*px*1.5; float ts=px;
+    for(int i=0;i<64;i++){
+      vec3 q=po+uSun*ts; float r=length(q); if(r>uRmax) break;
+      float hh=r-Hh(q,max(lod,log2(ts*0.012/uTexel)));
+      sh=min(sh,0.5+0.5*hh/(ts*SUN_R+px*0.6));              // the share of the sun's disc still showing over this piece of ground
+      if(sh<=0.0) break;
+      ts+=max(hh*0.6,max(px*0.8,ts*0.02));
+    }
+    sh=clamp(sh,0.0,1.0); sh=sh*sh*(3.0-2.0*sh);
+  }
+  vec3 V=-rd; float mu=max(dot(n,V),0.0); mu0=max(mu0,0.0);
+  float ls=2.0*mu0/(mu0+mu+1e-4);
+  float al=degrees(acos(clamp(dot(uSun,V),-1.0,1.0)));
+  float ph=exp(al*(-4.36e-2+al*(2.69e-4-al*9.90e-7)));
+  float alb=texture(tA,d).r*2.55;
+  float L=alb*ls*sh*ph/uPhaseRef;
+  outC=vec4(vec3(L)*cov,cov);
+}`;
+const rockU = { tH: { value: hCube.texture }, tA: { value: aCube.texture }, uRo: { value: new THREE.Vector3() }, uF: { value: new THREE.Vector3() }, uR: { value: new THREE.Vector3() }, uU: { value: new THREE.Vector3() }, uSun: { value: new THREE.Vector3() },
+  uRes: { value: new THREE.Vector2(1, 1) }, uShift: { value: new THREE.Vector2() }, uTan: { value: 0.19 }, uTexel: { value: 2 / N }, uRmax: { value: +QS.get('rmax') || 1.11 }, uPix: { value: 0.001 }, uPhaseRef: { value: 1 }, uPickOn: { value: 0 }, uPick: { value: new THREE.Vector2() } };
+const rockScene = quad(new THREE.ShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: rockU, vertexShader: VS, fragmentShader: ROCK_FS, depthTest: false, depthWrite: false }));
+const rockRT = new THREE.WebGLRenderTarget(4, 4, { format: THREE.RGBAFormat, type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
+
+/* ── stars: a faint field, steady (nothing twinkles in vacuum) ── */
+const starU = { uF: { value: new THREE.Vector3() }, uR: { value: new THREE.Vector3() }, uU: { value: new THREE.Vector3() }, uShift: rockU.uShift, uTan: rockU.uTan, uAspect: { value: 1 }, uDpr: { value: DPR }, uGain: { value: 0.7 } };
+function makeStars(n) {
+  const pos = new Float32Array(n * 3), a = new Float32Array(n * 2); let s = 1234567;
+  const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  for (let i = 0; i < n; i++) { const u = rnd() * 2 - 1, t = rnd() * 6.2831853, q = Math.sqrt(1 - u * u); pos.set([q * Math.cos(t), u, q * Math.sin(t)], i * 3); a.set([Math.pow(rnd(), 5.0) * 2.2 + 1.0, rnd()], i * 2); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(a, 2));
+  const m = new THREE.ShaderMaterial({ uniforms: starU, glslVersion: THREE.GLSL3, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `in vec2 aA; uniform vec3 uF,uR,uU; uniform vec2 uShift; uniform float uTan,uAspect,uDpr; out float vA; out float vS;
+      void main(){ vS=aA.y; vA=(0.35+0.65*aA.y*aA.y)*(0.5+0.5*smoothstep(1.0,3.2,aA.x));
+        vec3 v=vec3(dot(position,uR),dot(position,uU),dot(position,uF));
+        gl_PointSize=aA.x*uDpr*1.1;
+        gl_Position=(v.z>0.05)?vec4(v.x/(v.z*uTan*uAspect)+uShift.x, v.y/(v.z*uTan)+uShift.y, 0.0, 1.0):vec4(2.0,2.0,2.0,1.0); }`,
+    fragmentShader: `precision highp float; uniform float uGain; in float vA; in float vS; out vec4 outC;
+      vec3 starCol(float k){
+        vec3 c=mix(vec3(1.0,0.42,0.26), vec3(1.0,0.64,0.36), smoothstep(0.00,0.24,k));
+        c=mix(c, vec3(1.0,0.86,0.56), smoothstep(0.22,0.46,k));
+        c=mix(c, vec3(1.0,0.97,0.92), smoothstep(0.44,0.62,k));
+        c=mix(c, vec3(0.70,0.83,1.0), smoothstep(0.62,0.80,k));
+        c=mix(c, vec3(0.46,0.64,1.0), smoothstep(0.82,1.00,k));
+        return c; }
+      void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f;
+        outC=vec4(mix(vec3(1.0),starCol(fract(vS*7.3)),0.7),vA*f*uGain); }` });
+  const p = new THREE.Points(g, m); p.frustumCulled = false; return p;
+}
+const starScene = new THREE.Scene(); starScene.add(makeStars(SMALL ? 9000 : 16000));
+
+/* ── to the screen: exposure, the film curve the rest of the site uses, grain, a little vignette ── */
+const postU = { tRock: { value: rockRT.texture }, uExp: { value: +QS.get('exp') || 0.25 }, uTime: { value: 0 }, uSoft: { value: QS.has('soft') ? +QS.get('soft') : 0.7 }, uRes: { value: new THREE.Vector2(1, 1) } };
+const postScene = quad(new THREE.ShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: postU, vertexShader: VS, depthTest: false, depthWrite: false, transparent: true,
+  blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+  fragmentShader: /* glsl */`precision highp float; uniform sampler2D tRock; uniform float uExp,uTime,uSoft; uniform vec2 uRes; out vec4 outC;
+    float gh(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
+    vec3 fit(vec3 v){ vec3 a=v*(v+0.0245786)-0.000090537; vec3 b=v*(0.983729*v+0.4329510)+0.238081; return a/b; }
+    vec3 tone(vec3 c){ c=max(c,0.0)/0.6;
+      vec3 m=mat3(0.59719,0.07600,0.02840, 0.35458,0.90834,0.13383, 0.04823,0.01566,0.83777)*c;
+      m=mat3(1.60475,-0.10208,-0.00327, -0.53108,1.10813,-0.07276, -0.07367,-0.00605,1.07602)*fit(m);
+      return clamp(m,0.0,1.0); }
+    void main(){ vec2 uv=gl_FragCoord.xy/uRes; vec4 r=texture(tRock,uv);
+      vec2 o=uSoft/uRes; r=mix(r,0.25*(texture(tRock,uv+o)+texture(tRock,uv-o)+texture(tRock,uv+vec2(o.x,-o.y))+texture(tRock,uv+vec2(-o.x,o.y))),0.5);   // no lens is as sharp as arithmetic: a slight softening, under a pixel
+      vec3 col=r.rgb*uExp;
+      vec2 v=uv-0.5; col*=1.0-0.34*dot(v,v);
+      float gr=gh(gl_FragCoord.xy+floor(uTime*24.0)*37.0)-0.5; col+=gr*(0.05*sqrt(max(col.g,0.0)))*0.6;
+      vec3 c=tone(col);
+      c=mix(pow(c,vec3(0.41666))*1.055-0.055, c*12.92, vec3(lessThanEqual(c,vec3(0.0031308))));
+      c+=(gr+0.5)*0.008;
+      outC=vec4(c,r.a); }` }));
+
+/* ── the journey ── */
+// One row per stop: the opening, then the six projects.
+//   th, el : where the camera is, as angles around and above the asteroid's equator, measured from the direction of the sun (degrees).
+//            The angle between sun and camera (the phase) is what sets how much of the lit side is seen.
+//   size   : how big the body appears (its mean radius as a share of half the frame's height)
+//   sx, sy : where its centre sits in the frame (-1 to 1)
+//   spin   : how far the asteroid has turned
+//   roll   : tilt of the camera
+const KEYS = [
+  { th: 128, el: 6, size: 0.40, sx: 0.50, sy: -0.20, spin: 0, roll: 18 },
+  { th: 92, el: 10, size: 0.70, sx: 0.37, sy: 0.00, spin: 22, roll: 15 },
+  { th: 66, el: -8, size: 1.02, sx: 0.62, sy: 0.04, spin: 44, roll: 12 },
+  { th: 50, el: 20, size: 0.78, sx: 0.40, sy: -0.02, spin: 66, roll: 8 },
+  { th: -50, el: 16, size: 0.76, sx: -0.40, sy: 0.02, spin: 88, roll: -8 },
+  { th: -72, el: -10, size: 1.10, sx: -0.63, sy: -0.14, spin: 110, roll: -12 },
+  { th: -104, el: 6, size: 0.62, sx: -0.34, sy: 0.00, spin: 132, roll: -16 },
+];
+const TAN = Math.tan(11 * Math.PI / 180);                 // a long lens: 22° top to bottom
+const REST = 0.24;                                         // the camera is at rest within this much scroll either side of a stop
+const SPIN_RATE = RM ? 0 : (QS.has('nospin') ? 0 : 0.22);  // degrees a second the asteroid turns on its own (Bennu turns once in 4.3 h: this is about nine times faster)
+const D2R = Math.PI / 180;
+const stops = [...document.querySelectorAll('.stop')], titleEl = document.getElementById('title'), cueEl = document.getElementById('cue');
+let anchors = [], sT = 0, sE = 0, drift = 0, W = 1, Hpx = 1, scale = +QS.get('scale') || 1, portrait = false;
+const readScroll = () => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); sT = Math.min(6, Math.max(0, scrollY / max * 6)); };
+addEventListener('scroll', readScroll, { passive: true });
+stops.forEach((el, i) => el.querySelector('a').addEventListener('focus', () => { const max = document.documentElement.scrollHeight - innerHeight; const y = (i + 1) / 6 * max; if (Math.abs(sT - (i + 1)) > 0.2) scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' }); }));
+
+function resize() {
+  W = innerWidth; Hpx = innerHeight; portrait = matchMedia('(max-width:760px),(max-aspect-ratio:9/10)').matches;
+  renderer.setPixelRatio(DPR); renderer.setSize(W, Hpx, false);
+  const bw = Math.round(W * DPR), bh = Math.round(Hpx * DPR);
+  const rw = Math.max(2, Math.round(bw * scale)), rh = Math.max(2, Math.round(bh * scale));
+  rockRT.setSize(rw, rh); rockU.uRes.value.set(rw, rh); rockU.uPix.value = 2 * TAN / rh;
+  postU.uRes.value.set(bw, bh); starU.uAspect.value = W / Hpx;
+  readScroll(); measure();
+}
+addEventListener('resize', resize); resize();
+
+const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const cam = { th: 0, el: 0, size: 1, sx: 0, sy: 0, spin: 0, roll: 0 };
+function camAt(u) {
+  const k = Math.min(5, Math.floor(u)), f = u - k; let g = Math.min(1, Math.max(0, (f - REST) / (1 - 2 * REST))); g = g * g * g * (g * (g * 6 - 15) + 10);
+  const A = KEYS[k], B = KEYS[k + 1]; for (const key in cam) cam[key] = A[key] + (B[key] - A[key]) * g;
+}
+const vC = new THREE.Vector3(), vF = new THREE.Vector3(), vR = new THREE.Vector3(), vU = new THREE.Vector3(), vT = new THREE.Vector3(), Y = new THREE.Vector3(0, 1, 0);
+const SUN = new THREE.Vector3(1, 0.05, 0).normalize();    // the sun sits almost over the equator (Bennu's axis is within 3° of upright to its orbit)
+const phaseF = (a) => Math.exp(a * (-4.36e-2 + a * (2.69e-4 - a * 9.90e-7)));
+function setCamera() {
+  camAt(sE);
+  const th = cam.th * D2R, el = cam.el * D2R;
+  let size = cam.size, sx = cam.sx, sy = cam.sy;
+  if (portrait) { size = Math.min(W * (0.36 + 0.22 * cam.size), 0.27 * Hpx) / (0.55 * Hpx); sx = 0; sy = 0.40 - 0.1 * (1 - sm(0, 0.5, sE)); }   // narrow screens: the rock above, the words below
+  else size *= Math.min(1, (W / Hpx) / 1.78);                                                                                              // squarer screens: keep the rock clear of the column of text
+  const dist = camDist = 1 / (TAN * size);
+  vC.set(Math.cos(el) * Math.cos(th), Math.sin(el), Math.cos(el) * Math.sin(th));
+  vF.copy(vC).multiplyScalar(-1); vR.crossVectors(vF, Y).normalize(); vU.crossVectors(vR, vF).normalize();
+  const ro = cam.roll * D2R; vT.copy(vR); vR.multiplyScalar(Math.cos(ro)).addScaledVector(vU, Math.sin(ro)); vU.multiplyScalar(Math.cos(ro)).addScaledVector(vT, -Math.sin(ro));
+  starU.uF.value.copy(vF); starU.uR.value.copy(vR); starU.uU.value.copy(vU);
+  const psi = -(cam.spin + drift) * D2R;                    // into the asteroid's own frame: undo its turn
+  rockU.uRo.value.copy(vC).multiplyScalar(dist).applyAxisAngle(Y, psi);
+  rockU.uF.value.copy(vF).applyAxisAngle(Y, psi); rockU.uR.value.copy(vR).applyAxisAngle(Y, psi); rockU.uU.value.copy(vU).applyAxisAngle(Y, psi);
+  rockU.uSun.value.copy(SUN).applyAxisAngle(Y, psi);
+  rockU.uShift.value.set(sx, sy);
+  rockU.uPhaseRef.value = phaseF(Math.acos(Math.min(1, Math.max(-1, vC.dot(SUN)))) / D2R);
+}
+function setText() {
+  const o0 = sm(0.36, 0.06, sE); titleEl.style.opacity = o0; titleEl.style.visibility = o0 > 0.001 ? 'visible' : 'hidden';
+  titleEl.firstElementChild.style.transform = `translateY(${(-(1 - o0) * 14).toFixed(2)}px)`;
+  cueEl.style.opacity = sm(0.10, 0.01, sE);
+  for (let i = 0; i < 6; i++) { const el = stops[i], dlt = sE - (i + 1), o = sm(0.42, 0.25, Math.abs(dlt));
+    el.style.opacity = o; el.style.setProperty('--dy', ((1 - o) * (dlt < 0 ? 12 : -12)).toFixed(2) + 'px'); el.classList.toggle('on', o > 0.5); }
+}
+
+/* ── each project's place on the ground: a small ring that stays on its spot as the asteroid turns, joined to the project's number by a hairline ── */
+// (points on the ground in the asteroid's own frame, read off the finished surface: a boulder, a crater, a filled crater floor...)
+const PLACES = [[-0.3721, 0.35, 0.7302], [-0.4929, 0.0726, 0.7258], [0.289, 0.5468, 0.5721], [0.6639, 0.5047, 0.2384], [0.8937, -0.0894, 0.4611], [0.5581, 0.0628, 0.7303]].map((a) => new THREE.Vector3(...a));
+const marks = document.getElementById('marks'), mLine = marks.querySelector('polyline'), mRing = marks.querySelector('circle');
+const MARKS = !QS.has('nomark');
+function measure() { anchors = stops.map((el) => { const r = el.querySelector('.n').getBoundingClientRect(), L = el.classList.contains('L'); return { x: L ? r.right + 14 : r.left - 14, y: r.top + r.height / 2 - (parseFloat(el.style.getPropertyValue('--dy')) || 0), L }; }); }
+const vP = new THREE.Vector3();
+function setMark() {
+  let k = -1, o = 0; for (let i = 0; i < 6; i++) { const v = +stops[i].style.opacity; if (v > o) { o = v; k = i; } }
+  if (!MARKS || k < 0 || !PLACES[k] || o < 0.01) { marks.style.opacity = 0; return; }
+  vP.copy(PLACES[k]).applyAxisAngle(Y, (cam.spin + drift) * D2R);
+  const facing = vP.clone().normalize().dot(vC); vP.addScaledVector(vC, -camDist);
+  const z = vP.dot(vF), x = (vP.dot(vR) / (z * TAN * (W / Hpx)) + rockU.uShift.value.x + 1) / 2 * W, y = (1 - (vP.dot(vU) / (z * TAN) + rockU.uShift.value.y)) / 2 * Hpx;
+  marks.style.opacity = o * sm(0.08, 0.3, facing);
+  mRing.setAttribute('cx', x.toFixed(1)); mRing.setAttribute('cy', y.toFixed(1));
+  const a = anchors[k]; if (portrait || !a) { mLine.setAttribute('points', ''); return; }
+  const ay = a.y + (parseFloat(stops[k].style.getPropertyValue('--dy')) || 0), dy = Math.abs(y - ay), sg = a.L ? 1 : -1;
+  let ex = x - sg * dy; if ((ex - a.x) * sg < 24) ex = a.x + sg * 24;
+  const dx = x - ex, dyy = y - ay, len = Math.hypot(dx, dyy) || 1, cut = 5.5 / len;
+  mLine.setAttribute('points', `${a.x.toFixed(1)},${ay.toFixed(1)} ${ex.toFixed(1)},${ay.toFixed(1)} ${(x - dx * cut).toFixed(1)},${(y - dyy * cut).toFixed(1)}`);
+}
+
+let camDist = 1, lastDrop = 0, drops = 0, first = true, last = performance.now(), slow = 0, reps = 1, benchRT = null; const ft = [];
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (!baked) { bakeStep(10); setText(); return; }
+  if (first) { first = false; sE = sT; }                    // (a reload part-way down the page starts there, not with a rush from the top)
+  const prev = sE;
+  sE = RM ? sT : sE + (sT - sE) * (1 - Math.exp(-4 * dt)); if (Math.abs(sT - sE) < 1e-5) sE = sT;
+  drift += SPIN_RATE * dt; drift -= drift * Math.min(1, Math.abs(sE - prev) * 2.5);   // the turn made while resting is taken back up during the next move, so each stop keeps its own face
+  setCamera(); setText(); setMark();
+  postU.uTime.value = RM ? 0 : now / 1000;
+  for (let i = 1; i < reps; i++) { if (!benchRT) benchRT = rockRT.clone(); if (benchRT.width !== rockRT.width) benchRT.setSize(rockRT.width, rockRT.height); renderer.setRenderTarget(i & 1 ? benchRT : rockRT); renderer.render(rockScene, dummyCam); }   // (only for measuring: draws the rock extra times)
+  renderer.setRenderTarget(rockRT); renderer.render(rockScene, dummyCam);
+  renderer.setRenderTarget(null); renderer.clear(); renderer.render(starScene, dummyCam); renderer.render(postScene, dummyCam);
+  // if the machine cannot hold the frame rate, draw the rock at a lower resolution (never below 0.6) and scale it up
+  ft.push(dt); if (ft.length > 240) ft.shift();
+  if (!QS.has('scale')) { slow = (dt > 0.021 && dt < 0.1) ? slow + 1 : Math.max(0, slow - 0.5);
+    if (slow > 40 && scale > 0.6) { scale = Math.max(0.6, scale - 0.15); slow = 0; lastDrop = now; drops++; resize(); }
+    else if (scale < 1 && drops < 3 && now - lastDrop > 20000) { scale = Math.min(1, scale + 0.15); lastDrop = now; resize(); } }   // (a passing stall should not cost sharpness for good: try full size again, twice)
+}
+window.__dbg = { get s() { return sE; }, get baked() { return baked; }, bakeStats, get scale() { return scale; }, ft, KEYS, rockU, postU, starU,
+  jump(v) { const max = document.documentElement.scrollHeight - innerHeight; scrollTo(0, v / 6 * max); sT = v; sE = v; drift = 0; },
+  set reps(v) { reps = v; ft.length = 0; }, set drift(v) { drift = v; }, PLACES,
+  pick(x, y) { const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.FloatType, depthBuffer: false }); rockU.uPickOn.value = 1; rockU.uPick.value.set(x / W * 2 - 1, 1 - y / Hpx * 2);
+    renderer.setRenderTarget(rt); renderer.render(rockScene, dummyCam); const b = new Float32Array(4); renderer.readRenderTargetPixels(rt, 0, 0, 1, 1, b); renderer.setRenderTarget(null); rockU.uPickOn.value = 0; rt.dispose(); return [+b[0].toFixed(4), +b[1].toFixed(4), +b[2].toFixed(4)]; } };
+document.fonts && document.fonts.ready.then(() => measure()); measure();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

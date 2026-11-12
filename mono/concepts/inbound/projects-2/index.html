@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{ --bg:#030208; --ink:#f5f5f5; --faint:rgba(244,239,230,.34); --pad:clamp(22px,4vw,56px);
+  --site:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --serif:"Playfair Display",Georgia,serif; }
+*{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--site);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+#track{position:relative;height:700vh;height:700svh;pointer-events:none}
+
+.back{position:fixed;z-index:5;left:var(--pad);top:20px;display:inline-flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;
+  color:rgba(255,255,255,.88);text-decoration:none;border:1px solid var(--faint);border-radius:99px;padding:9px 15px;background:rgba(0,0,0,.4);transition:background .25s,color .25s,border-color .25s}
+.back:hover,.back:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;outline:none}
+
+#ui{position:fixed;inset:0;z-index:3;pointer-events:none;text-shadow:0 1px 24px rgba(0,0,0,.6)}
+#ui>*{opacity:0;visibility:hidden;will-change:opacity,transform}
+
+#title{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center}
+#title h1{margin:0;font-family:var(--serif);font-weight:400;font-size:clamp(2.3rem,4vw,3.8rem);line-height:1.04;letter-spacing:-.012em;color:#f5f5f5}
+#title h1::after{content:"";display:block;width:44px;height:1px;background:rgba(255,255,255,.34);margin:20px auto 0}
+#cue{position:absolute;left:0;right:0;bottom:34px;text-align:center;font-size:11px;letter-spacing:.3em;text-indent:.3em;text-transform:uppercase;color:rgba(255,255,255,.46)}
+#cue::after{content:"";display:block;width:1px;height:30px;margin:12px auto 0;background:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,0))}
+
+.proj{position:absolute;top:50%;width:min(30rem,36vw);margin:0}
+.proj.l{left:clamp(40px,9vw,150px)}
+.proj.r{left:58vw}
+.proj .n{display:block;font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.46);font-variant-numeric:tabular-nums;margin-bottom:20px}
+.proj h2{margin:0;font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,3.1vw,3rem);line-height:1.08;letter-spacing:-.012em;color:#f5f5f5;text-wrap:balance}
+.proj h2::after{content:"";display:block;width:44px;height:1px;background:rgba(255,255,255,.34);margin:22px 0 0}
+.proj p{margin:22px 0 30px;max-width:26rem;font-size:clamp(.95rem,1.1vw,1.04rem);line-height:1.72;letter-spacing:.003em;color:rgba(255,255,255,.7)}
+.go{pointer-events:auto;display:inline-flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#fff;text-decoration:none;text-shadow:none;
+  border:1px solid rgba(255,255,255,.34);border-radius:99px;padding:14px 24px;background:rgba(255,255,255,.04);transition:background .3s,color .3s,border-color .3s,gap .3s}
+.go:hover,.go:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;gap:18px;outline:none}
+
+@media (max-width:760px),(max-aspect-ratio:1/1){
+  .proj,.proj.l,.proj.r{left:24px;right:24px;width:auto;top:auto;bottom:max(34px,6vh)}
+  .proj .n{margin-bottom:12px}
+  .proj h2{font-size:clamp(1.6rem,7vw,2.2rem)} .proj h2::after{margin-top:16px}
+  .proj p{margin:16px 0 22px}
+  .back{top:14px}
+}
+#nogl{display:none;position:fixed;left:var(--pad);bottom:20px;font-size:11px;letter-spacing:.1em;color:rgba(255,255,255,.4)}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<a class="back" href="../?skip=1"><span aria-hidden="true">←</span> Back</a>
+
+<div id="ui">
+  <header id="title"><h1>Projects</h1></header>
+  <div id="cue" aria-hidden="true">Scroll</div>
+
+  <article class="proj" data-i="1">
+    <span class="n">01</span>
+    <h2>QuantumViz</h2>
+    <p>AI-powered quantum circuit generator using natural language and 3D visualization</p>
+    <a class="go" href="../?project=quantumviz">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="proj" data-i="2">
+    <span class="n">02</span>
+    <h2>Generative AI for Code &amp; Data</h2>
+    <p>GPT-powered coding assistant and natural language data analysis platform at Deloitte</p>
+    <a class="go" href="../?project=ai-engineering-deloitte">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="proj" data-i="3">
+    <span class="n">03</span>
+    <h2>AI for SMB Acquisitions</h2>
+    <p>Founding Engineer at an AI startup streamlining business acquisitions</p>
+    <a class="go" href="../?project=actuals">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="proj" data-i="4">
+    <span class="n">04</span>
+    <h2>Drone-Mounted IR System for Vegetation Monitoring</h2>
+    <p>Enhancing environmental monitoring using drone technology</p>
+    <a class="go" href="../?project=drone-ndvi">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="proj" data-i="5">
+    <span class="n">05</span>
+    <h2>Satellite-Based Fire Detection</h2>
+    <p>Visualizing fire, water, and land cover using Copernicus data from ESA</p>
+    <a class="go" href="../?project=satellite-fire">View project <span aria-hidden="true">→</span></a>
+  </article>
+  <article class="proj" data-i="6">
+    <span class="n">06</span>
+    <h2>Lattice Boltzmann Fluid Simulation</h2>
+    <p>Computational fluid dynamics simulation of flow past a cylinder using the LBM method</p>
+    <a class="go" href="../?project=lattice-boltzmann">View project <span aria-hidden="true">→</span></a>
+  </article>
+</div>
+<div id="track" aria-hidden="true"></div>
+<div id="nogl">This page needs WebGL 2.</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ─────────────────────────────────────────────────────────────────────────────────────────────
+   Six close fly-bys of six small bodies.
+
+   What is drawn, and what it is taken from:
+   · Each asteroid is one solid shape: a radius for every direction from a point inside it, baked once into a cube map (32-bit float)
+     and then ray-marched every frame. The shape is built the way the real ones are described: a few overlapping ellipsoids or a
+     plane-cut block for the body, then impact craters (parabolic bowl, raised rim, ejecta falling off as distance^-3) and angular
+     blocks at every size, the small ones far more numerous than the large (a power law, as counted on Bennu, Ryugu, Itokawa and Eros).
+   · Light: one sun, infinitely far, white. No sky light and no fill, so anything the sun cannot see is black. Shadows are found by
+     marching a second ray from the surface toward the sun through the same shape.
+   · Reflectance: the Lommel-Seeliger law (the single-scattering law used for dark airless surfaces; brightness goes as
+     mu0/(mu0+mu), which has no limb darkening when lit face-on), mixed with a little Lambert for the brighter stony bodies
+     (the "lunar-Lambert" form used in asteroid photometry), times an exponential fall-off with phase angle.
+   · The belt is empty. Between encounters there is nothing in frame but the star field and the next body as a far speck.
+   ───────────────────────────────────────────────────────────────────────────────────────────── */
+
+const Q = new URLSearchParams(location.search);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches || Q.get('rm') === '1';
+const canvas = document.getElementById('gl');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
+if (!renderer || !renderer.capabilities.isWebGL2) { document.getElementById('nogl').style.display = 'block'; }
+const gl = renderer.getContext();
+const DPR = Math.min(devicePixelRatio || 1, 2);
+renderer.setPixelRatio(DPR); renderer.autoClear = false; renderer.setClearColor(0x000000, 1);
+const FLOAT_OK = renderer.extensions.has('EXT_color_buffer_float') && renderer.extensions.has('OES_texture_float_linear');
+const SMALL = Math.min(innerWidth, innerHeight) < 600;
+const CUBE = +Q.get('cube') || (SMALL || !FLOAT_OK ? 512 : 1024);          // cube map face size for the baked shapes
+const ROFF = 0.8;                                                            // radii are stored minus this, to keep precision when only half floats are available
+
+/* ── full-screen triangle used by every pass ── */
+const fsGeo = new THREE.BufferGeometry(); fsGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([-1, -1, 0, 3, -1, 0, -1, 3, 0]), 3));
+const fsCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const fsScene = new THREE.Scene(); const fsMesh = new THREE.Mesh(fsGeo); fsMesh.frustumCulled = false; fsScene.add(fsMesh);
+const FSV = `void main(){ gl_Position=vec4(position.xy,0.0,1.0); }`;
+function pass(mat, target, face) { fsMesh.material = mat; renderer.setRenderTarget(target || null, face || 0); renderer.render(fsScene, fsCam); }
+
+/* ═════════════════════════════ the bodies ═════════════════════════════
+   Lengths are in units of roughly one body radius. `s` is the size in the scene; `period` is the spin period in seconds on screen
+   (real periods in hours, all at the same time-lapse of 1 hour = 12 seconds); `pole` tilts the spin axis (degrees about x, z).           */
+const N3 = (x, y, z) => { const l = Math.hypot(x, y, z); return [x / l, y / l, z / l]; };
+const BODIES = [null,
+  { // 1 · a spinning-top rubble pile, half a kilometre across: dark carbonaceous, boulders everywhere (the Bennu / Ryugu class)
+    s: 1.0, hours: 4.3, pole: [22, -16], phi0: 0.4, col: [0.97, 0.985, 1.0], gain: 1.0, lmix: 1.0,
+    ell: [[0, 0, 0, 1.0, 0.9, 1.0]], top: 1.36, ellK: 0.1, planes: [], plK: 0.1, lump: [0.03, 1.6, 0.0],
+    big: [[...N3(0.5, 0.35, 0.8), 0.34, 0.2, 0.012, 0.3], [...N3(-0.8, -0.3, 0.3), 0.26, 0.2, 0.01, 0.3], [...N3(0.2, -0.5, -0.8), 0.3, 0.2, 0.01, 0.3], [...N3(-0.3, 0.2, 0.9), 0.2, 0.2, 0.01, 0.3]],
+    cr: [0.3, 2, 0.6, 0.6, 3.0, 0.5], rk: [0.5, 7, 0.3, 1.0, 1.45, 1.0], sm: [0, 0, 0, 0], hum: [0.008, 5], fine: [0.0022, 110], alb: [0.42, 0.0, 0.1] },
+  { // 2 · an elongated stony body tens of kilometres long: regolith-covered, a saddle on one side and a large bowl on the other (the Eros class)
+    s: 1.55, hours: 5.27, pole: [30, 14], phi0: -0.55, col: [1.07, 1.0, 0.9], gain: 0.86, lmix: 0.5,
+    ell: [[-0.52, 0.0, 0.07, 0.80, 0.42, 0.40], [0.50, 0.0, -0.06, 0.82, 0.36, 0.41], [0, 0, 0, 0.5, 0.33, 0.35]], top: 0, ellK: 0.16,
+    planes: [[...N3(0.3, 1, 0.2), 0.36], [...N3(-0.4, -1, 0.1), 0.35], [...N3(0.5, 0.2, 1), 0.38], [...N3(-0.2, -0.3, -1), 0.37], [...N3(-0.6, 0.6, 0.7), 0.47]], plK: 0.14, lump: [0.06, 1.9, 0.05],
+    big: [[...N3(0.05, 0.1, 1.0), 0.36, 0.3, 0.0, 0.35], [...N3(-0.25, 0.3, -1.0), 0.2, 0.34, 0.04, 0.1], [...N3(0.9, 0.5, 0.3), 0.16, 0.3, 0.03, 0.15], [...N3(-0.9, -0.5, 0.4), 0.2, 0.3, 0.03, 0.15]],
+    cr: [0.42, 9, 1.0, 1.0, 1.5, 0.6], rk: [0.026, 2, 0.1, 0.9, 1.5, 0.3], sm: [0, 0, 0, 0], hum: [0.012, 7], fine: [0.001, 150], alb: [0.2, 0.42, 0.12] },
+  { // 3 · a small contact binary, a "head" and a "body" joined at a neck: rough boulder ground and smooth gravel seas (the Itokawa class)
+    s: 0.95, hours: 12.1, pole: [34, -12], phi0: 0.1, col: [1.04, 1.0, 0.93], gain: 0.92, lmix: 0.75,
+    ell: [[-0.60, 0, 0, 0.80, 0.45, 0.52], [0.34, 0.09, 0.02, 0.45, 0.34, 0.36]], top: 0, ellK: 0.07, planes: [], plK: 0.1, lump: [0.06, 1.8, 0.03],
+    big: [[...N3(-0.6, 0.7, 0.2), 0.22, 0.2, 0.0, 0.3]],
+    cr: [0.25, 2, 0.6, 0.5, 3.0, 0.5], rk: [0.34, 7, 0.4, 0.9, 1.4, 1.0], sm: [1.6, 0.08, 0.14, 0.9], hum: [0.008, 6], fine: [0.0018, 120], alb: [0.4, 0.1, 0.1] },
+  { // 4 · an angular, faceted fragment of a larger parent: flat faces meeting at blunt edges, few large craters, many small sharp ones (the Gaspra class)
+    s: 1.2, hours: 7.04, pole: [32, 10], phi0: -0.3, col: [1.06, 1.0, 0.91], gain: 0.86, lmix: 0.5,
+    ell: [[0, 0, 0, 1.0, 0.58, 0.64]], top: 0, ellK: 0.1,
+    planes: [[...N3(0.2, 1, 0.1), 0.46], [...N3(-0.3, -1, 0.25), 0.42], [...N3(0.1, 0.2, 1), 0.50], [...N3(0.3, -0.3, -1), 0.47], [...N3(1, 0.5, 0.4), 0.72], [...N3(-1, 0.3, -0.5), 0.70], [...N3(0.8, -0.6, -0.2), 0.74], [...N3(-0.7, -0.4, 0.7), 0.66], [...N3(-0.5, 0.8, 0.6), 0.6]], plK: 0.07, lump: [0.035, 2.2, 0.03],
+    big: [[...N3(0.4, 1, 0.3), 0.2, 0.26, 0.0, 0.3], [...N3(-0.6, -0.2, 1), 0.18, 0.28, 0.02, 0.2]],
+    cr: [0.3, 8, 1.0, 1.0, 1.1, 0.6], rk: [0.02, 1, 0.08, 0.8, 1.5, 0.2], sm: [0, 0, 0, 0], hum: [0.01, 8], fine: [0.001, 160], alb: [0.2, 0.42, 0.12] },
+  { // 5 · a large, very dark body scooped out by craters almost as wide as itself (the Mathilde class); it turns once in 17 days
+    s: 1.9, hours: 417, pole: [10, 10], phi0: 3.6, col: [0.97, 0.985, 1.0], gain: 1.0, lmix: 1.0,
+    ell: [[0, 0, 0, 1.0, 0.86, 0.9]], top: 0, ellK: 0.1, planes: [], plK: 0.1, lump: [0.05, 1.4, 0.04],
+    big: [[...N3(0.9, 0.3, 0.5), 0.56, 0.3, 0.02, 0.12], [...N3(-0.2, 0.9, 0.5), 0.5, 0.28, 0.02, 0.12], [...N3(-0.9, -0.3, 0.45), 0.5, 0.3, 0.02, 0.14], [...N3(0.3, -0.9, 0.3), 0.42, 0.28, 0.02, 0.12], [...N3(0.1, 0.2, -1), 0.6, 0.28, 0.02, 0.12]],
+    cr: [0.4, 10, 1.0, 1.0, 1.6, 0.6], rk: [0.016, 1, 0.06, 0.8, 1.5, 0.2], sm: [0, 0, 0, 0], hum: [0.012, 6], fine: [0.001, 170], alb: [0.15, 0.14, 0.1] },
+  { // 6 · a long, waisted, heavily cratered stony body with a moon a fortieth of its length (the Ida and Dactyl class)
+    s: 1.55, hours: 4.63, pole: [30, 20], phi0: 2.75, col: [1.06, 1.0, 0.91], gain: 0.86, lmix: 0.5,
+    ell: [[-0.50, 0.03, 0.10, 0.74, 0.42, 0.43], [0.46, -0.02, -0.08, 0.84, 0.35, 0.45]], top: 0, ellK: 0.2,
+    planes: [[...N3(0.2, 1, -0.2), 0.36], [...N3(0.3, -1, 0.3), 0.34], [...N3(-0.4, 0.3, 1), 0.4], [...N3(0.4, 0.2, -1), 0.4]], plK: 0.16, lump: [0.07, 1.7, 0.05],
+    big: [[...N3(-0.9, 0.4, 0.5), 0.2, 0.3, 0.03, 0.12], [...N3(0.6, 0.2, 1), 0.24, 0.3, 0.02, 0.15], [...N3(0.1, 1, -0.3), 0.22, 0.28, 0.02, 0.2], [...N3(0.95, -0.3, -0.3), 0.26, 0.26, 0.0, 0.3], [...N3(-0.1, -0.2, 1), 0.2, 0.3, 0.02, 0.2]],
+    cr: [0.42, 9, 1.0, 1.0, 1.4, 0.6], rk: [0.02, 1, 0.08, 0.8, 1.5, 0.2], sm: [0, 0, 0, 0], hum: [0.012, 7], fine: [0.001, 160], alb: [0.2, 0.42, 0.12] },
+];
+const TIMELAPSE = 12;                                                        // seconds on screen per real hour
+
+/* ═════════════════════════════ baking a body into a cube map ═════════════════════════════ */
+const bakeU = { uFace: { value: 0 }, uSize: { value: CUBE }, uOut: { value: 0 }, uSeed: { value: 1 }, uRoff: { value: ROFF },
+  uEllN: { value: 1 }, uEllC: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] }, uEllR: { value: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)] }, uEllK: { value: 0.1 }, uTop: { value: 0 },
+  uPlN: { value: 0 }, uPl: { value: Array.from({ length: 12 }, () => new THREE.Vector4(0, 1, 0, 9)) }, uPlK: { value: 0.1 },
+  uLump: { value: new THREE.Vector3() }, uBigN: { value: 0 }, uBig: { value: Array.from({ length: 6 }, () => new THREE.Vector4()) }, uBigP: { value: Array.from({ length: 6 }, () => new THREE.Vector3()) },
+  uCr: { value: new THREE.Vector4() }, uCrF: { value: new THREE.Vector2(2, 0.5) }, uRk: { value: new THREE.Vector4() }, uRkG: { value: new THREE.Vector2() }, uSm: { value: new THREE.Vector4() }, uHum: { value: new THREE.Vector2() }, uFine: { value: new THREE.Vector2() }, uAlb: { value: new THREE.Vector3() } };
+const bakeMat = new THREE.ShaderMaterial({ uniforms: bakeU, glslVersion: THREE.GLSL3, depthTest: false, depthWrite: false, vertexShader: FSV, fragmentShader: /* glsl */`
+  precision highp float; out vec4 outC;
+  uniform int uFace,uOut,uEllN,uPlN,uBigN; uniform float uSize,uSeed,uRoff,uEllK,uTop,uPlK; uniform vec2 uCrF; uniform vec3 uLump;
+  uniform vec3 uEllC[3],uEllR[3]; uniform vec4 uPl[12]; uniform vec2 uRkG,uHum,uFine; uniform vec4 uBig[6]; uniform vec3 uBigP[6]; uniform vec4 uCr,uRk,uSm; uniform vec3 uAlb;
+
+  vec3 hash33(vec3 p){ p=fract(p*vec3(.1031,.1030,.0973)); p+=dot(p,p.yxz+33.33); return fract((p.xxy+p.yxx)*p.zyx); }
+  vec4 hash43(vec3 p){ vec4 q=fract(vec4(p.xyzx)*vec4(.1031,.1030,.0973,.1099)); q+=dot(q,q.wzxy+33.33); return fract((q.xxyz+q.yzzw)*q.zywx); }
+  float gnoise(vec3 x){ vec3 i=floor(x), f=fract(x); vec3 u=f*f*f*(f*(f*6.0-15.0)+10.0);
+    #define G(o) dot(hash33(i+o)*2.0-1.0, f-o)
+    return mix(mix(mix(G(vec3(0,0,0)),G(vec3(1,0,0)),u.x), mix(G(vec3(0,1,0)),G(vec3(1,1,0)),u.x),u.y),
+               mix(mix(G(vec3(0,0,1)),G(vec3(1,0,1)),u.x), mix(G(vec3(0,1,1)),G(vec3(1,1,1)),u.x),u.y),u.z)*1.7; }
+  float fbm(vec3 p,int n){ float a=1.0,s=0.0,w=0.0; for(int i=0;i<n;i++){ s+=a*gnoise(p); w+=a; a*=0.5; p=p*2.03+vec3(17.1,3.7,9.2); } return s/w; }
+  float smin(float a,float b,float k){ float h=clamp(0.5+0.5*(b-a)/k,0.0,1.0); return mix(b,a,h)-k*h*(1.0-h); }
+  float smax(float a,float b,float k){ return -smin(-a,-b,k); }
+
+  // the direction a texel of cube face f looks along
+  vec3 faceDir(int f,vec2 s){
+    if(f==0) return vec3(1.0,-s.y,-s.x); if(f==1) return vec3(-1.0,-s.y,s.x);
+    if(f==2) return vec3(s.x,1.0,s.y);   if(f==3) return vec3(s.x,-1.0,-s.y);
+    if(f==4) return vec3(s.x,-s.y,1.0);  return vec3(-s.x,-s.y,-1.0); }
+
+  // how far along direction d (from the body's own origin) the surface of an ellipsoid lies
+  float ellExit(vec3 d,vec3 c,vec3 r){ vec3 dd=d/r, cc=c/r; float a=dot(dd,dd), b=dot(dd,cc), k=dot(cc,cc)-1.0; float h=b*b-a*k; return h<0.0?0.0:max((b+sqrt(h))/a,0.0); }
+  // the overall figure: overlapping ellipsoids (or a spinning-top figure), optionally cut by flat faces
+  float baseR(vec3 d){
+    float R;
+    if(uTop>0.0){ float c=length(d.xz)/uEllR[0].x, s=abs(d.y)/uEllR[0].y; R=pow(pow(c,uTop)+pow(s,uTop),-1.0/uTop); }
+    else R=ellExit(d,uEllC[0],uEllR[0]);
+    for(int i=1;i<uEllN;i++) R=smax(R,ellExit(d,uEllC[i],uEllR[i]),uEllK);
+    for(int i=0;i<uPlN;i++){ float c=dot(uPl[i].xyz,d); if(c>0.02) R=smin(R,uPl[i].w/c,uPlK); }
+    return R; }
+
+  // an impact crater in cross-section, in units of its own radius: a parabolic bowl, a raised rim, ejecta thinning as distance^-3
+  float craterProf(float rho,float depth,float rim,float k){
+    float bowl=depth*(rho*rho-1.0)+rim; float rr=max(rho,0.7); float ej=rim/(rr*rr*rr);
+    return smin(bowl,ej,k)*(1.0-smoothstep(1.5,2.2,rho)); }
+
+  // one size class of craters scattered through space; only the ones that meet the surface show. wall: the steep inner wall of fresh ones
+  float craterLayer(vec3 P,float c,float dens,float sd,out float wall){
+    vec3 q=P/c+sd*vec3(3.3,8.1,1.7); vec3 g=floor(q), f=q-g; float h=0.0; wall=0.0;
+    for(int k=0;k<27;k++){
+      vec3 o=vec3(float(k%3),float((k/3)%3),float(k/9))-1.0; vec3 id=g+o;
+      vec4 r1=hash43(id+sd*17.0); if(r1.w>dens) continue;
+      vec4 r2=hash43(id.yzx+sd*5.0+43.1);
+      float rad=mix(0.13,0.45,r2.x*r2.x);
+      float rho=length(f-(o+0.5+(r1.xyz-0.5)*0.8))/rad; if(rho>2.2) continue;
+      float fr=pow(r2.y,uCrF.x);                                                   // most craters are old and soft; a few are fresh and sharp
+      h+=craterProf(rho,mix(0.10,0.36,fr),mix(0.0,0.06,fr),mix(0.4,0.05,fr))*rad;
+      wall+=fr*smoothstep(0.3,0.75,rho)*(1.0-smoothstep(0.95,1.15,rho));
+    }
+    return h*c; }
+
+  // one size class of angular blocks: each is a random convex polyhedron resting in the surface; alb: its own brightness, -1..1
+  float rockLayer(vec3 P,float c,float dens,float sd,out float alb){
+    vec3 q=P/c+sd*vec3(7.3,3.1,5.7); vec3 g=floor(q), f=q-g; float h=0.0; alb=0.0;
+    for(int k=0;k<27;k++){
+      vec3 o=vec3(float(k%3),float((k/3)%3),float(k/9))-1.0; vec3 id=g+o;
+      vec4 r1=hash43(id+sd*13.0); if(r1.w>dens) continue;
+      vec3 x=f-(o+0.5+(r1.xyz-0.5)*0.6);
+      vec4 r2=hash43(id.zxy+sd*29.0+71.3);
+      float rad=mix(0.22,0.62,r2.x*r2.x);
+      float d2=dot(x,x); if(d2>rad*rad) continue;
+      vec3 r3=hash33(id.yzx+sd*3.0+11.7); vec4 r4=hash43(id.xzy+sd*7.0+3.9);
+      vec3 n1=normalize(r2.yzw-0.5+1e-3), n2=normalize(r1.zxy-0.5+2e-3), n3=normalize(r3-0.5+1e-3);   // six randomly tilted faces, at random depths
+      vec3 n4=normalize(cross(n1,n2)+0.3*n3), n5=-normalize(n1+n2+n3+0.2*n4), n6=normalize(cross(n3,n2)-0.4*n1);
+      float m=rad-sqrt(d2);
+      m=min(m,rad*mix(0.34,0.8,r4.x)-dot(x,n1)); m=min(m,rad*mix(0.34,0.8,r4.y)-dot(x,n2)); m=min(m,rad*mix(0.34,0.8,r4.z)-dot(x,n3));
+      m=min(m,rad*mix(0.34,0.8,r4.w)-dot(x,n4)); m=min(m,rad*mix(0.34,0.8,r3.x)-dot(x,n5)); m=min(m,rad*mix(0.34,0.8,r3.y)-dot(x,n6));
+      if(m>0.0){ float hh=min(m*1.7, rad*mix(0.13,0.4,r3.z)+m*0.32); if(hh>h){ h=hh; alb=r2.w*2.0-1.0; } }
+    }
+    return h*c; }
+
+  void main(){
+    vec3 d=normalize(faceDir(uFace,(gl_FragCoord.xy/uSize)*2.0-1.0));
+    float sd=uSeed;
+    float R=baseR(d);
+    { vec3 lp=d*R*uLump.y+sd*11.3; R*=1.0+uLump.x*fbm(lp,4)+uLump.z*(0.45-abs(fbm(lp*1.3+7.7,3))*1.6); }   // broad lumps, and creased ridges
+    vec3 P1=d*R; float hb=0.0;
+    for(int i=0;i<uBigN;i++){ vec3 cd=uBig[i].xyz; vec3 cp=cd*baseR(cd); float rr=uBig[i].w;   // the few named, giant craters
+      hb+=craterProf(length(P1-cp)/rr,uBigP[i].x,uBigP[i].y,uBigP[i].z)*rr; }
+    R+=hb; vec3 P=d*R;
+
+    float H=0.0, A=0.0;
+    // where fine gravel has pooled and buried the blocks (low ground and the neck)
+    float pond=0.0;
+    if(uSm.x>0.0){ float n=0.6*fbm(P*uSm.x+sd*5.1,3)+uSm.w*smoothstep(0.3,0.06,abs(P.x)); pond=smoothstep(uSm.y,uSm.y+uSm.z,n-0.36); }
+
+    // craters, large to small
+    float cw=0.0;
+    for(int k=0;k<11;k++){ if(float(k)>=uCr.y) break; float w; float c=uCr.x*pow(uCrF.y,float(k));
+      H+=craterLayer(P,c,uCr.z,sd+float(k)*1.37,w)*uCr.w; cw=max(cw,w*smoothstep(0.004,0.02,c)); }
+
+    // blocks, large to small; small ones are suppressed on top of large ones, so big boulders keep clean faces
+    float cover=0.0, ra=0.0, rm=0.0;
+    for(int k=0;k<8;k++){ if(float(k)>=uRk.y) break; float al; float c=uRk.x*pow(0.5,float(k));
+      float dens=min(uRk.z*pow(uRkG.x,float(k)),uRkG.y);
+      float keep=1.0-pond*smoothstep(0.0,1.0,float(k)*0.6+0.4);
+      float h=rockLayer(P,c,dens*mix(0.12,1.0,keep),sd+float(k)*2.11,al)*uRk.w;
+      float w=mix(1.0,0.22,cover);
+      H+=h*w; float on=smoothstep(0.0,0.1*c,h);
+      ra=mix(ra,al,on*w); rm=max(rm,on);
+      cover=max(cover,smoothstep(0.02*c,0.2*c,h));
+    }
+    // rolling ground and the finest roughness
+    H+=uHum.x*fbm(P*uHum.y+sd*3.0,4)*(1.0-0.5*cover);
+    H+=uFine.x*fbm(P*uFine.y+sd,3)*mix(1.0,0.4,pond);
+
+    A=1.0+uAlb.x*ra + uAlb.y*clamp(cw,0.0,1.0)*(0.6+0.4*fbm(P*30.0,2)) + uAlb.z*fbm(P*2.3+sd*7.0,5) + 0.05*pond;
+    if(uOut==0) outC=vec4(R+H-uRoff,0.0,0.0,1.0); else outC=vec4(clamp(A*0.5,0.0,1.0),0.0,0.0,1.0);
+  }` });
+
+function setBake(b, seed) {
+  const u = bakeU; u.uSeed.value = seed;
+  u.uEllN.value = b.ell.length; b.ell.forEach((e, i) => { u.uEllC.value[i].set(e[0], e[1], e[2]); u.uEllR.value[i].set(e[3], e[4], e[5]); });
+  u.uEllK.value = b.ellK; u.uTop.value = b.top; u.uPlN.value = b.planes.length; b.planes.forEach((p, i) => u.uPl.value[i].set(p[0], p[1], p[2], p[3])); u.uPlK.value = b.plK;
+  u.uLump.value.set(b.lump[0], b.lump[1], b.lump[2]); u.uBigN.value = b.big.length; b.big.forEach((c, i) => { u.uBig.value[i].set(c[0], c[1], c[2], c[3]); u.uBigP.value[i].set(c[4], c[5], c[6]); });
+  u.uCr.value.set(b.cr[0], b.cr[1], b.cr[2], b.cr[3]); u.uCrF.value.set(b.cr[4], b.cr[5]); u.uRk.value.set(b.rk[0], b.rk[1], b.rk[2], b.rk[3]); u.uRkG.value.set(b.rk[4], b.rk[5]);
+  u.uSm.value.set(...b.sm); u.uHum.value.set(...b.hum); u.uFine.value.set(...b.fine); u.uAlb.value.set(...b.alb);
+}
+
+/* Two slots: at any moment at most two bodies are near enough to be resolved (the one being left and the one ahead). Body i lives in slot i%2. */
+const hType = FLOAT_OK ? THREE.FloatType : THREE.HalfFloatType;
+const slots = [0, 1].map(() => ({
+  h: new THREE.WebGLCubeRenderTarget(CUBE, { type: hType, format: THREE.RedFormat, depthBuffer: false, generateMipmaps: false, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter }),
+  a: new THREE.WebGLCubeRenderTarget(CUBE / 2, { type: THREE.UnsignedByteType, format: THREE.RedFormat, depthBuffer: false, generateMipmaps: false, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter }),
+  body: 0, ready: false }));
+const TILES = 2;                                                             // each face of the shape is baked in TILES x TILES pieces, one piece a frame, so baking never stalls a frame
+let job = null;
+function bakeStep() {                                                        // returns true when the job has finished
+  const j = job, sl = slots[j.slot]; setBake(BODIES[j.body], j.body * 7.31);
+  const nH = 6 * TILES * TILES;
+  if (j.step < nH) {
+    const face = Math.floor(j.step / (TILES * TILES)), t = j.step % (TILES * TILES), n = CUBE / TILES;
+    bakeU.uFace.value = face; bakeU.uSize.value = CUBE; bakeU.uOut.value = 0;
+    sl.h.scissorTest = true; sl.h.scissor.set((t % TILES) * n, Math.floor(t / TILES) * n, n, n);
+    sl.h.texture.generateMipmaps = j.step === nH - 1;                        // build the smaller copies once, after the last piece
+    pass(bakeMat, sl.h, face); sl.h.texture.generateMipmaps = false;
+  } else {
+    const face = j.step - nH; bakeU.uFace.value = face; bakeU.uSize.value = CUBE / 2; bakeU.uOut.value = 1;
+    sl.a.texture.generateMipmaps = face === 5; pass(bakeMat, sl.a, face); sl.a.texture.generateMipmaps = false;
+  }
+  if (++j.step >= nH + 6) { sl.ready = true; job = null; return true; }
+  return false;
+}
+function startBake(body) { const s = body % 2; slots[s].body = body; slots[s].ready = false; job = { slot: s, body, step: 0 }; }
+function bakeNow(body) { startBake(body); while (!bakeStep()); }
+
+/* The outermost radius of each body (for its bounding sphere), measured from a small bake rather than guessed. */
+(function measure() {
+  const n = 64, probe = new THREE.WebGLCubeRenderTarget(n, { type: FLOAT_OK ? THREE.FloatType : THREE.HalfFloatType, format: THREE.RGBAFormat, depthBuffer: false, generateMipmaps: false });
+  const buf = FLOAT_OK ? new Float32Array(n * n * 4) : null;
+  for (let b = 1; b <= 6; b++) {
+    let mx = 0, mn = 9;
+    if (buf) { setBake(BODIES[b], b * 7.31); bakeU.uSize.value = n; bakeU.uOut.value = 0;
+      for (let f = 0; f < 6; f++) { bakeU.uFace.value = f; pass(bakeMat, probe, f); renderer.setRenderTarget(null); renderer.readRenderTargetPixels(probe, 0, 0, n, n, buf, f); for (let i = 0; i < buf.length; i += 4) { const v = buf[i] + ROFF; if (v > mx) mx = v; if (v < mn) mn = v; } } }
+    if (!(mx > 0.2 && mx < 3)) { mx = 1.45; mn = 0.3; }
+    BODIES[b].rb = mx * 1.03 + 0.02; BODIES[b].rmin = mn;
+  }
+  probe.dispose();
+})();
+
+/* ═════════════════════════════ the route ═════════════════════════════
+   Stop i has the camera at rest at C[i], looking along (yaw, pitch), with body i held at (ox, oy) in the frame, `dist` away.
+   Leg i runs straight from C[i] to C[i+1], `L` long, along (yaw, pitch). The sun never moves.                                              */
+const D2R = Math.PI / 180;
+const dirYP = (y, p) => new THREE.Vector3(Math.sin(y * D2R) * Math.cos(p * D2R), Math.sin(p * D2R), -Math.cos(y * D2R) * Math.cos(p * D2R));
+const quatYP = (y, p) => new THREE.Quaternion().setFromEuler(new THREE.Euler(p * D2R, -y * D2R, 0, 'YXZ'));
+const SUN = dirYP(90, 60);                                                  // high above the route and to its right, so every body is met side-lit, with long shadows
+const STOPS = [
+  { yaw: -23, pitch: 6 },
+  { yaw: -29, pitch: 2, ox: 0.36, oy: 0.02, dist: 5.1 },
+  { yaw: -29, pitch: -3, ox: -0.38, oy: -0.02, dist: 8.9 },
+  { yaw: 7, pitch: 3, ox: 0.36, oy: 0.03, dist: 5.6 },
+  { yaw: 4, pitch: -2, ox: -0.38, oy: 0.0, dist: 6.7 },
+  { yaw: 25, pitch: 3, ox: 0.33, oy: -0.02, dist: 8.8 },
+  { yaw: 0, pitch: 0, ox: -0.38, oy: -0.04, dist: 9.0 },
+];
+const LEGS = [
+  { yaw: -14, pitch: 9, L: 900 },
+  { yaw: -48, pitch: 12, L: 420 },
+  { yaw: -10, pitch: 7, L: 420 },
+  { yaw: -12, pitch: 13, L: 420 },
+  { yaw: 23, pitch: 8, L: 420 },
+  { yaw: 8, pitch: 13, L: 420 },
+];
+const TANY0 = Math.tan(16 * D2R);                                            // a 32 degree field of view, top to bottom
+let tanX = 1, tanY = TANY0, narrow = false;
+const C = [], P = [], QS = STOPS.map(s => quatYP(s.yaw, s.pitch)), TD = LEGS.map(l => dirYP(l.yaw, l.pitch));
+const vR = new THREE.Vector3(), vU = new THREE.Vector3(), vF = new THREE.Vector3();
+function buildRoute() {
+  const asp = innerWidth / innerHeight; narrow = asp < 1.05;
+  tanY = TANY0 * Math.max(1, 0.82 / asp); tanX = tanY * asp;
+  C[1] = new THREE.Vector3(0, 0, 0); C[0] = C[1].clone().addScaledVector(TD[0], -LEGS[0].L);
+  for (let i = 1; i <= 6; i++) {
+    const s = STOPS[i]; vR.set(1, 0, 0).applyQuaternion(QS[i]); vU.set(0, 1, 0).applyQuaternion(QS[i]); vF.set(0, 0, -1).applyQuaternion(QS[i]);
+    const ox = narrow ? 0 : s.ox, oy = narrow ? 0.4 : s.oy;
+    s.d = s.dist * (narrow ? 1.12 : 1);
+    P[i] = C[i].clone().add(vF.clone().addScaledVector(vR, ox * tanX).addScaledVector(vU, oy * tanY).normalize().multiplyScalar(s.d));
+    if (i < 6) C[i + 1] = C[i].clone().addScaledVector(TD[i], LEGS[i].L);
+  }
+}
+const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const REST = 0.14;                                                           // the camera stands still for this much scroll either side of a stop
+const camP = new THREE.Vector3(), camQ = new THREE.Quaternion();
+function pose(p) {
+  p = Math.min(6, Math.max(0, p)); const i = Math.min(5, Math.floor(p)), fr = p - i;
+  const u = Math.min(1, Math.max(0, (fr - REST) / (1 - 2 * REST))), w = u * u * (3 - 2 * u), L = LEGS[i].L;
+  let x;                                                                     // distance covered along the leg
+  if (i === 0) { const db = STOPS[1].d, K = Math.log(L / db + 1); x = L - db * (Math.exp(K * (1 - w)) - 1); }
+  else { const WA = 0.33, WB = 0.46, Xa = STOPS[i].d * 1.3, db = STOPS[i + 1].d, Kb = Math.log(L * (1 - WB) / db + 1);
+    if (w < WA) x = Xa * Math.pow(w / WA, 1.15);                             // drawing away from the body just visited: it slides out of frame
+    else if (w < WB) x = Xa * Math.pow(L * WB / Xa, (w - WA) / (WB - WA));    // the crossing: nothing is near, and at these distances nothing appears to move
+    else x = L - db * (Math.exp(Kb * (1 - w) / (1 - WB)) - 1); }               // closing on the next: its apparent size grows at a steady rate, then eases to rest
+  camP.copy(C[i]).addScaledVector(TD[i], x);
+  const r = u * u * u * (u * (u * 6 - 15) + 10); camQ.copy(QS[i]).slerp(QS[i + 1], r);
+}
+
+/* ═════════════════════════════ drawing the bodies ═════════════════════════════ */
+const astU = { uRes: { value: new THREE.Vector2(1, 1) }, uCR: { value: new THREE.Vector3() }, uCU: { value: new THREE.Vector3() }, uCF: { value: new THREE.Vector3() }, uTan: { value: new THREE.Vector2() }, uSun: { value: SUN },
+  tH0: { value: slots[0].h.texture }, tH1: { value: slots[1].h.texture }, tA0: { value: slots[0].a.texture }, tA1: { value: slots[1].a.texture }, uRoff: { value: ROFF }, uTexel: { value: 2 / CUBE }, uPh: { value: 0.36 }, uDbg: { value: Q.get('dbg') === 'alb' ? 1 : 0 },
+  uPos: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] }, uInv: { value: [new THREE.Matrix3(), new THREE.Matrix3(), new THREE.Matrix3()] },
+  uPrm: { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] }, uCol: { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] }, uOn: { value: [0, 0, 0] } };
+const astMat = new THREE.ShaderMaterial({ uniforms: astU, glslVersion: THREE.GLSL3, depthTest: false, depthWrite: false, vertexShader: FSV, fragmentShader: /* glsl */`
+  precision highp float; precision highp samplerCube; out vec4 outC;
+  uniform vec2 uRes,uTan; uniform vec3 uCR,uCU,uCF,uSun; uniform samplerCube tH0,tH1,tA0,tA1; uniform float uRoff,uTexel,uPh,uDbg;
+  uniform vec3 uPos[3]; uniform mat3 uInv[3]; uniform vec4 uPrm[3]; uniform vec4 uCol[3]; uniform float uOn[3];
+
+  float hgt(int s,vec3 q,float lod){ return (s==0 ? textureLod(tH0,q,lod).r : textureLod(tH1,q,lod).r)+uRoff; }
+  float F(int s,vec3 q,float lod){ return length(q)-hgt(s,q,lod); }
+
+  // b: which body · rd: the line of sight · pw: the width of one pixel at unit distance. Returns colour (already multiplied by coverage) and coverage.
+  vec4 body(int b,vec3 rd,float pw,out float tHit){
+    tHit=1e9; if(uOn[b]<0.5) return vec4(0.0);
+    mat3 M=uInv[b]; vec3 o=M*(-uPos[b]), d=M*rd;                               // the camera and the line of sight, in the body's own frame
+    float Rb=uPrm[b].x, lod=uPrm[b].z; int s=int(uPrm[b].w+0.5);
+    float a=dot(d,d), bb=dot(o,d), cc=dot(o,o)-Rb*Rb, h=bb*bb-a*cc; if(h<=0.0) return vec4(0.0);
+    h=sqrt(h); float t1=(-bb+h)/a; if(t1<=0.0) return vec4(0.0); float t0=max((-bb-h)/a,0.0);
+    float dl=sqrt(a), t=t0, tp=t0, best=1e9, tb=t0; bool hit=false;
+    for(int i=0;i<120;i++){
+      vec3 p=o+d*t; float f=F(s,p,lod), px=pw*t*dl;
+      if(f<0.0){ hit=true; break; }
+      float r=f/px; if(r<best){ best=r; tb=t; }
+      tp=t; t+=max(f*0.5,px*0.75)/dl; if(t>t1) break;
+    }
+    float cov=1.0;
+    if(hit){ float ta=tp, tc=t; for(int j=0;j<6;j++){ float tm=0.5*(ta+tc); if(F(s,o+d*tm,lod)<0.0) tc=tm; else ta=tm; } t=ta; }
+    else { if(best>=1.0) return vec4(0.0); cov=1.0-best; t=tb; }               // a near miss: the pixel is partly covered by the limb
+    tHit=t;
+    vec3 p=o+d*t; float px=pw*t*dl;
+    float e=max(length(p)*uTexel*exp2(lod)*0.75, px);
+    vec2 k=vec2(1.0,-1.0);
+    vec3 n=normalize(k.xyy*F(s,p+k.xyy*e,lod)+k.yyx*F(s,p+k.yyx*e,lod)+k.yxy*F(s,p+k.yxy*e,lod)+k.xxx*F(s,p+k.xxx*e,lod));
+    vec3 nw=normalize(n*M);                                                    // (transpose(M) * n)
+    float mu0=dot(nw,uSun), mu=max(dot(nw,-rd),0.02);
+    if(mu0<=0.0) return vec4(0.0,0.0,0.0,cov);                                 // facing away from the sun: black
+    // is the sun visible from here? march toward it through the same shape
+    vec3 l=M*uSun; float ll=length(l); l/=ll; float sh=1.0; float ts=e*1.5; vec3 ps=p+n*e*1.2;
+    for(int i=0;i<56;i++){
+      vec3 q=ps+l*ts; float r2=dot(q,q); if(r2>Rb*Rb) break;
+      float f=sqrt(r2)-hgt(s,q,lod);
+      sh=min(sh,f/(0.006*ts+px*1.5)); if(sh<=0.0) break;
+      ts+=clamp(f*0.55,px*1.2,0.12);
+    }
+    sh=clamp(sh,0.0,1.0); sh=sh*sh*(3.0-2.0*sh);
+    float alb=(s==0 ? texture(tA0,p).r : texture(tA1,p).r)*2.0;
+    float ls=2.0*mu0/(mu0+mu);                                                 // Lommel-Seeliger
+    float refl=mix(mu0,ls,uCol[b].w);
+    float ph=exp(-uPh*acos(clamp(dot(uSun,-rd),-1.0,1.0)));                    // fall-off with phase angle
+    if(uDbg>0.5) return vec4(vec3(alb*0.4)*cov,cov);
+    return vec4(uCol[b].rgb*alb*refl*sh*ph*cov,cov);
+  }
+  void main(){
+    vec2 ndc=gl_FragCoord.xy/uRes*2.0-1.0;
+    vec3 rd=normalize(uCF+ndc.x*uTan.x*uCR+ndc.y*uTan.y*uCU);
+    float pw=2.0*uTan.y/uRes.y;
+    vec4 acc=vec4(0.0); float tn=1e9;
+    for(int b=0;b<3;b++){ float t; vec4 c=body(b,rd,pw,t); if(c.a>0.0){ if(t<tn){ acc=c+(1.0-c.a)*acc; tn=t; } else acc=acc+(1.0-acc.a)*c; } }
+    outC=acc;
+  }` });
+const astRT = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, depthBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
+
+/* ── to the screen: exposure, film grain, vignette, filmic tone curve ── */
+const outU = { tAst: { value: astRT.texture }, uTime: { value: 0 }, uExp: { value: 1 }, uVig: { value: 0.34 }, uPx: { value: new THREE.Vector2(1, 1) } };
+const VIG = `float vig(vec2 uv){ vec2 d=uv-0.5; float v=length(d*vec2(1.0,1.12))*1.3; return 1.0-uVig*smoothstep(0.3,1.05,v); }`;
+const outMat = new THREE.ShaderMaterial({ uniforms: outU, glslVersion: THREE.GLSL3, depthTest: false, depthWrite: false, vertexShader: FSV, fragmentShader: /* glsl */`
+  precision highp float; out vec4 outC; uniform sampler2D tAst; uniform float uTime,uExp,uVig; uniform vec2 uPx;
+  float gh(vec2 p){ vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z); }
+  vec3 fit(vec3 v){ vec3 a=v*(v+0.0245786)-0.000090537; vec3 b=v*(0.983729*v+0.4329510)+0.238081; return a/b; }
+  vec3 tone(vec3 c){ c=max(c,0.0)/0.6;
+    vec3 m=mat3(0.59719,0.07600,0.02840, 0.35458,0.90834,0.13383, 0.04823,0.01566,0.83777)*c;
+    m=mat3(1.60475,-0.10208,-0.00327, -0.53108,1.10813,-0.07276, -0.07367,-0.00605,1.07602)*fit(m);
+    return clamp(m,0.0,1.0); }
+  ${VIG}
+  void main(){ vec2 uv=gl_FragCoord.xy*uPx; vec3 col=texture(tAst,uv).rgb*uExp*vig(uv);
+    float gr=gh(gl_FragCoord.xy+floor(uTime*24.0)*37.0)-0.5; col+=gr*(0.012+0.05*sqrt(max(dot(col,vec3(0.299,0.587,0.114)),0.0)))*0.6;
+    vec3 c=tone(col); outC=vec4(mix(pow(c,vec3(0.41666))*1.055-0.055, c*12.92, vec3(lessThanEqual(c,vec3(0.0031308)))),1.0); }` });
+
+/* ── the sky: fixed stars, coloured by temperature as on the main page; no twinkle (there is no air to make it) ── */
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const starCam = new THREE.PerspectiveCamera(32, 1, 0.1, 20000);
+const starScene = new THREE.Scene();
+const STARF = /* glsl */`precision highp float; uniform float uGain,uVig; uniform sampler2D tAst; uniform vec2 uPx; in float vA; in float vS; out vec4 outC;
+  vec3 starCol(float k){
+    vec3 c=mix(vec3(1.0,0.42,0.26), vec3(1.0,0.64,0.36), smoothstep(0.00,0.24,k));
+    c=mix(c, vec3(1.0,0.86,0.56), smoothstep(0.22,0.46,k)); c=mix(c, vec3(1.0,0.97,0.92), smoothstep(0.44,0.62,k));
+    c=mix(c, vec3(0.70,0.83,1.0), smoothstep(0.62,0.80,k)); c=mix(c, vec3(0.46,0.64,1.0), smoothstep(0.82,1.00,k)); return c; }
+  ${VIG}
+  void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f; vec2 uv=gl_FragCoord.xy*uPx;
+    float occ=1.0-texture(tAst,uv).a;                                          // nothing shows through a body, lit or not
+    vec3 c=vS<0.0 ? vec3(0.93,0.9,0.86) : starCol(fract(vS*7.3));
+    outC=vec4(c*(vA*f*uGain*occ*vig(uv)),1.0); }`;
+function makePoints(pos, attr, sizeMul) {
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(attr, 3));
+  const u = { uGain: { value: 0.62 }, uDpr: { value: DPR * sizeMul }, uVig: outU.uVig, tAst: { value: astRT.texture }, uPx: outU.uPx };
+  const m = new THREE.ShaderMaterial({ uniforms: u, glslVersion: THREE.GLSL3, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `in vec3 aA; uniform float uDpr; out float vA; out float vS; void main(){ vS=aA.y; vA=aA.z; gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`, fragmentShader: STARF });
+  const p = new THREE.Points(g, m); p.frustumCulled = false; return p;
+}
+{ const n = SMALL ? 3200 : 8000, rad = 4000, r = rng(20261111), pos = new Float32Array(n * 3), a = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) { const u = r() * 2 - 1, t = r() * 6.2831853, s = Math.sqrt(1 - u * u); pos.set([s * Math.cos(t) * rad, u * rad, s * Math.sin(t) * rad], i * 3); const k = r(); a.set([Math.pow(r(), 4.5) * 2.4 + 1.15, k, 0.5 + 0.5 * k], i * 3); }
+  starScene.add(makePoints(pos, a, 1)); }
+/* a handful of other bodies, hundreds of radii off the route: unresolved points that creep against the stars as the camera travels */
+const farScene = new THREE.Scene(); const farCam = new THREE.PerspectiveCamera(32, 1, 1, 60000);
+function buildFar() {
+  farScene.clear(); const r = rng(7), n = 7, pos = new Float32Array(n * 3), a = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) { const leg = 1 + Math.floor(r() * 5), base = C[leg].clone().lerp(C[Math.min(6, leg + 1)], r()); const ang = r() * 6.283, el = (r() - 0.5) * 1.2, dist = 1400 + r() * 2600;
+    pos.set([base.x + Math.cos(ang) * Math.cos(el) * dist, base.y + Math.sin(el) * dist, base.z + Math.sin(ang) * Math.cos(el) * dist], i * 3); a.set([1.25, -1, 0.16 + 0.2 * r()], i * 3); }
+  farScene.add(makePoints(pos, a, 1));
+}
+
+/* ═════════════════════════════ sizes ═════════════════════════════ */
+let scale = +Q.get('res') || (DPR > 1.5 ? 0.75 : 1);                         // the bodies are drawn at this fraction of the screen's pixels; lowered if frames run slow
+let W = 1, H = 1;
+function resize() {
+  renderer.setSize(innerWidth, innerHeight, false); const s = renderer.getDrawingBufferSize(new THREE.Vector2()); W = s.x; H = s.y;
+  const aw = Math.max(2, Math.round(W * scale)), ah = Math.max(2, Math.round(H * scale)); astRT.setSize(aw, ah); astU.uRes.value.set(aw, ah);
+  outU.uPx.value.set(1 / W, 1 / H);
+  buildRoute(); buildFar();
+  const fov = 2 * Math.atan(tanY) / D2R; for (const c of [starCam, farCam]) { c.fov = fov; c.aspect = W / H; c.updateProjectionMatrix(); }
+  astU.uTan.value.set(tanX, tanY);
+  layoutUI();
+}
+
+/* ═════════════════════════════ the words ═════════════════════════════ */
+const elTitle = document.getElementById('title'), elCue = document.getElementById('cue'), elProj = [...document.querySelectorAll('.proj')];
+function layoutUI() { elProj.forEach((el, k) => { const left = STOPS[k + 1].ox > 0; el.classList.toggle('l', left); el.classList.toggle('r', !left); }); }
+function show(el, o, dy, center) { const v = o > 0.004; if (el._o === o) return; el._o = o; el.style.visibility = v ? 'visible' : 'hidden'; if (!v) return; el.style.opacity = o.toFixed(3);
+  if (center !== null) el.style.transform = (center ? 'translateY(-50%) ' : '') + `translateY(${dy.toFixed(1)}px)`; }
+function updateUI(p) {
+  const o0 = 1 - sstep(0.03, 0.16, p); show(elTitle, o0, -p * 60, true); show(elCue, 1 - sstep(0.01, 0.08, p), 0, null);
+  elProj.forEach((el, k) => { const dp = p - (k + 1), o = 1 - sstep(0.09, 0.21, Math.abs(dp)); show(el, o, RM ? 0 : -dp * 46, !narrow); });   // one is fully gone before the next begins
+}
+
+/* ═════════════════════════════ every frame ═════════════════════════════ */
+let fixP = Q.has('p') ? +Q.get('p') : null, fixT = Q.has('t') ? +Q.get('t') : null;   // ?p=2.5&t=8 holds the scroll position and the clock still (for stills)
+window.__set = (p, t) => { fixP = p; if (t !== undefined) { fixT = t; time = t; } };
+let pe = 0, time = fixT || 0, last = performance.now(), slowN = 0, slowAcc = 0;
+const target = () => { if (fixP !== null) return fixP; const max = document.documentElement.scrollHeight - innerHeight; return max > 0 ? 6 * Math.min(1, Math.max(0, scrollY / max)) : 0; };
+const qB = new THREE.Quaternion(), qS = new THREE.Quaternion(), yAxis = new THREE.Vector3(0, 1, 0), xAxis = new THREE.Vector3(1, 0, 0), m4 = new THREE.Matrix4(), rel = new THREE.Vector3(), sq = new THREE.Matrix3();
+// a body's spin axis is set in the frame of the camera at its stop: tipped toward the viewer by pole[0] degrees, then rolled by pole[1]
+const poleQ = BODIES.map((b, i) => b && QS[i].clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(b.pole[0] * D2R, 0, b.pole[1] * D2R, 'ZXY'))));
+const clock = [0, 0, 0, 0, 0, 0, 0];                                        // each body's own rotation clock runs only while it is one of the two near bodies
+function setBody(k, idx, t, moon) {
+  const sl = slots[idx % 2], b = BODIES[idx], u = astU;
+  if (!sl.ready || sl.body !== idx) { u.uOn.value[k] = 0; return; }
+  const spin = b.phi0 + (RM ? 0.25 : 1) * t * 6.2831853 / (b.hours * TIMELAPSE);
+  let s = b.s, lip = 1; rel.copy(P[idx]);
+  if (moon) {                                                                // the moon: a round body a fortieth of the primary's length, on a slow prograde orbit near the equatorial plane
+    const a = 0.9 + t * 6.2831853 / (26 * TIMELAPSE) * (RM ? 0.25 : 1), r = b.s * 3.0;
+    rel.set(Math.cos(a) * r, 0.12 * Math.sin(a + 1) * r, Math.sin(a) * r).applyQuaternion(poleQ[idx]).add(P[idx]);
+    qB.copy(poleQ[idx]).multiply(qS.setFromAxisAngle(yAxis, a + 2.0)).multiply(qS.setFromAxisAngle(xAxis, 1.1)); s = b.s * 0.03;
+  } else qB.copy(poleQ[idx]).multiply(qS.setFromAxisAngle(yAxis, spin));
+  rel.sub(camP);
+  const M = u.uInv.value[k]; M.setFromMatrix4(m4.makeRotationFromQuaternion(qB)).transpose();
+  if (moon) { sq.set(1.3, 0, 0, 0, 0.52, 0, 0, 0, 0.6); M.premultiply(sq); lip = 1.25; }   // squash the long primary's figure into a roughly round one
+  M.multiplyScalar(1 / s);
+  u.uPos.value[k].copy(rel);
+  const dist = rel.length(), near = Math.max(dist - b.rb * s, 0.25 * s);
+  const pw = 2 * tanY / astU.uRes.value.y, lod = Math.log2(Math.max(1e-6, pw * near * lip / s / (0.8 * 2 / CUBE))) - 0.3;
+  u.uPrm.value[k].set(b.rb, s, Math.min(7, Math.max(0, lod)), idx % 2);
+  const g = 0.46 * b.gain; u.uCol.value[k].set(b.col[0] * g, b.col[1] * g, b.col[2] * g, b.lmix);
+  u.uOn.value[k] = 1;
+}
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.1, (now - last) / 1000); last = now; if (fixT === null) time += dt;
+  const pt = target(); pe = (RM || fixP !== null) ? pt : pe + (pt - pe) * (1 - Math.exp(-4 * dt)); if (Math.abs(pt - pe) < 1e-5) pe = pt;
+  pose(pe);
+
+  // which bodies are near: the stop behind and the stop ahead
+  const lo = Math.min(5, Math.floor(pe)), hi = lo + 1, want = lo >= 1 ? [hi, lo] : [hi];
+  if (!job) { for (const b of want) { const sl = slots[b % 2]; if (sl.body !== b) { startBake(b); break; } }
+    if (!job) { const nx = Math.round(pt) + (pt > pe ? 1 : -1); if (nx >= 1 && nx <= 6 && !want.includes(nx) && slots[nx % 2].body !== nx && !want.includes(slots[nx % 2].body)) startBake(nx); } }
+  perf.baking = !!job; if (job) bakeStep();
+  astU.uOn.value[0] = astU.uOn.value[1] = astU.uOn.value[2] = 0;
+  if (fixT === null) { clock[hi] += dt; if (lo >= 1) clock[lo] += dt; } else clock.fill(fixT);
+  setBody(0, hi, clock[hi], false); if (lo >= 1) setBody(1, lo, clock[lo], false);
+  if (hi === 6 && pe > 5.45) setBody(2, 6, clock[6], true);
+
+  vR.set(1, 0, 0).applyQuaternion(camQ); vU.set(0, 1, 0).applyQuaternion(camQ); vF.set(0, 0, -1).applyQuaternion(camQ);
+  astU.uCR.value.copy(vR); astU.uCU.value.copy(vU); astU.uCF.value.copy(vF);
+  pass(astMat, astRT);
+  outU.uTime.value = time; pass(outMat, null);
+  starCam.quaternion.copy(camQ); renderer.render(starScene, starCam);
+  farCam.position.copy(camP); farCam.quaternion.copy(camQ); renderer.render(farScene, farCam);
+  updateUI(pe);
+
+  // if frames are running slow, draw the bodies at fewer pixels
+  if (fixP === null && !Q.has('res')) { slowAcc += dt; if (++slowN >= 45) { const avg = slowAcc / slowN; slowN = 0; slowAcc = 0; if (avg > 0.0205 && scale > 0.4 && !job && document.visibilityState === 'visible') { scale = Math.max(0.4, scale * 0.85); resize(); } } }
+  perf.n++; perf.acc += dt; if (dt > perf.worst) perf.worst = dt;
+}
+const perf = window.__perf = { n: 0, acc: 0, worst: 0, baking: false, get scale() { return scale; }, get pe() { return pe; }, reset() { this.n = 0; this.acc = 0; this.worst = 0; } };
+window.__bench = (n = 30) => { const t0 = performance.now(); for (let i = 0; i < n; i++) { pass(astMat, astRT); pass(outMat, null); } gl.finish(); const px = new Uint8Array(4); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return (performance.now() - t0) / n; };
+
+resize(); addEventListener('resize', resize);
+bakeNow(1); bakeNow(2);
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+requestAnimationFrame(t => { last = t; frame(t); });
+</script>
+</body>
+</html>

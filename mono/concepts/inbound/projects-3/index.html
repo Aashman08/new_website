@@ -15,26 +15,13 @@ html,body{margin:0;background:var(--bg);color:#fff;font-family:var(--site);-webk
 a{color:inherit;text-decoration:none}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.6s ease}
 html.ready #gl{opacity:1;transition:opacity .75s ease}
-/* The landing's picture: NASA's illustration of a quasar, its dusty torus and its clumpy outflow (see the credit), shown as it is but for the two
-   reflections of the camera's lens that were painted into it (the pale discs above the torus and on its near wall), which are retouched out. It sits over the
-   3D scene while the page is at its title, with the torus where each project's star will be (right of centre) so the title stays clear of it.
-   Leaving the title, the view pushes into the quasar's light and the picture gives way to the flight through the cloud. */
-#plate{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;opacity:0;transform-origin:64.9% 36%;will-change:transform,opacity}   /* (the point the view steers in on: the thick of the clouds, up and to the left of the torus) */
-html:not(.ready) #plate{opacity:0!important}
-html.ready #plate{animation:platein 1s ease}
-@keyframes platein{from{opacity:0}}
-html.jump #plate{opacity:0!important}
-#plate .pl{position:absolute;left:70%;top:52%;width:118vh;height:118vh;transform:translate(-47.5%,-56.5%)}
-#plate img{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 93%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 93%,transparent 100%)}   /* (the picture's edges fade out to either side; the moving version does the same for itself) */
-#plate img,#plate canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-#plate canvas{opacity:0;transition:opacity .6s ease}
-#plate canvas.on{opacity:1}
+/* The landing: NASA's illustration of a quasar, its dusty torus and its clumpy outflow (see the credit), built into the 3D scene as a surface with
+   relief (see `quasar` in the script), not laid over it as a picture. */
 #credit{position:fixed;right:26px;bottom:20px;z-index:3;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.42);opacity:0;pointer-events:none;transition:opacity .6s ease,color .2s}
 html.ready.plate-on #credit{opacity:1;pointer-events:auto}
 #credit:hover,#credit:focus-visible{color:#fff;outline:none}
 #cue{z-index:2}
-html.nogl #plate,html.nogl #credit{display:none}
-@media (max-aspect-ratio:1/1){ #plate{transform-origin:42% 30%} #plate .pl{left:50%;top:42%;width:130vw;height:130vw} }   /* on a tall screen the picture is fitted to the width, with the torus above the title */
+html.nogl #credit{display:none}
 /* Dots down the right-hand side: one for each project. Clicking one goes straight there, with no flight: the picture dips to black for a moment
    and comes back at that project. (Scrolling still flies there through the cloud.) */
 #stops{transition:opacity .55s ease}
@@ -99,7 +86,6 @@ html.nogl .stop{position:static;transform:none;opacity:1!important;visibility:vi
 </head>
 <body>
 <canvas id="gl" aria-hidden="true"></canvas>
-<div id="plate" aria-hidden="true"><div class="pl"><img src="img/quasar-clouds.jpg" alt="" decoding="async"><canvas></canvas></div></div>
 <a id="credit" href="https://www.nasa.gov/universe/why-clouds-form-near-black-holes/" target="_blank" rel="noopener">Illustration: Nima Abkenar / NASA</a>
 <a class="back" href="../?skip=1&amp;at=projects">&larr; Back</a>
 <button type="button" id="sound" aria-pressed="false" aria-label="Toggle music"><span class="eq" aria-hidden="true"><b></b><b></b><b></b></span><span id="sound-t">Sound off</span></button>
@@ -132,11 +118,6 @@ const root = document.documentElement, $ = (s) => document.querySelector(s);
    the thick of the picture's clouds and pushes into them until they fill the screen, and as it does the picture thins away into the real gas the camera
    is by then flying through. All of it is set by how far along the flight is (s: 0 at the title, 1 at the first project), not by a clock, so it runs
    backwards exactly on the way back, and stops where the flight stops. */
-const plateEl = document.getElementById('plate'); let plateOp = -1;
-function plateAt(s) { const k = Math.min(1, Math.max(0, s)), e = (a, b) => { const t = Math.min(1, Math.max(0, (k - a) / (b - a))); return t * t * (3 - 2 * t); };
-  const op = 1 - e(0.26, 0.64, k), z = e(0.0, 0.70, k); if (op === plateOp && (op === 0 || k === 0)) return; plateOp = op;
-  plateEl.style.opacity = op.toFixed(3); plateEl.style.visibility = op > 0 ? 'visible' : 'hidden'; root.classList.toggle('plate-on', op > 0.7 && k < 0.2);   // (plate-on: the picture is up and near enough whole for its credit to be shown with it)
-  plateEl.style.transform = k > 0 && op > 0 ? 'translate(' + (-14.9 * z).toFixed(2) + 'vw,' + (14 * z).toFixed(2) + 'vh) scale(' + (1 + 3.2 * z * z).toFixed(3) + ')' : 'none'; }
 // Links to the main page (Back, and each star's "View project"): the picture dims out before the page changes.
 const leaveTo = (url) => { if (matchMedia('(prefers-reduced-motion: reduce)').matches) { location.href = url; return; } root.classList.add('leave'); setTimeout(() => { location.href = url; }, 300); };
 addEventListener('pageshow', (e) => { if (e.persisted) root.classList.remove('leave'); });
@@ -233,9 +214,11 @@ function boot() {
        · Ionised gas glows by recombination, as density squared. Gas inside the front has been heated to ten thousand degrees and has expanded
          and thinned, so the interior is a faint haze; gas just inside the front is fresh off the dense cloud and still dense, so the front
          itself is a bright rim on whatever dense gas faces the star. Its brightness is limited by the star's flux there (weaker further out).
-         Colour is natural colour, as a colour camera records it, not the false-colour "Hubble palette": hydrogen's red Hα with a little
-         blue-green Hβ makes rose; near a very hot star doubly ionised oxygen ([O III], 501 nm) adds teal, which pales the core; at the front
-         itself, [N II] and [S II] make the rim a deeper red.
+         Colour: each of the six clouds is shown in a palette of its own (see PAL), the way narrow-band pictures of nebulae are (the
+         same glowing gas mapped to a chosen set of colours: Hubble's gold-and-teal Eagle is one such), so that no two projects look alike.
+         Within each, the glow is deeper in colour out at the front and paler and brighter in toward the star, as the real zones are (hydrogen's
+         and nitrogen's lines at the front, doubly ionised oxygen's in the hot inner zone). Only the last cloud is in natural colour: a very hot
+         star's nebula, mostly oxygen's teal.
 
        · Dust scatters the star's light, forwards more than back, and blue more than red. Round a star too cool to ionise hydrogen that
          scattered light is all there is: a reflection nebula, bluer than its star. Round a cool, still-embedded star the same thing is amber.
@@ -265,21 +248,37 @@ function boot() {
   }
   const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
   // each stop: the star, the resting view, its lamp(s), and the exposure the camera is set to there
-  const STOPS = [
-    { P: V3(1.5, 0.4, -14), dist: 4.2, yaw: -5, pitch: 1.5, sx: 0.44, sy: 0.12, exp: 1.0,
-      lights: [{ o: V3(0, 0, 0), R: 6.5, col: O6, L: 9, Rs: 2.4, em: 0.16, o3: 1.0, lum: 1 },
-               { o: V3(0.3, 1.1, 7.0), R: 5.0, col: [1.00, 0.66, 0.50], L: 60, Rs: 2.2, em: 0.12, o3: 0.4, lum: 0 }] },   // (and a second light, deep in the front of the cloud, ahead of the camera and to one side of the way in, so that the gas the camera flies through is lit from in front and glows: so that what the landing's picture gives way to is glowing gas in the picture's own warm colours, and not the dark of an unlit cloud. It is not drawn as a star, and it reaches no further in than the first stop's camera, so nothing at the stops is changed by it)
-    { P: V3(1.2, 0.5, -28), dist: 4.0, yaw: 4, pitch: -1, sx: 0.48, sy: 0.14, exp: 1.0,
-      lights: [{ o: V3(0, 0, 0), R: 6.5, col: B3, L: 21, Rs: 0, em: 0, o3: 0, lum: 1 }] },
-    { P: V3(1.3, 0.0, -42), dist: 4.0, yaw: -3, pitch: 2, sx: 0.40, sy: -0.16, exp: 1.0,
-      lights: [{ o: V3(0, 0, 0), R: 6.0, col: K4, L: 5, Rs: 0, em: 0, o3: 0, lum: 0.5 }] },
-    { P: V3(2.0, 1.4, -56), dist: 5.0, yaw: 3, pitch: 2, sx: 0.52, sy: 0.50, exp: 1.0,
-      lights: [{ o: V3(0, 0, 0), R: 6.9, col: O9, L: 12, Rs: 3.1, em: 0.16, o3: 0.25, lum: 1.2 }] },
-    { P: V3(1.3, 0.1, -70), dist: 4.6, yaw: -4, pitch: 0, sx: 0.44, sy: -0.10, exp: 1.0,
-      lights: [{ o: V3(0, 0, 0), R: 6.0, col: O9, L: 2.2, Rs: 2.1, em: 0.21, o3: 0, lum: 1 }, { o: V3(0.55, 1.45, -0.2), R: 4.5, col: [1.0, 0.42, 0.16], L: 2.4, Rs: 0, em: 0, o3: 0, lum: 0.6 }] },   // (the fire project: all red. Glowing hydrogen with none of the oxygen's teal, little of the hot star's blue scattered light, and a cool companion whose light on the dust is amber)
-    { P: V3(1.2, 0.3, -84), dist: 5.2, yaw: 2, pitch: 1, sx: 0.44, sy: 0.10, exp: 1.0,
-      lights: [{ o: V3(0, 0, 0), R: 6.9, col: O6, L: 20, Rs: 2.8, em: 0.19, o3: 2.0, lum: 0.8 }] },   // (the fluid project: blues and greens. o3 above 1 marks gas whose glow is mostly doubly ionised oxygen's green, as round the very hottest stars and in planetary nebulae, with the star's blue light scattered by dust)
+  // The glowing gas's colours at each stop: o out toward the front · r at the front itself · i what is added in toward the star (so the inner zone is
+  // the brightest and palest). Matched in brightness to the sixth cloud's, which is left in its natural colours (oxygen's teal: see palOf).
+  const PAL = [
+    { o: [0.58, 0.24, 0.96], r: [0.66, 0.18, 0.90], i: [0.42, 0.58, 0.49] },      // 1 · violet
+    { o: [0.145, 0.38, 0.96], r: [0.11, 0.30, 0.92], i: [0.40, 0.62, 0.54] },     // 2 · blue
+    { o: [0.62, 0.36, 0.08], r: [0.62, 0.27, 0.05], i: [0.83, 0.64, 0.34] },      // 3 · gold
+    { o: [0.20, 0.47, 0.07], r: [0.14, 0.42, 0.05], i: [0.60, 0.68, 0.23] },      // 4 · green
+    { o: [0.98, 0.22, 0.056], r: [1.00, 0.13, 0.04], i: [0.62, 0.58, 0.16] },     // 5 · fire: red out at the front, orange to yellow within
   ];
+  const VIO = [0.60, 0.42, 1.0], BLU = [0.28, 0.48, 1.0], GOLD = [1.0, 0.74, 0.40], GRN = [0.72, 1.0, 0.52], FIRE = [1.0, 0.56, 0.30];   // the light each star throws on its dust, in keeping with its cloud
+  // All six are the same kind of scene, the one the sixth always was: a small, very bright star in a cavity it has blown open in the cloud, seen from
+  // about five units off, its light strong on the dust all round (so the cavity is a lit volume, with the cloud's own shadows running through it)
+  // and the gas glowing brightest toward it. What differs is where each is in the cloud (so the shapes are its own), how it is framed, and its colours.
+  const STOPS = [
+    { P: V3(1.5, 0.4, -14), dist: 4.9, yaw: -5, pitch: 1.5, sx: 0.44, sy: 0.12, exp: 1.0,
+      lights: [{ o: V3(0, 0, 0), R: 6.9, col: VIO, L: 20, Rs: 2.8, em: 0.19, pal: PAL[0], lum: 0.8 },
+               { o: V3(0.816, -0.163, 13.912), R: 6.9, col: [1.00, 0.82, 0.76], L: 1.5, Rs: 0, em: 0, o3: 0, lum: 0 }] },   // (the second light is the landing's quasar itself: the source at the heart of its torus, in front of the cloud. Its light is shadowed by the torus like any other lamp's by any other dust, so it reaches the gas along the torus's axis and not in its plane; that gas glows rose and orange, lavender nearer in)
+    { P: V3(1.2, 0.5, -28), dist: 5.0, yaw: 4, pitch: -1, sx: 0.48, sy: 0.14, exp: 1.0,
+      lights: [{ o: V3(0, 0, 0), R: 6.9, col: BLU, L: 21, Rs: 2.7, em: 0.19, pal: PAL[1], lum: 0.8 }] },
+    { P: V3(1.3, 0.0, -42), dist: 5.1, yaw: -3, pitch: 2, sx: 0.42, sy: -0.12, exp: 1.0,
+      lights: [{ o: V3(0, 0, 0), R: 6.9, col: GOLD, L: 18, Rs: 2.9, em: 0.19, pal: PAL[2], lum: 0.8 }] },
+    { P: V3(1.4, 0.4, -56), dist: 5.2, yaw: 3, pitch: 2, sx: 0.48, sy: 0.22, exp: 1.0,
+      lights: [{ o: V3(0, 0, 0), R: 6.9, col: GRN, L: 14, Rs: 2.8, em: 0.21, pal: PAL[3], lum: 0.8 }] },   // (this star used to stand up at the cloud's thin edge, where there is little for it to light but haze: it is now in the body of the cloud like the rest, and its light on the dust is a little weaker, so the glowing gas shows through it)
+    { P: V3(1.3, 0.1, -70), dist: 5.0, yaw: -4, pitch: 0, sx: 0.44, sy: -0.10, exp: 1.0,
+      lights: [{ o: V3(0, 0, 0), R: 6.9, col: FIRE, L: 18, Rs: 2.8, em: 0.20, pal: PAL[4], lum: 0.8 }] },
+    { P: V3(1.2, 0.3, -84), dist: 5.2, yaw: 2, pitch: 1, sx: 0.44, sy: 0.10, exp: 1.0,
+      lights: [{ o: V3(0, 0, 0), R: 6.9, col: O6, L: 20, Rs: 2.8, em: 0.19, o3: 2.0, lum: 0.8 }] },   // (natural colour. o3 above 1 marks gas whose glow is mostly doubly ionised oxygen's green, as round the very hottest stars and in planetary nebulae, with the star's blue light scattered by dust)
+  ];
+  // a lamp's glow colours: its own palette, or (the sixth star, and the light on the way in) natural colour from how much of the glow is oxygen's
+  const palOf = (l) => { if (l.pal) return l.pal; const o3 = l.o3 || 0, ox = clamp(o3 - 1, 0, 1), h = 1 - 0.88 * ox, g = [0.08 * ox * 0.55, 0.78 * ox * 0.55, 0.50 * ox * 0.55], t = Math.min(o3, 1) * 0.9;
+    return { o: [1.0 * h + g[0], 0.115 * h + g[1], 0.21 * h + g[2]], r: [1.0 * h + g[0], 0.07 * h + g[1], 0.035 * h + g[2]], i: [0.10 * t, 0.80 * t, 0.62 * t] }; };   // hydrogen's rose · deeper red at the front ([N II], [S II]) · oxygen's teal in the inner zone of a very hot star · above 1, oxygen's green through the whole of the glowing gas
   const REF = STOPS.map((s) => pose(s.P, s.dist, s.yaw, s.pitch, s.sx, s.sy, 16 / 9));       // the stops as composed for a 16:9 screen: the cloud is built round these
   const at = (k, nx, ny, depth) => { const p = REF[k]; return p.C.clone().addScaledVector(p.f, depth).addScaledVector(p.r, nx * TAN_REF * depth * ASP_REF).addScaledVector(p.u, ny * TAN_REF * depth); };
 
@@ -301,21 +300,20 @@ function boot() {
        · And what it does to the nebula: the disc stands in the star's light, so the gas near the plane of the disc, further out, is in its
          shadow (the lighting of the cloud takes this in; the star HBC 672 throws such a shadow across the Serpens nebula).
      Not real: the sizes (a star seen from this far off would be a point: these are some hundred thousand times too big for their nebulae);
-     the speeds (a turn takes such a star days, and its disc's outer edge weeks: here, ten seconds and about a minute); the markings on
+     the speeds (a turn takes such a star days, and its disc's outer edge weeks: here, about three seconds and about a quarter of a minute); the markings on
      the hot stars (their real surfaces are very nearly featureless: without something to follow, the turning could not be seen); and the
      disc's light, which fades more gently outwards than a real one's so that the disc can be seen to its edge. */
   // R: polar radius · w: turning, as a fraction of break-up · per: seconds per turn · inc, pa: how the axis lies (degrees from the line of sight; and round it, from screen-up)
   // I: surface brightness · ld, beta: limb and gravity darkening · surf: mottling, granulation, spots · disc: inner and outer edge (polar radii), thickness at r = 1, brightness, colours inner and outer, dust, forward-throw, fall-off, spiral
-  // The six are not one star six times. Their sizes go by what kind of star each is (a hot supergiant is several times the width of an ordinary hot
-  // star, a young sun-like star a fraction of it, the dying star at the heart of a nebula like the last one smaller still), though the true spread is
-  // wider than this: drawn to scale, the smallest would be a dot. Each disc is kept about the same width across, whatever the size of its star.
+  // All six are the same kind of thing (the sixth was the pattern): a small, very hot, very bright star with a wide thin disc. They are not one star six
+  // times: size, tilt, speed, the disc's reach and its colours are each their own. Each disc is kept about the same width across, whatever the size of its star.
   const SYS = [
-    { fade: [7.4, 5.2], R: 0.200, w: 0.25, per: 11, inc: 60, pa: -14, I: 3.9, ld: 0.32, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.10, rout: 5.6, h0: 0.090, db: 1.35, c1: [1.00, 0.66, 0.70], c2: [1.00, 0.30, 0.38], dust: 0.0, g: 0.25, pw: 1.9, arm: 3.2 },   // a hot giant (O6)
-    { R: 0.135, w: 0.25, per: 9, inc: 62, pa: 17, I: 3.7, ld: 0.34, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.20, rout: 7.6, h0: 0.075, db: 1.15, c1: [0.86, 0.90, 1.00], c2: [0.50, 0.62, 1.00], dust: 0.0, g: 0.35, pw: 1.8, arm: 2.6 },    // an ordinary hot star (B3)
-    { R: 0.095, w: 0.25, per: 13, inc: 58, pa: -24, I: 3.3, ld: 0.68, beta: 0.08, surf: [0.10, 0.34, 0.55], rin: 2.30, rout: 11.0, h0: 0.055, db: 1.00, c1: [1.00, 0.72, 0.40], c2: [0.86, 0.44, 0.20], dust: 1.5, g: 0.55, pw: 1.6, arm: 4.0 },  // a young sun-like star (K4), small, in a wide dusty disc
-    { R: 0.165, w: 0.25, per: 11, inc: 61, pa: 10, I: 3.8, ld: 0.32, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.10, rout: 6.6, h0: 0.085, db: 1.25, c1: [1.00, 0.68, 0.74], c2: [0.98, 0.34, 0.46], dust: 0.0, g: 0.25, pw: 1.9, arm: 3.0 },    // a hot star (O9)
-    { R: 0.265, w: 0.25, per: 14, inc: 56, pa: -8, I: 3.2, ld: 0.34, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 1.95, rout: 4.4, h0: 0.085, db: 1.40, c1: [1.00, 0.70, 0.56], c2: [1.00, 0.22, 0.14], dust: 0.3, g: 0.35, pw: 1.8, arm: 3.6 },    // a blue supergiant (O9 I): the biggest
-    { R: 0.075, w: 0.25, per: 8, inc: 61, pa: 21, I: 5.0, ld: 0.30, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.40, rout: 13.0, h0: 0.045, db: 1.25, c1: [0.84, 1.00, 0.96], c2: [0.26, 0.92, 0.74], dust: 0.0, g: 0.25, pw: 1.6, arm: 3.0 },    // the small, very hot star at the heart of a nebula like this one: the smallest
+    { fade: [7.4, 5.2], R: 0.085, w: 0.25, per: 2.6, inc: 60, pa: -14, I: 5.0, ld: 0.30, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.40, rout: 11.5, h0: 0.047, db: 1.25, c1: [0.92, 0.86, 1.00], c2: [0.60, 0.34, 1.00], dust: 0.0, g: 0.25, pw: 1.6, arm: 3.2 },   // violet
+    { R: 0.070, w: 0.25, per: 2.2, inc: 63, pa: 17, I: 5.0, ld: 0.30, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.40, rout: 13.5, h0: 0.044, db: 1.25, c1: [0.86, 0.93, 1.00], c2: [0.30, 0.56, 1.00], dust: 0.0, g: 0.25, pw: 1.6, arm: 2.6 },    // blue: the smallest
+    { R: 0.095, w: 0.25, per: 3.0, inc: 58, pa: -24, I: 4.8, ld: 0.34, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.35, rout: 10.5, h0: 0.048, db: 1.25, c1: [1.00, 0.92, 0.72], c2: [1.00, 0.62, 0.18], dust: 0.0, g: 0.30, pw: 1.6, arm: 3.6 },  // gold
+    { R: 0.080, w: 0.25, per: 2.4, inc: 62, pa: 10, I: 5.0, ld: 0.30, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.40, rout: 12.2, h0: 0.045, db: 1.25, c1: [0.92, 1.00, 0.78], c2: [0.50, 0.95, 0.22], dust: 0.0, g: 0.25, pw: 1.6, arm: 3.0 },    // green
+    { R: 0.100, w: 0.25, per: 3.2, inc: 57, pa: -8, I: 4.8, ld: 0.32, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.30, rout: 10.0, h0: 0.050, db: 1.30, c1: [1.00, 0.86, 0.66], c2: [1.00, 0.34, 0.10], dust: 0.0, g: 0.30, pw: 1.7, arm: 3.4 },    // fire: the biggest
+    { R: 0.075, w: 0.25, per: 2.2, inc: 61, pa: 21, I: 5.0, ld: 0.30, beta: 0.25, surf: [0.45, 0.16, 0.0], rin: 2.40, rout: 13.0, h0: 0.045, db: 1.25, c1: [0.84, 1.00, 0.96], c2: [0.26, 0.92, 0.74], dust: 0.0, g: 0.25, pw: 1.6, arm: 3.0 },    // teal: the one the others are modelled on
   ];
   SYS.forEach((y, k) => { const F = REF[k], i = y.inc * Math.PI / 180, a = y.pa * Math.PI / 180;
     const los = STOPS[k].P.clone().sub(F.C).normalize(), up = F.u.clone().addScaledVector(los, -F.u.dot(los)).normalize(), rt = new THREE.Vector3().crossVectors(los, up);   // the line of sight from the resting camera to the star (not the way the camera faces: the star is off to one side), and screen-up and screen-right across it
@@ -333,26 +331,9 @@ function boot() {
   const sightAndDark = (k) => { const s = STOPS[k], p = REF[k];
     prim(k, p.C.clone().lerp(s.P, 0.3), 0.45, s.P.clone(), 0.6, -1.8);                                    // the gap the star is seen through
     prim(k, at(k, -0.52, -0.80, 2.1), 1.15, at(k, -0.40, 0.75, 2.5), 1.25, 4.2); };            // the dark cloud on the left
-  // 1 · a hot star in a blister on the face of the cloud, the dense wall behind it lit (the Orion Nebula is this, seen face on)
-  sightAndDark(0); prim(0, STOPS[0].P.clone().addScaledVector(REF[0].f, 2.5).addScaledVector(REF[0].r, 0.5), 2.3, STOPS[0].P.clone().addScaledVector(REF[0].f, 2.5).addScaledVector(REF[0].r, 0.5), 2.3, 2.0);
-  // 2 · a B star that has drifted into dust: its wind keeps a little room clear round it, and sheets of dust beside it scatter its light
-  sightAndDark(1); prims[1][1] = { A: at(1, -0.54, -0.85, 2.0), rA: 1.1, B: at(1, -0.38, 0.8, 2.4), rB: 1.2, amp: 4.4 }; prim(1, STOPS[1].P.clone(), 0.45, STOPS[1].P.clone(), 0.45, -2.5); prim(1, STOPS[1].P.clone().add(V3(0.5, 0.5, -1.0)), 1.6, STOPS[1].P.clone().add(V3(0.5, 0.5, -1.0)), 1.6, 1.2);
-  // 3 · a star still inside the core it formed from, its light getting out along the cone its outflow has opened and lighting the cone's walls: a fan of amber, the star at its tip
-  { const k = 2, p = REF[k], P = STOPS[k].P, ax = V3(0, 0, 0).addScaledVector(p.r, 0.42).addScaledVector(p.u, 0.88).addScaledVector(p.f, -0.22).normalize();
-    prim(k, p.C.clone(), 0.45, P.clone().addScaledVector(ax, 0.4), 0.6, -1.8);
-    prim(k, at(k, -0.52, -0.80, 2.1), 1.15, at(k, -0.40, 0.75, 2.5), 1.25, 4.2);
-    prim(k, P.clone().addScaledVector(ax, -0.9), 1.5, P.clone().addScaledVector(ax, -0.9), 1.5, 2.2);
-    prim(k, P.clone().addScaledVector(ax, 0.0), 0.16, P.clone().addScaledVector(ax, 3.4), 1.5, -5.0); }
-  // 4 · the edge of the cloud, seen from the side, with the star above it eating down into it: the front is the bright line along the top, and
-  //     where a dense knot shades the gas behind it a pillar is left standing, pointing at the star (the Eagle's pillars, Carina's cliffs)
-  { const k = 3, P = STOPS[k].P; prim(k, at(k, 0.1, 0.15, 1.5), 0.6, P.clone().lerp(at(k, 0.2, 0.3, 4.4), 0.35), 1.6, -2.4);
-    prim(k, at(k, -0.56, -0.80, 2.1), 1.15, at(k, -0.46, 0.75, 2.5), 1.25, 4.2);
-    prim(k, at(k, -0.6, -0.95, 5.0), 1.5, at(k, 1.1, -0.78, 5.6), 1.7, 3.2);
-    for (const [nx, ny, dz, len] of [[0.10, 0.10, 0.0, 3.0], [0.37, -0.06, 0.4, 2.6]]) { const H = at(k, nx, ny, STOPS[k].dist + dz), dir = H.clone().sub(P).normalize(); prim(k, H, 0.2, H.clone().addScaledVector(dir, len), 0.6, 5.6); } }
-  // 5 · a hot star's glowing gas with a cooler star's blue reflection nebula beside it, dark dust across both (the Trifid is this)
-  { const k = 4; sightAndDark(k); const Pb = STOPS[k].P.clone().add(STOPS[k].lights[1].o); prim(k, Pb.clone(), 0.4, Pb.clone(), 0.4, -2.5); }
-  // 6 · a small cluster that has blown its cavity open through the far side of the cloud
-  sightAndDark(5); prims[5][1] = { A: at(5, -0.56, -0.85, 2.0), rA: 1.1, B: at(5, -0.40, 0.8, 2.4), rB: 1.2, amp: 4.4 };
+  // Every stop is laid out as the sixth was: nothing but the gap and the dark cloud, the star left to blow its own cavity open in the turbulence
+  // (the walls, shells and pillars that used to be built by hand at the other five closed the view in and made it flat).
+  for (let k = 0; k < 6; k++) { sightAndDark(k); prims[k][1] = { A: at(k, -0.56, -0.85, 2.0), rA: 1.1, B: at(k, -0.40, 0.8, 2.4), rB: 1.2, amp: 4.4 }; }
   const uPA = [], uPB = [], uPC = [];
   for (let k = 0; k < 6; k++) for (let j = 0; j < NPS; j++) { const p = (prims[k] || [])[j]; if (p) { uPA.push(new THREE.Vector4(p.A.x, p.A.y, p.A.z, p.rA)); uPB.push(new THREE.Vector4(p.B.x, p.B.y, p.B.z, p.rB)); uPC.push(p.amp); } else { uPA.push(new THREE.Vector4()); uPB.push(new THREE.Vector4()); uPC.push(0); } }
 
@@ -360,8 +341,12 @@ function boot() {
      the way to the next. The cloud is thinner along it: the flight follows a lane through the gas, with the denser cloud to either side, so
      that what lies ahead can be seen from a distance. Its line is kept in a small table (x, y for each z) for the cloud's density to read. */
   const START = { C: V3(-0.6, 0.5, 9.5), q: new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.02, 0.03, 0, 'YXZ')) };
+  const qFr = { value: new THREE.Vector4(0.4 * TAN_REF * ASP_REF, -0.04 * TAN_REF, 1.18 * 2 * TAN_REF, 9.5) };   // the reference picture's frame as the starting camera sees it: where its anchor point falls (tangent units), its size, and how far off the quasar's heart stands
+  const QW = 256, qMap = new THREE.DataTexture(new Uint8Array(QW * QW * 4), QW, QW, THREE.RGBAFormat, THREE.UnsignedByteType); qMap.minFilter = qMap.magFilter = THREE.LinearFilter; qMap.wrapS = qMap.wrapT = THREE.ClampToEdgeWrapping; qMap.needsUpdate = true;   // where the reference has cloud (red: its brightness, softened · alpha: fading to nothing at the picture's edges); filled in when the picture has loaded
+  const Q_DP = 9.5, Q_ENT = [0.40, 0.43];                   // the landing's quasar: how far from the starting camera its heart stands · the point of its picture the camera makes for (the thick of the clouds, up and to the left of the torus)
+  const ENT0 = new THREE.Vector3(0.4 * TAN_REF * ASP_REF + (Q_ENT[0] - 0.475) * 1.18 * 2 * TAN_REF, -0.04 * TAN_REF - (Q_ENT[1] - 0.565) * 1.18 * 2 * TAN_REF, -1).applyQuaternion(START.q).multiplyScalar(Q_DP + 0.3).add(START.C);   // that point in the world, as composed for a 16:9 screen
   const VIA = STOPS.map((s, k) => s.P.clone().addScaledVector(REF[k].r, -1.5).addScaledVector(REF[k].u, -0.35).addScaledVector(REF[k].f, 1.1));
-  const pathTex = (() => { const pts = [START.C]; REF.forEach((p, k) => { pts.push(p.C); pts.push(VIA[k]); }); pts.push(VIA[5].clone().add(V3(0, 0, -12)));
+  const pathTex = (() => { const pts = [START.C, ENT0]; REF.forEach((p, k) => { pts.push(p.C); pts.push(VIA[k]); }); pts.push(VIA[5].clone().add(V3(0, 0, -12)));
     const c = new THREE.CatmullRomCurve3(pts, false, 'centripetal'), M = 3000, sm = []; for (let i = 0; i <= M; i++) sm.push(c.getPoint(i / M));
     const n = 256, d = new Uint16Array(n * 4); let j = 0;
     for (let i = 0; i < n; i++) { const z = 10 - 104 * (i + 0.5) / n; while (j < M - 1 && sm[j + 1].z > z) j++; const a = sm[j], b = sm[j + 1], t = clamp((a.z - z) / Math.max(1e-6, a.z - b.z), 0, 1);
@@ -374,6 +359,8 @@ function boot() {
     if (!l) { uLP.push(new THREE.Vector4(0, 0, 0, 0)); uLC.push(new THREE.Vector4()); uLE.push(new THREE.Vector4()); continue; }
     const pos = STOPS[k].P.clone().add(l.o); l.pos = pos; l.slab = nSlab++; l.stop = k; LIGHTS.push(l);
     uLP.push(new THREE.Vector4(pos.x, pos.y, pos.z, l.R)); uLC.push(new THREE.Vector4(l.col[0] * l.L, l.col[1] * l.L, l.col[2] * l.L, l.Rs > 0 ? 1 : 0)); uLE.push(new THREE.Vector4(l.em, 1.35 * Math.pow(l.Rs, 1.5), l.slab, l.o3)); }
+  const palU = (() => { const z = () => new THREE.Vector3(), O = [], R = [], I = []; for (let k = 0; k < 6; k++) for (let j = 0; j < 2; j++) { const l = STOPS[k].lights[j], q = l ? palOf(l) : null; O.push(q ? new THREE.Vector3(...q.o) : z()); R.push(q ? new THREE.Vector3(...q.r) : z()); I.push(q ? new THREE.Vector3(...q.i) : z()); }
+    return { uEO: { value: O }, uER: { value: R }, uEI: { value: I } }; })();
   const LW = SMALL ? 128 : 192, LH = LW / 2, LD = SMALL ? 80 : 128;
 
   /* ── the noise the turbulence is made from: a tiling 64³ volume, made on the graphics card ── */
@@ -394,7 +381,7 @@ function boot() {
   // taken as nothing: what is seen there is the star's own glow, which stays with the star.
   const FLOWS = FLOW + /* glsl */`
     uniform vec3 uSP6[6];
-    vec3 flowShift(vec3 P,float t1,float t0){ float ds=1e9; for(int k=0;k<6;k++){ vec3 e=P-uSP6[k]; ds=min(ds,dot(e,e)); } return (flowAt(P,t1)-flowAt(P,t0))*smoothstep(0.35,1.6,sqrt(ds)); }`;
+    vec3 flowShift(vec3 P,float t1,float t0){ float ds=1e9; for(int k=0;k<6;k++){ vec3 e=P-uSP6[k]; ds=min(ds,dot(e,e)); } return (flowAt(P,t1)-flowAt(P,t0))*smoothstep(0.35,1.6,sqrt(ds))*smoothstep(-2.2,-4.4,P.z); }`;
   // And where on a picture of the gas (made when the gas's clock read tR) to find the gas that the flow has carried to screen position x by time tD.
   // How far a bit of gas moves across the screen depends on how far away it is. That distance is read from a deliberately coarse, smooth map (tDS:
   // see the pass that keeps it). A sharp one tears the picture along every silhouette, where near gas and far gas meet; and worse, the hand-over
@@ -432,14 +419,41 @@ function boot() {
   /* ── the cloud's density, shared by everything that needs it ── */
   const COMMON = /* glsl */`
     #define NPS ${NPS}
+    uniform sampler2D tQm; uniform vec3 uQC0; uniform mat3 uQR0; uniform vec4 uQFr;   // the landing's quasar: the reference's cloud map, and the camera and frame it was painted in
     uniform sampler3D uN; uniform sampler2D uPath; uniform vec4 uPA[${6 * NPS}], uPB[${6 * NPS}]; uniform float uPC[${6 * NPS}];
     const float D=${D.toFixed(1)}, KD=3.8, RW=0.4, WARP=0.9;
     const mat3 M1=mat3(0.36,0.48,-0.80, -0.80,0.60,0.0, 0.48,0.64,0.60);
     int stopOf(float z){ return int(clamp(floor(-z/D+0.5),1.0,6.0))-1; }
     // the cloud as a whole: a long body round a meandering axis, beginning just ahead of where the page starts and broken open at its far end
+    // The landing's quasar. Its torus is fitted to the reference by calculation, not by eye: a ring is projected through the starting camera and its
+    // centre, tilt, radius, tube and the angle it is seen from are solved for, so that its outline lies on the reference torus's outline (an
+    // ellipse of half-axes 0.127 and 0.056 picture-widths) and its near wall's rim crosses where the reference's does (0.09 of the short half-axis
+    // above the long axis). The fit is within 3% all the way round. It comes out as a ring of radius 0.95 and tube 0.28, seen from only 8.8 degrees
+    // above its own plane: so the near wall hides the source, and of the lit inside a thin crescent shows over the rim.
+    const vec3 QC=vec3(2.247,0.264,-0.087), QN=vec3(-0.4704,0.8697,0.1493); const float QR=0.9522, QT=0.3245;   // its centre · its axis (toward the camera at the top) · the ring's radius · the tube's
+    float qD2(vec3 p){ vec3 qd=p-QC; float qh=dot(qd,QN), qr=length(qd-QN*qh); return ((qr-QR)*(qr-QR)+qh*qh)/(QT*QT); }   // how far a point is from the middle of the tube (squared; 1 at about its surface)
+    float qTor(vec3 p){ float d2=qD2(p); return exp(-d2*d2*d2*d2*d2*d2); }                                                      // the ring's dust: 1 inside, falling off very sharply at its surface (so that its solid part is the measured size: with a soft surface the solid part was a fifth smaller than the ring was meant to be)
     float bodyF(vec3 p){ vec2 c=p.xy-vec2(1.6*sin(p.z*0.11+0.6),1.0*sin(p.z*0.07+2.0)); float th=atan(c.y,c.x); float rr=length(c*vec2(1.0,1.2))*(1.0+0.22*sin(3.0*th+p.z*0.23+1.0)+0.13*sin(5.0*th-p.z*0.31));
       vec2 dq=p.xy-texture(uPath,vec2((10.0-p.z)/104.0,0.5)).rg;                       // the lane the camera flies along, where the gas is thinner
-      return -7.0*(smoothstep(7.0,12.0,rr)+smoothstep(-1.5,4.0,p.z)+smoothstep(-87.0,-91.5,p.z))-1.25*exp(-dot(dq,dq)/3.2)*(1.0-smoothstep(-9.6,-7.6,p.z)); }   // (the cloud's front reaches some five units further forward than it did, and through those first dozen units no lane is kept clear for the camera: the flight in from the landing is through the thick of the gas, which hides what is ahead until, just short of the first stop, the lane opens and the first project's star is there. Nothing in front of the first stop's camera is changed)
+      float in0=smoothstep(-9.6,-7.6,p.z);                                              // on the way in from the landing (ahead of the first star's camera) the lane is wider and clearer: what is flown down is a passage with the first star's cloud in sight at the end of it, not a fog
+      // The landing's quasar, as gas (it stands in front of the main cloud, which begins behind it). Besides the torus, its gas is the outflow, and the
+      // outflow is taken from the reference itself: there is gas where the reference has cloud and none where it is dark, so every puff and stream
+      // is where it was painted, crowding the torus's opening and streaming out from it both ways. Along each line of sight from the starting camera
+      // the gas is put at the depth the outflow has there (its axis leans toward the camera at the top, so the upper lobe comes forward and the
+      // lower goes back) and is as deep as the outflow is wide there. Nothing else is in front of the main cloud: the torus does not sit in a fog.
+      float quasar=0.0;
+      if(p.z>-4.2){ vec3 qv=(p-uQC0)*uQR0;                                              // this point as the starting camera sees it
+        if(qv.z<-1.0){ vec2 pv=vec2((qv.x/(-qv.z)-uQFr.x)/uQFr.z+0.475,0.565-(qv.y/(-qv.z)-uQFr.y)/uQFr.z);                   // where on the reference it falls
+          if(pv.x>0.0&&pv.x<1.0&&pv.y>0.0&&pv.y<1.0){ vec4 qm=texture(tQm,pv); float al=dot(pv-vec2(0.472,0.531),vec2(-0.43,-0.903))*uQFr.z*uQFr.w;   // how far along the outflow's axis this is (toward the upper lobe)
+            float pres=smoothstep(0.008,0.03,qm.r)*qm.a, sg=0.30+0.50*abs(al), dz=(-qv.z-(uQFr.w-0.155*al))/sg;
+            // The outflow is an hourglass: two cones on the torus's own axis, their points meeting at the torus, widening outward (as the reference shows it:
+            // a V above the torus and a V below). Inside the cones there is gas on every line of sight the reference has cloud on, thinner where the
+            // cone is wider so that the sight-lines through it all pass about the same amount. Outside them only a thin sheet is kept, in the plane
+            // of the picture, for the reference's faint dust beside the torus.
+            vec3 qd=p-QC; float qh=dot(qd,QN), qr=length(qd-QN*qh), rc=0.58+0.48*abs(qh);
+            float dq=pres*(2.4/rc*smoothstep(1.12,0.80,qr/rc)+1.05/sg*exp(-dz*dz)); quasar=dq>0.002?7.0+log(dq):0.0; } }
+        quasar=max(quasar,12.5*qTor(p)); }
+      return -7.0*(smoothstep(7.0,12.0,rr)+smoothstep(-4.6,-2.2,p.z)+smoothstep(-87.0,-91.5,p.z))+quasar-(1.25+1.75*in0)*exp(-dot(dq,dq)/(3.2+2.6*in0))*(1.0-smoothstep(-5.6,-4.2,p.z)); }
     float primF(vec3 p,int k){ float e=0.0;
       for(int j=0;j<NPS;j++){ int i=k*NPS+j; float amp=uPC[i]; if(amp==0.0) continue; vec3 a=uPA[i].xyz, ab=uPB[i].xyz-a; float h=clamp(dot(p-a,ab)/max(dot(ab,ab),1e-5),0.0,1.0); vec3 d=p-a-ab*h;
         e+=amp*(1.0-smoothstep(0.55,1.3,length(d)/mix(uPA[i].w,uPB[i].w,h))); }
@@ -453,7 +467,7 @@ function boot() {
     // edge, and the cloud shows its texels as blotches with a fine crawling pattern; here the blend between texels eases in and out instead.
     vec4 nz(vec3 u,float lod){ if(lod>=1.0) return textureLod(uN,u,lod); vec3 c=u*${NS}.0-0.5, i=floor(c), f=c-i; f=f*f*f*(f*(f*6.0-15.0)+10.0);
       vec4 sm=textureLod(uN,(i+f+0.5)/${NS}.0,0.0); return lod<=0.0?sm:mix(sm,textureLod(uN,u,lod),lod); }
-    float rho0(vec3 p,float fp,float cw,out float nd){ nd=0.0; float e=bodyF(p); if(e<-6.0) return 0.0; p+=flowAt(p,uFlowT);   // (the clouds placed by hand to keep the words readable stay where they are; the gas in and round them moves)
+    float rho0(vec3 p,float fp,float cw,out float nd){ nd=0.0; float e=bodyF(p); if(e<-6.0) return 0.0; float qk=smoothstep(-2.2,-4.4,p.z); p+=flowAt(p,uFlowT)*qk;   // (qk: 0 in the landing's quasar, which keeps still and is nearly smooth, so that it stays the reference's picture; 1 in the cloud proper)   // (the clouds placed by hand to keep the words readable stay where they are; the gas in and round them moves)
       vec3 q=p+0.9*sin(p.yzx*0.31+vec3(1.3,4.1,2.2))+0.4*sin(p.zxy*0.83+vec3(0.5,2.6,5.1)); q=M1*q*(1.0/12.0);
       float l0=log2(max(fp,1e-4)*${(NS / 12).toFixed(4)}), nc=0.0;
       vec4 a=nz(q,max(l0,0.0)); vec3 w=WARP*(vec3(a.b,a.a,a.r)-0.5);
@@ -461,7 +475,7 @@ function boot() {
       if(l0<2.4){ vec4 b=nz(q.zxy*8.0+0.37,max(l0+3.0,0.0)); float k1=1.0-smoothstep(1.4,2.4,l0); nd=0.512*((b.r-0.5)*2.0+RW*(b.g-0.30))*k1; w+=0.3*WARP*(vec3(b.b,b.a,b.r)-0.5)*k1;
         if(cw>0.0){ vec4 c=nz(q.yzx*64.0+0.71,max(l0+6.0,0.0)); nc=0.262*((c.r-0.5)*2.0+RW*(c.g-0.30))*cw; } }
       e+=primF(p+w,stopOf(p.z)); if(e<-6.0) return 0.0;                                   // the bodies placed by hand are pulled about by the same turbulence, so none keeps the shape it was given
-      return max(exp(KD*(n+nd+nc)+e)-0.4,0.0); }                              // the exponential is what makes the spread of densities lognormal
+      return max(exp(KD*(n+nd+nc)*mix(0.30,1.0,qk)+e)-0.4*qk,0.0); }                              // the exponential is what makes the spread of densities lognormal
     float rho0(vec3 p,float fp){ float nd; return rho0(p,fp,0.0,nd); }
     float ndAt(vec3 p){ p+=flowAt(p,uFlowT); vec3 q=M1*(p+0.9*sin(p.yzx*0.31+vec3(1.3,4.1,2.2))+0.4*sin(p.zxy*0.83+vec3(0.5,2.6,5.1)))*(1.0/12.0); vec4 b=nz(q.zxy*8.0+0.37,0.0); return 0.512*((b.r-0.5)*2.0+RW*(b.g-0.30)); }   // (the middle scales of the structure alone, at one point: see the ionisation front)
     // The camera carries a little clear space with it: gas closer than NEAR1 thins away to nothing at NEAR0. (Not physical. Gas right at the
@@ -481,7 +495,7 @@ function boot() {
     const float NSLAB=${nSlab.toFixed(1)}, LD=${LD.toFixed(1)};
     vec2 lightTex(float slab,vec3 d,float r,float R){ float lon=atan(d.z,d.x)*0.15915494+0.5, lat=acos(clamp(d.y/max(r,1e-4),-1.0,1.0))*0.31830989;
       float s=pow(clamp((r-LR0)/(R-LR0),0.0,1.0),1.0/LPOW); return textureLod(uLA,vec3(lon,lat,(slab+clamp(s,0.5/LD,1.0-0.5/LD))/NSLAB),0.0).rg; }`;
-  const densU = { uFlowT: flowU.uFlowT, uN: { value: noiseRT.texture }, uPath: { value: pathTex }, uPA: { value: uPA }, uPB: { value: uPB }, uPC: { value: uPC } };
+  const densU = { tQm: { value: qMap }, uQC0: { value: START.C.clone() }, uQR0: { value: new THREE.Matrix3().setFromMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(START.q)) }, uQFr: qFr, uFlowT: flowU.uFlowT, uN: { value: noiseRT.texture }, uPath: { value: pathTex }, uPA: { value: uPA }, uPB: { value: uPB }, uPC: { value: uPC } };
 
   /* ── each star's map of its own light: for every direction (longitude × latitude) and distance, how much of its ionising budget is spent
         (kept as a logarithm, so the front can be placed more finely than the map's own steps) and the dust's optical depth back to the star.
@@ -528,22 +542,24 @@ function boot() {
   const bnTex = (() => { const b = atob('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'), d = new Uint8Array(4096); for (let i = 0; i < 4096; i++) d[i] = b.charCodeAt(i);
     const t = new THREE.DataTexture(d, 64, 64, THREE.RedFormat, THREE.UnsignedByteType); t.minFilter = t.magFilter = THREE.NearestFilter; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.needsUpdate = true; return t; })();
   const sizeU = { uL: { value: new THREE.Vector2(4, 4) }, uH: { value: new THREE.Vector2(4, 4) }, uJit: { value: new THREE.Vector2() }, uUp: { value: 1 } };
-  const SIGE = 0.13;
+  const SIGE = 0.18;
   const cloud = mkPass(/* glsl */`precision highp float; precision highp sampler3D; in vec2 vUv; layout(location=0) out vec4 o0; layout(location=1) out vec4 o1;
-    uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uFrame,uPix; uniform vec2 uJit,uL; uniform sampler2D uBN;
+    uniform vec3 uCam; uniform mat3 uRot; uniform float uTan,uAspect,uFrame,uPix,uPicK,uCal,uQHK; uniform vec2 uJit,uL,uOff; uniform sampler2D uBN,tPic,tQH;
     ${COMMON}
     ${LIGHTU}
-    const float SIGE=${SIGE.toFixed(3)}, SIGS=0.082;                    // how strongly dust blocks light, per unit length at the median density · how much of that is scattered rather than absorbed (albedo about 0.6)
+    const float SIGE=${SIGE.toFixed(3)}, SIGS=0.113;                    // how strongly dust blocks light, per unit length at the median density · how much of that is scattered rather than absorbed (albedo about 0.6)
     const vec3 CEXT=vec3(0.72,1.0,1.38), STINT=vec3(0.80,1.0,1.30);    // blue is blocked, and scattered, more than red
     uniform float uCoarse;
     const float DT0=0.055, DTK=0.066, TFAR=15.5, FRONT=2.4;
     float hg(float mu,float g){ float g2=g*g; return 0.0795775*(1.0-g2)/pow(1.0+g2-2.0*g*mu,1.5); }
-    vec3 emCol(float lx,float o3){ float inner=1.0-smoothstep(-4.5,-1.0,lx), rim=smoothstep(-1.6,0.0,lx);
-      float ox=clamp(o3-1.0,0.0,1.0);                                    // above 1: oxygen's green outshines hydrogen's red through the whole of the glowing gas, not only close to the star
-      return mix(vec3(1.0,0.115,0.21),vec3(1.0,0.07,0.035),rim*0.7)*(1.0-0.88*ox)+vec3(0.10,0.80,0.62)*min(o3,1.0)*inner*0.9+vec3(0.08,0.78,0.50)*ox*0.55; }   // hydrogen's rose · deeper red at the front ([N II], [S II]) · oxygen's teal in the inner zone of a very hot star
-    void main(){ vec2 ndc=(vUv+uJit/uL)*2.0-1.0; vec3 v=normalize(uRot*vec3(ndc.x*uTan*uAspect,ndc.y*uTan,-1.0));
+    uniform vec3 uEO[12],uER[12],uEI[12];                                // each lamp's palette (see PAL, palOf): out toward the front · at the front · added in toward the star
+    vec3 untoneQ(vec3 d){ vec3 c=mix(d/12.92,pow((d+0.055)/1.055,vec3(2.4)),step(vec3(0.04045),d));                      // a painted colour, as the light that the camera's tone curve turns into it
+      vec3 y=clamp(mat3(0.64304,0.05927,0.00596, 0.31119,0.93144,0.06393, 0.04578,0.00929,0.93012)*c,0.0,0.97), a=1.0-0.983729*y, b=0.0245786-0.4329510*y, k=-(0.000090537+0.238081*y);
+      return max(mat3(1.76474,-0.14703,-0.03634, -0.67578,1.16025,-0.16244, -0.08896,-0.01322,1.19877)*((-b+sqrt(max(b*b-4.0*a*k,0.0)))/(2.0*a)),0.0)*0.6; }
+    vec3 emCol(float lx,int i){ float inner=1.0-smoothstep(-4.5,-1.0,lx), rim=smoothstep(-1.6,0.0,lx); return mix(uEO[i],uER[i],rim*0.7)+uEI[i]*inner; }
+    void main(){ vec2 ndc=(vUv+uJit/uL)*2.0-1.0; vec3 v=normalize(uRot*vec3(ndc.x*uTan*uAspect+uOff.x,ndc.y*uTan+uOff.y,-1.0));   // (uOff: nothing, but for the calibration, whose view is the reference's own frame, off the starting camera's axis)
       float jit=fract(texelFetch(uBN,ivec2(gl_FragCoord.xy)&63,0).r+uFrame*0.62870672);
-      float t=NEAR0; if(uCam.z>0.0&&v.z<-0.01) t=max(t,uCam.z/(-v.z)); float tS=t;
+      float t=NEAR0; if(uCam.z>3.4&&v.z<-0.01) t=max(t,(uCam.z-3.4)/(-v.z)); float tS=t;
       t+=DT0*(pow(1.0+DTK,fract(texelFetch(uBN,ivec2(gl_FragCoord.xy+vec2(17.0,41.0))&63,0).r+uFrame*0.53859726))-1.0)/DTK;   // where the steps fall along the ray is itself shifted from pixel to pixel and frame to frame (by up to one step, keeping their spacing), so no trace of the steps is left standing in the picture
       vec3 col=vec3(0.0), T=vec3(1.0); float dS=0.0, wS=0.0; vec2 lEnd[2]; float tEnd=-1.0, ndE=0.0; int kEnd=-1; bool hasE[2], hasN=false; hasE[0]=false; hasE[1]=false;   // (what each lamp's map read at the end of the last step, which is the start of this one)
       for(int i=0;i<46;i++){ float dt=DT0+DTK*(t-tS), ts=t+dt*jit; vec3 p=uCam+v*ts;
@@ -562,7 +578,7 @@ function boot() {
               for(int hh=0;hh<2;hh++){ float f0=0.5*float(hh), f1=f0+0.5, xs=hh==0?x0:xc, xe=hh==0?xc:x1, fa=f0, fb=f1, xa=xs, xb=xe;   // each half of the step in turn
                 if(xa*xb<0.0) for(int q=0;q<2;q++){ float fm=0.5*(fa+fb); vec3 pm=mix(pa,pb,fm), dm=pm-LP.xyz; float xm=lightTex(LE.z,dm,length(dm),LP.w).x+FRONT*ndAt(pm); if(xa*xm<=0.0){ fb=fm; xb=xm; } else { fa=fm; xa=xm; } }   // the front crosses it: find where, to an eighth of the step
                 for(int q=0;q<3;q++){ float lx, wq; if(q==0){ lx=mix(xs,xa,jit); wq=fa-f0; } else if(q==1){ lx=mix(xa,xb,jit); wq=fb-fa; } else { lx=mix(xb,xe,jit); wq=f1-fb; }
-                  if(wq<=0.0) continue; float rq=thin(r0,lx), re=min(rq,cap); rs+=wq*rq; em+=wq*re*re*ionF(lx)*emCol(lx,LE.w); } }
+                  if(wq<=0.0) continue; float rq=thin(r0,lx), re=min(rq,cap); rs+=wq*rq; em+=wq*re*re*ionF(lx)*emCol(lx,k*2+j); } }
               r0=mix(r0,rs,wl[j]); src+=LE.x*em*dt*wl[j]*(j==0?mix(1.0,discShade(k,d,r),0.7):1.0); } }                            // recombination glow: density squared, capped by what the star's flux can keep ionised at this distance
           float rho=r0; hasN=gotN; ndE=ndB;
           for(int j=0;j<2;j++){ if(wl[j]<=0.0) continue; vec4 LP=uLP[k*2+j], LC=uLC[k*2+j];
@@ -572,19 +588,54 @@ function boot() {
             vec3 sh=hg(mu,0.55)*exp(-tau)+0.35*hg(mu,0.2)*exp(-0.75*tau);                // scattered once, forwards most · and (approximately) the softer light that has been scattered more than once, which in dust this dark gets little further
             src+=rho*SIGS*LC.rgb*STINT*sh*Ia*wl[j]*(j==0?discShade(k,p-LP.xyz,rr[j]):1.0); }
           src+=rho*mix(vec3(0.0027,0.0020,0.0016),vec3(0.0017,0.0023,0.0038),exp(-min(rho,14.0)*0.45))*exp(-min(rho,14.0)*0.25)*dt;   // the faint light of all the rest of the sky's stars on the outer gas: bluish where it is thin, a dull brown where it is thick (the 'cloudshine' of dark clouds), and little of it, so that unlit cloud is dark dust against the stars and not grey fog
+          // The landing's quasar glows in the reference picture's own colours: each bit of its gas has, as its own light, the colour the reference has on
+          // the line of sight it lies on from where the camera starts. So from there the gas, added up, is the reference; from anywhere else it is the
+          // same gas seen from there. (The colour is first put backwards through the camera's tone curve, so that it comes out of the camera as
+          // painted. How much of it each line of sight delivers, thick dust all and thin gas a part, is measured first and allowed for: see below.) The main cloud behind takes a
+          // tenth of it. Not real: gas does not glow in a painter's colours; and no light is traced from the quasar's heart, the reference's own light and shade being used.
+          // How bright that glow comes out depends on how much gas the line of sight passes through: thick gas shows the colour once over, thin gas
+          // only a part of it. So the marcher is first run once in a calibration (uCal), from the starting camera, over the reference's frame, every bit of
+          // gas glowing with a brightness of one and nothing else alight: what comes out (tQH) is the share of its glow that each line of sight delivers,
+          // colour by colour. Dividing by that share (down to a floor: the faintest haze is not driven up without limit) makes the gas along every line of
+          // sight add up to the reference's own colour there, thick or thin. The darkening toward the screen's corners that the camera adds is undone too.
+          if(uCal>0.5) src=vec3(0.0);
+          if(uPicK>0.0&&p.z>-9.5){ vec3 q=(p-uQC0)*uQR0; if(q.z<-0.5){ vec2 tq=q.xy/(-q.z), pv=vec2((tq.x-uQFr.x)/uQFr.z+0.475,0.565-(tq.y-uQFr.y)/uQFr.z);
+            if(pv.x>0.0&&pv.x<1.0&&pv.y>0.0&&pv.y<1.0){ float W=smoothstep(-9.5,-4.5,p.z)*(0.02+0.98*smoothstep(-4.4,-2.0,p.z));
+              if(uCal>0.5) src=vec3(rho*SIGE*W*dt);
+              else { vec3 pc=untoneQ(textureLod(tPic,pv,max(0.0,log2(float(textureSize(tPic,0).x)*uPix/uQFr.z)-0.5)).rgb)*texture(tQm,pv).a*uPicK;
+                if(uQHK>0.5){ vec2 sd=vec2(tq.x/(uTan*uAspect),tq.y/uTan)*0.5;
+                  pc/=max(texture(tQH,vec2(pv.x,1.0-pv.y)).rgb,vec3(0.14))*(1.0-0.42*smoothstep(0.3,1.05,length(sd*vec2(1.0,1.12))*1.3)); }
+                else pc*=vec3(0.915,1.0,1.121)*mix(mix(1.02,1.66,smoothstep(0.8,2.3,length(p-QC))),0.55,1.0-smoothstep(1.3,2.4,qD2(p)));
+                src+=rho*SIGE*pc*W*dt; } } } }
           vec3 x=rho*SIGE*CEXT*dt, tr=exp(-x), c=T*src*(1.0-tr)/max(x,vec3(1e-6)); col+=c;
           float wg=dot(c,vec3(0.3,0.5,0.2))+0.15*T.g*(1.0-tr.g); dS+=wg*ts; wS+=wg; T*=tr;   // (and where along the ray the light, or the darkness, came from: see the averaging)
           kEnd=k; tEnd=t+dt; }
         t+=dt; if(T.r<0.015||t-tS>TFAR) break; }
       if(T.r>0.008){ float tf=0.0; for(int i=0;i<7;i++){ vec3 p=uCam+v*(t+3.0+6.0*float(i)); tf+=exp(bodyF(p)+0.9)*6.0; } T*=exp(-tf*SIGE*CEXT); }   // whatever cloud lies beyond where the march stops still hides the stars behind it
-      o0=vec4(col,T.g); o1=vec4(wS>1e-5?dS/wS:1000.0,0.0,0.0,1.0); }`, Object.assign({ uCoarse: { value: 0.8 }, uFrame: { value: 0 }, uPix: { value: 0.002 }, uBN: { value: bnTex }, uJit: sizeU.uJit, uL: sizeU.uL }, viewU, densU, lightU));
+      o0=vec4(col,T.g); o1=vec4(wS>1e-5?dS/wS:1000.0,0.0,0.0,1.0); }`, Object.assign({ uCoarse: { value: 0.8 }, uFrame: { value: 0 }, uPix: { value: 0.002 }, uBN: { value: bnTex }, uJit: sizeU.uJit, uL: sizeU.uL, uCal: { value: 0 }, uQHK: { value: 0 }, uOff: { value: new THREE.Vector2() }, tQH: { value: null } }, viewU, densU, lightU, palU));
+  // The calibration of the landing's glow (see the marcher): the marcher itself, run over the reference's frame from the starting camera, a couple of
+  // dozen times with its rays shifted, and averaged. Done once, when the reference has loaded (the quasar's gas does not move).
+  const QH = 1024, calCur = mkMRT(THREE.RedFormat); calCur.setSize(QH, QH);   // (fine enough to follow the torus's edge, where thick gas meets thin within a few pixels: coarser, and a thin dark line was left along it)
+  const mkCal = () => new THREE.WebGLRenderTarget(QH, QH, { type: THREE.HalfFloatType, format: THREE.RGBAFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
+  let calA = mkCal(), calB = mkCal();
+  const calMix = mkPass(`precision highp float; in vec2 vUv; out vec4 o; uniform sampler2D tA,tB; uniform float uW; void main(){ o=mix(texture(tA,vUv),texture(tB,vUv),uW); }`, { tA: { value: null }, tB: { value: calCur.texture[0] }, uW: { value: 1 } });
+  function calibrateQ() {
+    const fr = qFr.value, sv = [viewU.uCam.value.clone(), viewU.uRot.value.clone(), viewU.uTan.value, viewU.uAspect.value, sizeU.uL.value.clone(), sizeU.uJit.value.clone(), cloud.u.uPix.value, cloud.u.uCoarse.value, cloud.u.uFrame.value];
+    viewU.uCam.value.copy(START.C); viewU.uRot.value.copy(densU.uQR0.value); viewU.uTan.value = fr.z / 2; viewU.uAspect.value = 1;
+    cloud.u.uOff.value.set(fr.x + 0.025 * fr.z, fr.y + 0.065 * fr.z); sizeU.uL.value.set(QH, QH); cloud.u.uCoarse.value = 0.015; cloud.u.uCal.value = 1;   // (the gas is read at the fineness the screen's own rays read it at: uPix is left as it is)
+    try { for (let i = 0; i < 12; i++) { sizeU.uJit.value.set((0.5 + i * 0.7548776662466927) % 1 - 0.5, (0.5 + i * 0.5698402909980532) % 1 - 0.5); cloud.u.uFrame.value = (i * 37) % 1024;
+      run(cloud, calCur); calMix.u.tA.value = calA.texture; calMix.u.uW.value = 1 / (i + 1); run(calMix, calB); { const t = calA; calA = calB; calB = t; } }
+      cloud.u.tQH.value = calA.texture; cloud.u.uQHK.value = 1; cloud.u.uPicK.value = 1; }
+    finally { cloud.u.uCal.value = 0; cloud.u.uOff.value.set(0, 0);   // (whatever happens, the marcher is handed back as it was: if the calibration could not be made, the gas keeps its earlier, rougher allowance for thick and thin)
+    viewU.uCam.value.copy(sv[0]); viewU.uRot.value.copy(sv[1]); viewU.uTan.value = sv[2]; viewU.uAspect.value = sv[3]; sizeU.uL.value.copy(sv[4]); sizeU.uJit.value.copy(sv[5]); cloud.u.uPix.value = sv[6]; cloud.u.uCoarse.value = sv[7]; cloud.u.uFrame.value = sv[8];
+    renderer.setRenderTarget(null); fresh = true; } }
   // what the latest samples round each one look like (their average and their spread): what the remembered picture is checked against
   const stat = mkPass(`precision highp float; in vec2 vUv; layout(location=0) out vec4 o0; layout(location=1) out vec4 o1; uniform sampler2D tCur;
     void main(){ vec2 px=1.0/vec2(textureSize(tCur,0)); vec3 m=vec3(0.0), m2=vec3(0.0);
       for(int j=-1;j<=1;j++) for(int i=-1;i<=1;i++){ vec3 c=texture(tCur,vUv+vec2(float(i),float(j))*px).rgb; m+=c; m2+=c*c; }
       m/=9.0; m2/=9.0; o0=vec4(m,1.0); o1=vec4(sqrt(max(m2-m*m,0.0)),1.0); }`, { tCur: { value: curRT.texture[0] } });
   const resolve = mkPass(/* glsl */`precision highp float; in vec2 vUv; layout(location=0) out vec4 o0; layout(location=1) out vec4 o1;
-    uniform sampler2D tCur,tDepth,tMean,tSd,tHist,tHistN; uniform vec2 uL,uH,uJit; uniform float uUp,uTan,uAspect,uReset,uFlowT,uFlowTp,uFlowD,uStep; uniform vec3 uCam,pCam; uniform mat3 uRot,pRot;
+    uniform sampler2D tCur,tDepth,tMean,tSd,tHist,tHistN; uniform vec2 uL,uH,uJit; uniform float uUp,uTan,uAspect,uReset,uFlowT,uFlowTp,uFlowD,uStep,uMeanK,uKer; uniform vec3 uCam,pCam; uniform mat3 uRot,pRot;
     ${WARP}
     // this frame's samples enlarged smoothly (a cubic B-spline: no creases and no diamonds, as plain bilinear enlargement leaves)
     vec4 bsp(sampler2D t,vec2 uv){ vec2 p=uv*uL-0.5, i=floor(p), f=p-i, f2=f*f, f3=f2*f;
@@ -623,19 +674,27 @@ function boot() {
       if(mpx>0.25){ mean=bsp(tMean,uvS).rgb; vec3 sd=bsp(tSd,uvS).rgb, lo=mean-1.8*sd-0.003, hi=mean+1.8*sd+0.003, hc=clamp(hist.rgb,lo,hi);   // (only a moving picture needs these; and enlarged smoothly, like the frame itself: enlarged plainly, the limits they set carried the small picture's grid, and holding the remembered picture to them printed that grid into it as soon as the camera began to move)
         float lost=clamp(length(hist.rgb-hc)/(2.0*length(sd)+0.02),0.0,1.0);
         hist.rgb=mix(hist.rgb,hc,mc); N*=1.0-0.5*lost*mc; }
-      float w=exp(-dot(dd,dd)*uUp*uUp/4.5);                                                              // how much this frame's sample has to say about this pixel (all of it if its ray passes through the pixel, little three pixels away. Any narrower and the pixels the rays happened to pass through most recently stand out from their neighbours as a fine regular dot pattern)
+      float w=exp(-dot(dd,dd)*uUp*uUp/mix(4.5,uKer,smoothstep(12.0,60.0,N)));                                                              // how much this frame's sample has to say about this pixel (all of it if its ray passes through the pixel, little three pixels away. Any narrower and the pixels the rays happened to pass through most recently stand out from their neighbours as a fine regular dot pattern)
       float wc=mix(w,0.6,m);                                                                              // (while moving, every pixel takes the same small share of the smoothly enlarged frame: favouring the pixels that were hit would print the small picture's grid into the big one)
-      N=min(N,mix(110.0,6.0,mn)); if(uStep>0.5) N*=0.8;                                                       // (a step leaves the old picture a little out of date: let the new samples in faster)                                                                          // how many samples' worth of memory: long when still, a few frames when moving fast
+      N=min(N,mix(300.0,6.0,mn)); if(uStep>0.5) N*=0.8;                                                       // (a step leaves the old picture a little out of date: let the new samples in faster)                                                                          // how many samples' worth of memory: long when still, a few frames when moving fast
       vec4 cur=mix(near,soft,max(m,1.0-smoothstep(1.0,4.0,N)));
-      cur.rgb=mix(cur.rgb,mean,smoothstep(0.3,2.5,mpx));                                                  // (while the picture moves there is no time to gather: a single frame's rays, each a little off, show as stipple. So each is first averaged with its neighbours, whose errors are arranged to cancel. Softer, which a moving picture can afford, and clean)
+      cur.rgb=mix(cur.rgb,mean,uMeanK*smoothstep(0.3,2.5,mpx));                                                  // (while the picture moves there is no time to gather: a single frame's rays, each a little off, show as stipple. So each is first averaged with its neighbours, whose errors are arranged to cancel. Softer, which a moving picture can afford, and clean)
       float a=N>0.0?wc/(N+wc):1.0;
       o0=mix(hist,cur,a); o1=vec4(max(N+wc,1.0),0.0,0.0,1.0); }`,
     Object.assign({ tCur: { value: curRT.texture[0] }, tDepth: { value: curRT.texture[1] }, tMean: { value: statRT.texture[0] }, tSd: { value: statRT.texture[1] }, tHist: { value: null }, tHistN: { value: null },
-      uReset: { value: 1 }, pCam: { value: new THREE.Vector3() }, pRot: { value: new THREE.Matrix3() }, uFlowT: flowU.uFlowT, uFlowD: flowU.uFlowD, uFlowTp: { value: 0 }, uStep: { value: 0 }, uSP6: { value: STOPS.map((st) => st.P) } }, sizeU, viewU, warpU));
+      uReset: { value: 1 }, pCam: { value: new THREE.Vector3() }, pRot: { value: new THREE.Matrix3() }, uFlowT: flowU.uFlowT, uFlowD: flowU.uFlowD, uFlowTp: { value: 0 }, uStep: { value: 0 }, uMeanK: { value: 1 }, uKer: { value: 4.5 }, uSP6: { value: STOPS.map((st) => st.P) } }, sizeU, viewU, warpU));
   // The smooth map of the gas's distance: each of its few thousand pixels is the average over a patch of this frame's rays, eased in over several frames.
-  const dsm = mkPass(/* glsl */`precision highp float; in vec2 vUv; out vec4 o; uniform sampler2D tDepth,tPrev; uniform float uK;
-    void main(){ vec2 e=2.0/vec2(textureSize(tDepth,0)); float s=0.0; for(int j=-1;j<=1;j++) for(int i=-1;i<=1;i++) s+=1.0/clamp(texture(tDepth,vUv+vec2(float(i),float(j))*e).r,0.5,12.0);
-      o=vec4(mix(texture(tPrev,vUv).r,s/9.0,uK),0.0,0.0,1.0); }`, { tDepth: { value: curRT.texture[1] }, tPrev: { value: null }, uK: { value: 1 } });
+  const dsm = mkPass(/* glsl */`precision highp float; in vec2 vUv; out vec4 o; uniform sampler2D tDepth,tCol,tPrev; uniform float uK;
+    // (Each ray counts by how much gas it met. A ray through empty sky met none and has no distance to give: counted, as it once was, as "very far",
+    // it put a cliff in the map along the edge of every cloud that stands against the sky, and the picture, bent by the map, folded over there and
+    // showed the edge two or three times. Where a patch of rays met nothing at all the map takes its neighbours' value, so the gas's distance
+    // spreads out smoothly into the sky beside it.)
+    void main(){ vec2 e=2.0/vec2(textureSize(tDepth,0)); float s=0.0, W=0.0;
+      for(int j=-1;j<=1;j++) for(int i=-1;i<=1;i++){ vec2 q=vUv+vec2(float(i),float(j))*e; float d=texture(tDepth,q).r; vec4 c=texture(tCol,q);
+        float pr=d>900.0?0.0:clamp(max(1.0-c.a,3.0*dot(c.rgb,vec3(0.3,0.5,0.2))),0.02,1.0); s+=pr/clamp(d,0.5,12.0); W+=pr; }
+      vec2 t=1.5/vec2(textureSize(tPrev,0)); float p0=texture(tPrev,vUv).r, pb=0.25*(texture(tPrev,vUv+vec2(t.x,0.0)).r+texture(tPrev,vUv-vec2(t.x,0.0)).r+texture(tPrev,vUv+vec2(0.0,t.y)).r+texture(tPrev,vUv-vec2(0.0,t.y)).r);
+      float conf=clamp(W/2.0,0.0,1.0);
+      o=vec4(mix(mix(pb,p0,conf),W>1e-4?s/W:pb,uK*conf),0.0,0.0,1.0); }`, { tDepth: { value: curRT.texture[1] }, tCol: { value: curRT.texture[0] }, tPrev: { value: null }, uK: { value: 1 } });
 
   /* ── the stars inside the cloud: the six (and their companions), and a scatter of the faint cool stars a young cluster is mostly made of.
         Each is a point, drawn with the soft profile a camera gives a point of light (no spikes: those belong to telescopes), dimmed and reddened
@@ -643,14 +702,20 @@ function boot() {
   const STARS = []; let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }, gauss = () => (rnd() + rnd() + rnd() + rnd() - 2) * 1.2;
   const starCol = (k) => { const m = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t), s = (a, b) => sst(a, b, k); let c = m([1, 0.42, 0.26], [1, 0.64, 0.36], s(0, 0.24)); c = m(c, [1, 0.86, 0.56], s(0.22, 0.46)); c = m(c, [1, 0.97, 0.92], s(0.44, 0.62)); c = m(c, [0.70, 0.83, 1], s(0.62, 0.80)); return m(c, [0.46, 0.64, 1], s(0.82, 1)); };
   for (const l of LIGHTS) STARS.push({ p: l.pos.clone(), c: l.col, lum: l === STOPS[l.stop].lights[0] ? 0 : -420 * l.lum });   // (each stop's own star is drawn as a body, further down: here it only keeps its place in the list, for the measure of the gas in front of it. A second lamp at a stop is marked by a brightness below zero: like the star it keeps company with, it is seen only from near by)
-  { const P = STOPS[5].P; for (const [x, y, z, lm] of [[0.34, 0.16, -0.2, 0.5], [-0.22, 0.30, 0.25, 0.35], [0.12, -0.27, 0.1, 0.3], [-0.30, -0.12, -0.3, 0.22]]) STARS.push({ p: P.clone().add(V3(x, y, z)), c: B3, lum: 260 * lm }); }
+  [ [[0.42, 0.20, 0.1, 0.4], [-0.30, -0.26, -0.2, 0.3], [0.10, 0.38, 0.3, 0.25]],                               // each star's few companions (every one of these is a small cluster), in its own light's colour
+    [[-0.36, 0.22, -0.1, 0.45], [0.28, -0.20, 0.2, 0.3], [0.46, 0.30, -0.3, 0.22], [-0.12, -0.36, 0.15, 0.2]],
+    [[0.30, -0.24, 0.2, 0.4], [-0.40, 0.14, -0.2, 0.28], [0.16, 0.34, 0.0, 0.22]],
+    [[-0.28, -0.30, 0.1, 0.42], [0.38, 0.12, -0.25, 0.3], [-0.14, 0.36, 0.2, 0.24], [0.24, -0.34, -0.1, 0.2]],
+    [[0.36, 0.26, 0.15, 0.45], [-0.34, 0.18, -0.15, 0.3], [0.08, -0.40, 0.25, 0.24]],
+    [[0.34, 0.16, -0.2, 0.5], [-0.22, 0.30, 0.25, 0.35], [0.12, -0.27, 0.1, 0.3], [-0.30, -0.12, -0.3, 0.22]] ].forEach((set, k) => { const P = STOPS[k].P, c = k === 5 ? B3 : STOPS[k].lights[0].col.map((v) => 0.5 + 0.5 * v);
+      for (const [x, y, z, lm] of set) STARS.push({ p: P.clone().add(V3(x, y, z)), c, lum: 260 * lm }); });
   for (let k = 0; k < 6; k++) for (let i = 0; i < 8; i++) STARS.push({ p: STOPS[k].P.clone().add(V3(gauss() * 2.4, gauss() * 1.8, gauss() * 2.4)), c: starCol(0.05 + 0.4 * rnd()), lum: 260 * (0.004 + 0.03 * Math.pow(rnd(), 3)) });
   const NSTAR = STARS.length;
   const probeRT = new THREE.WebGLRenderTarget(NSTAR, 1, { type: THREE.HalfFloatType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false });
   const probe = mkPass(/* glsl */`precision highp float; precision highp sampler3D; in vec2 vUv; out vec4 o; uniform vec3 uCam; uniform vec3 uSP[${NSTAR}];
     ${COMMON}
     ${LIGHTU}
-    void main(){ vec3 S=uSP[int(gl_FragCoord.x)]; vec3 d=S-uCam; float L=length(d); d/=L; float tS=NEAR0; if(uCam.z>0.0&&d.z<-0.01) tS=max(tS,uCam.z/(-d.z)); float tau=0.0;
+    void main(){ vec3 S=uSP[int(gl_FragCoord.x)]; vec3 d=S-uCam; float L=length(d); d/=L; float tS=NEAR0; if(uCam.z>3.4&&d.z<-0.01) tS=max(tS,(uCam.z-3.4)/(-d.z)); float tau=0.0;
       if(L>tS){ const int N=40; float dt=(L-tS)/float(N); for(int i=0;i<N;i++){ float ts=tS+(float(i)+0.5)*dt; vec3 p=uCam+d*ts; float r0=rho0(p,max(dt*0.35,0.02))*smoothstep(NEAR0,NEAR1,ts);
         if(r0>2e-3){ int k=stopOf(p.z); for(int j=0;j<2;j++){ vec4 LP=uLP[k*2+j]; if(LP.w<=0.0||uLC[k*2+j].w<0.5) continue; vec3 e=p-LP.xyz; float r=length(e); if(r<LP.w) r0=mix(r0,thin(r0,lightTex(uLE[k*2+j].z,e,r,LP.w).x),smoothstep(LP.w,LP.w*0.8,r)); } tau+=r0*dt; } } }
       o=vec4(exp(-tau*${SIGE.toFixed(3)}*vec3(0.72,1.0,1.38)),1.0); }`, Object.assign({ uCam: viewU.uCam, uSP: { value: STARS.map((s) => s.p) } }, densU, lightU));
@@ -664,12 +729,21 @@ function boot() {
        · Where the picture has settled it is read sharply; where it has not had time to (just after the camera stops, or while it flies) it is
          read softly and smoothed over a few pixels. So what has not resolved yet is soft, never grainy, and it comes into focus as it gathers. */
   const wfRT = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, format: THREE.RGFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
-  const wfield = mkPass(/* glsl */`precision highp float; in vec2 vUv; out vec4 o; uniform float uTan,uAspect,uFlowT,uFlowD; uniform vec3 uCam; uniform mat3 uRot;
+  const wfield = mkPass(/* glsl */`precision highp float; in vec2 vUv; out vec4 o; uniform float uTan,uAspect,uFlowT,uFlowD,uSw; uniform vec3 uCam,dCam; uniform mat3 uRot,dRot;
     ${WARP}
-    void main(){ o=vec4(abs(uFlowD-uFlowT)>1e-5?gasFrom(vUv,uFlowD,uFlowT)-vUv:vec2(0.0),0.0,1.0); }`, Object.assign({ uFlowT: flowU.uFlowT, uFlowD: flowU.uFlowD, uSP6: { value: STOPS.map((st) => st.P) } }, viewU, warpU));   // (how far, and which way, each part of the picture is bent: worked out on a grid an eighth of the screen's fineness, since it varies slowly, so that filling the screen costs one look-up)
-  const compU = { tCloud: { value: null }, tHistN: { value: null }, uH: sizeU.uH, tWarp: { value: wfRT.texture } };
+    // At the landing the camera's slow drift is not marched afresh. Marched afresh, the remembered picture had to be moved a fraction of a pixel
+    // every frame to follow it, and each move wore away a little of its fine detail: after a few seconds less than half was left. So there the
+    // picture is gathered from the resting viewpoint, where it keeps everything, and is shown as the drifting camera (dCam, dRot) sees it: each
+    // part of it moved by its own distance from the camera, near gas one way and far gas the other, in the one bend that puts it on the screen.
+    vec2 scrD(vec3 P){ vec3 q=(P-dCam)*dRot; return vec2(q.x/(-q.z*uTan*uAspect),q.y/(-q.z*uTan))*0.5+0.5; }
+    vec2 dispNow(vec2 u,bool fl){ vec3 P=gasAt(u); if(fl) P-=flowShift(P,uFlowD,uFlowT); return scrD(P); }
+    void main(){ bool fl=abs(uFlowD-uFlowT)>1e-5; vec2 w=vec2(0.0);
+      if(uSw>0.5){ vec2 u=vUv; for(int k=0;k<5;k++) u+=vUv-dispNow(u,fl); w=u-vUv; }
+      else if(fl) w=gasFrom(vUv,uFlowD,uFlowT)-vUv;
+      o=vec4(w,0.0,1.0); }`, Object.assign({ uFlowT: flowU.uFlowT, uFlowD: flowU.uFlowD, uSP6: { value: STOPS.map((st) => st.P) }, uSw: { value: 0 }, dCam: { value: new THREE.Vector3() }, dRot: { value: new THREE.Matrix3() } }, viewU, warpU));   // (how far, and which way, each part of the picture is bent: worked out on a grid an eighth of the screen's fineness, since it varies slowly, so that filling the screen costs one look-up)
+  const compU = { tCloud: { value: null }, tHistN: { value: null }, uH: sizeU.uH, tWarp: { value: wfRT.texture }, uShp: { value: 0 } };
   { const m = new THREE.ShaderMaterial({ uniforms: compU, vertexShader: VS, glslVersion: THREE.GLSL3, depthTest: false, depthWrite: false,
-      fragmentShader: /* glsl */`precision highp float; in vec2 vUv; out vec4 o; uniform sampler2D tCloud,tHistN,tWarp; uniform vec2 uH;
+      fragmentShader: /* glsl */`precision highp float; in vec2 vUv; out vec4 o; uniform sampler2D tCloud,tHistN,tWarp; uniform vec2 uH; uniform float uShp;
         vec3 softC(vec2 uv){ vec2 p=uv*uH-0.5, i=floor(p), f=p-i, f2=f*f, f3=f2*f;
           vec2 w0=(1.0-3.0*f+3.0*f2-f3)/6.0, w1=(4.0-6.0*f2+3.0*f3)/6.0, w3=f3/6.0, w2=1.0-w0-w1-w3, g0=w0+w1, g1=w2+w3, h0=(w1/g0-0.5+i)/uH, h1=(w3/g1+1.5+i)/uH;
           return g0.y*(g0.x*texture(tCloud,vec2(h0.x,h0.y)).rgb+g1.x*texture(tCloud,vec2(h1.x,h0.y)).rgb)+g1.y*(g0.x*texture(tCloud,vec2(h0.x,h1.y)).rgb+g1.x*texture(tCloud,vec2(h1.x,h1.y)).rgb); }
@@ -682,7 +756,7 @@ function boot() {
           return max(r,0.0); }
         void main(){ vec2 uv=vUv+texture(tWarp,vUv).rg;
           float N=texture(tHistN,uv).r; vec3 c=softC(uv); float sharp=smoothstep(24.0,80.0,N);
-          if(sharp>0.01) c=mix(c,sharpC(uv),0.85*sharp);
+          if(sharp>0.01) c=mix(c,sharpC(uv),(0.85+uShp*smoothstep(60.0,160.0,N))*sharp);   // (past 1: the difference between the sharp reading and the soft one is added again, which gives back the fine contrast the gathering takes away)
           float rough=1.0-smoothstep(4.0,40.0,N);
           if(rough>0.01){ vec2 e=1.0/uH; vec3 b=vec3(0.0);
             for(int k=0;k<8;k++){ float a=float(k)*0.7853982+0.39; vec2 d=vec2(cos(a),sin(a)); b+=texture(tCloud,uv+d*2.6*e).rgb*0.085+texture(tCloud,uv+vec2(d.y,-d.x)*5.6*e).rgb*0.04; }
@@ -714,7 +788,7 @@ function boot() {
   const veil = mkPass(/* glsl */`precision highp float; precision highp sampler3D; in vec2 vUv; out vec4 o; uniform vec3 uCam,uVS; uniform mat3 uRot; uniform float uVExt;
     ${COMMON}
     ${LIGHTU}
-    void main(){ vec2 n=vUv*2.0-1.0; vec3 e=uVS+(uRot[0]*n.x+uRot[1]*n.y)*uVExt-uCam; float L=length(e); e/=L; float tS=NEAR0; if(uCam.z>0.0&&e.z<-0.01) tS=max(tS,uCam.z/(-e.z)); float tau=0.0;
+    void main(){ vec2 n=vUv*2.0-1.0; vec3 e=uVS+(uRot[0]*n.x+uRot[1]*n.y)*uVExt-uCam; float L=length(e); e/=L; float tS=NEAR0; if(uCam.z>3.4&&e.z<-0.01) tS=max(tS,(uCam.z-3.4)/(-e.z)); float tau=0.0;
       if(L>tS){ const int N=30; float dt=(L-tS)/float(N); for(int i=0;i<N;i++){ float ts=tS+(float(i)+0.5)*dt; vec3 p=uCam+e*ts; float r0=rho0(p,max(dt*0.8,0.05))*smoothstep(NEAR0,NEAR1,ts);
         if(r0>2e-3){ int k=stopOf(p.z); for(int j=0;j<2;j++){ vec4 LP=uLP[k*2+j]; if(LP.w<=0.0||uLC[k*2+j].w<0.5) continue; vec3 q=p-LP.xyz; float r=length(q); if(r<LP.w) r0=mix(r0,thin(r0,lightTex(uLE[k*2+j].z,q,r,LP.w).x),smoothstep(LP.w,LP.w*0.8,r)); } tau+=r0*dt; } } }
       o=vec4(exp(-tau*${SIGE.toFixed(3)}*vec3(0.72,1.0,1.38)),1.0); }`, Object.assign({ uCam: viewU.uCam, uRot: viewU.uRot, uVS: { value: new THREE.Vector3() }, uVExt: { value: 1 } }, densU, lightU, { uFlowT: flowU.uFlowD }));
@@ -771,7 +845,7 @@ function boot() {
       uM: { value: new THREE.Matrix3().set(y.e1.x, y.axis.x, y.e3.x, y.e1.y, y.axis.y, y.e3.y, y.e1.z, y.axis.z, y.e3.z) },
       uCol: { value: new THREE.Vector3(c[0] * y.I, c[1] * y.I, c[2] * y.I) }, uDC1: { value: new THREE.Vector3(...y.c1) }, uDC2: { value: new THREE.Vector3(...y.c2) },
       uFig: { value: new THREE.Vector4(y.a, y.W2, 4 * y.beta, y.ld) }, uSurf: { value: new THREE.Vector4(y.surf[0], y.surf[1], y.surf[2], 0) },
-      uClk: { value: new THREE.Vector4(0, 0, 2 * Math.PI / y.per * Math.pow(y.rin, 1.5), 18) }, uPh: { value: new THREE.Vector2(0, 9) },   // (z: the rate of an orbit at the star's equator, set so that the disc's inner edge goes round in step with the star)
+      uClk: { value: new THREE.Vector4(0, 0, 2 * Math.PI / y.per * Math.pow(y.rin, 1.5), 1.64 * y.per) }, uPh: { value: new THREE.Vector2(0, 0.82 * y.per) },   // (z: the rate of an orbit at the star's equator, set so that the disc's inner edge goes round in step with the star · w: how long the disc's pattern is wound before it is renewed, in seconds: the same number of turns however fast the star goes, or a faster star's disc would be wound into plain rings)
       uFade: { value: 0 }, uCyc: { value: new THREE.Vector2(0, 0) },
       uDisc: { value: new THREE.Vector4(y.rin * y.a, y.rout, y.h0, y.db) }, uDsk2: { value: new THREE.Vector4(y.dust, y.g, y.pw, y.arm) },
       tVeil: { value: veilRT.texture }, tProbe: { value: probeRT.texture } }, densU);
@@ -791,16 +865,147 @@ function boot() {
   const sky = (() => { const n = SMALL ? 3200 : 8000, rad = 4000, pos = new Float32Array(n * 3), a = new Float32Array(n * 2);
     for (let i = 0; i < n; i++) { const u = Math.random() * 2 - 1, t = Math.random() * 6.2831853, s = Math.sqrt(1 - u * u); pos.set([s * Math.cos(t) * rad, u * rad, s * Math.sin(t) * rad], i * 3); a.set([Math.pow(Math.random(), 4.5) * 2.4 + 1.15, Math.random()], i * 2); }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(a, 2));
-    const m = new THREE.ShaderMaterial({ uniforms: { uT: { value: 0 }, uDpr: resU.uDpr, tCloud: compU.tCloud, uInvRes: resU.uInvRes }, glslVersion: THREE.GLSL3, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+    const m = new THREE.ShaderMaterial({ uniforms: { uT: { value: 0 }, uDpr: resU.uDpr, tCloud: compU.tCloud, tWarp: compU.tWarp, uInvRes: resU.uInvRes }, glslVersion: THREE.GLSL3, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
       vertexShader: `in vec2 aA; uniform float uT,uDpr; out float vA; out float vS;
         void main(){ vS=aA.y; vA=(0.5+0.5*aA.y)*(0.8+0.2*sin(uT*(0.6+aA.y*2.0)+aA.y*80.0)); gl_PointSize=aA.x*uDpr*1.15; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
-      fragmentShader: `precision highp float; uniform sampler2D tCloud; uniform vec2 uInvRes; in float vA; in float vS; out vec4 outC;
+      fragmentShader: `precision highp float; uniform sampler2D tCloud,tWarp; uniform vec2 uInvRes; in float vA; in float vS; out vec4 outC;
         vec3 starCol(float k){ vec3 c=mix(vec3(1.0,0.42,0.26),vec3(1.0,0.64,0.36),smoothstep(0.00,0.24,k)); c=mix(c,vec3(1.0,0.86,0.56),smoothstep(0.22,0.46,k)); c=mix(c,vec3(1.0,0.97,0.92),smoothstep(0.44,0.62,k));
           c=mix(c,vec3(0.70,0.83,1.0),smoothstep(0.62,0.80,k)); return mix(c,vec3(0.46,0.64,1.0),smoothstep(0.82,1.00,k)); }
-        void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f; float tr=texture(tCloud,gl_FragCoord.xy*uInvRes).a;
+        void main(){ vec2 q=gl_PointCoord*2.0-1.0; float f=smoothstep(1.0,0.3,length(q)); f*=f; vec2 su=gl_FragCoord.xy*uInvRes; float tr=texture(tCloud,su+texture(tWarp,su).rg).a;
           outC=vec4(starCol(fract(vS*7.3))*vec3(pow(tr,0.72),tr,pow(tr,1.38)),vA*f); }` });
     const p = new THREE.Points(g, m); p.frustumCulled = false; p.renderOrder = 1; scene.add(p); return p; })();
 
+  /* ── the landing: a quasar, its dusty torus and its outflow, standing in the scene in front of the cloud ──
+     NASA's illustration (see the credit) is not laid over the screen as a flat picture. It is a thing in the world: a surface with the picture's own
+     relief, seen through the same camera as everything else.
+       · Its shape. Every point of the picture lies on the line of sight it had from where the camera starts, so from there it is the picture exactly
+         as painted; how far along that line it lies is its relief. The torus is a ring (its near wall toward the camera, the lit inside of its far
+         wall beyond the heart); the outflow lies along the ring's axis, which leans toward the camera at the top (we look down into the ring), so the
+         upper lobe comes forward and the lower goes back; cloud stands forward of the empty dark behind it. The relief is kept gentle and smooth: it
+         is judged from a painting, and anything steep in it would stretch into streaks as the camera moved. So when the camera moves (it drifts
+         round the heart while the page is at its title, and leans with the pointer), near things slide across far ones.
+       · Its life. The torus's near wall turns, the outflow streams outward along the lobes, shafts of light shimmer, the heart wavers.
+       · Going in. Leaving the title the camera really flies at it: up and to the right, into the thick of the clouds beside the ring. Coming
+         close, the painting is given finer structure of its own (a painting enlarged is only its brushwork enlarged: so, the nearer it is, the more
+         fine wisp is worked into it, in its own colours), and at the last, as the camera reaches any part of it, that part thins away wisp by wisp.
+         Behind it a lane runs on through the gas to the first star, its walls glowing in the painting's colours.
+     How it is drawn: last of all, straight onto the finished frame, in the colours the painting was painted in. (It was first drawn inside the scene,
+     through the camera's tone curve run backwards so as to come out as painted; that cost more per frame than the whole of the rest, the page's own
+     guard against slow frames answered by lowering the fineness of the gas for good, and every flight after it was coarse.)
+     Not real: a quasar's torus is light-years across and has no star-forming cloud a few units behind it; the relief is judged, not known. */
+  const quasar = (() => {
+    const GEO = /* glsl */`
+      const vec2 C=vec2(0.472,0.531), TC=vec2(0.480,0.555), TM=vec2(0.919,-0.393), TN=vec2(0.393,0.919), AX=vec2(-0.43,-0.903);
+      const float TA=0.127, TB=0.056, PER=7.0;
+      float r,s,x,lobe,u,w,prof,mn; vec2 d;
+      void geo(){ d=v-C; r=length(d); s=dot(d,AX); x=dot(d,vec2(-AX.y,AX.x))/(0.10+0.40*abs(s));
+        lobe=smoothstep(0.07,0.22,r)*exp(-x*x*1.2)*smoothstep(0.02,0.09,abs(s));              // in one of the two lobes of the outflow (which begin a little way off the torus's plane: right beside the torus nothing streams)
+        vec2 dt=v-TC; u=dot(dt,TM)/TA; w=dot(dt,TN)/TB; float rr=length(vec2(u,w)), we=-0.09-0.20*u*u; prof=sqrt(max(1.0-u*u,0.0));   // across the torus (−1…1 tip to tip) · toward the viewer's side · we: where its near wall's top edge runs
+        mn=smoothstep(-0.06,0.05,w-we)*(1.0-smoothstep(0.90,1.02,rr)); }                          // on the torus's near wall
+      float h1(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+      float n2(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(h1(i),h1(i+vec2(1.0,0.0)),f.x),mix(h1(i+vec2(0.0,1.0)),h1(i+vec2(1.0,1.0)),f.x),f.y); }`;
+    const START_R = new THREE.Matrix3().setFromMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(START.q));
+    const DP = Q_DP;                                            // how far from the starting camera the quasar's heart stands: at the face of the cloud
+    const U = { t: { value: null }, tl: { value: null }, ta: { value: null }, tRelief: { value: null }, uT: { value: 0 }, uIn: { value: 0 }, uC0: { value: START.C.clone() }, uR0: { value: START_R },
+      uFr: qFr, uRel: { value: 1 }, uNear: { value: new THREE.Vector2(1.0, 2.4) }, uG: { value: 1 } };   // (uNear: within the first of these distances a part of the surface is gone, beyond the second it is whole · uG: all of it fades as the camera goes in under the cloud's face)
+    // The soft things, worked out small (they have no fine detail): the travelling unevenness of the outflow and of the torus (red) · the shafts of light (green) · the little eddies in the flow (blue, alpha)
+    const aRT = new THREE.WebGLRenderTarget(512, 512, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false }); U.ta.value = aRT.texture;
+    const passA = mkPass(/* glsl */`precision highp float; in vec2 vUv; out vec4 o; uniform float uT; vec2 v;
+      ${GEO}
+      float h3(vec3 p){ return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453); }
+      float n3(vec3 p){ vec3 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
+        return mix(mix(mix(h3(i),h3(i+vec3(1.0,0.0,0.0)),f.x),mix(h3(i+vec3(0.0,1.0,0.0)),h3(i+vec3(1.0,1.0,0.0)),f.x),f.y),
+                   mix(mix(h3(i+vec3(0.0,0.0,1.0)),h3(i+vec3(1.0,0.0,1.0)),f.x),mix(h3(i+vec3(0.0,1.0,1.0)),h3(i+vec3(1.0,1.0,1.0)),f.x),f.y),f.z); }
+      float fbm(vec3 p){ return 0.5*n3(p)+0.3*n3(p*2.03+7.1)+0.2*n3(p*4.01+3.3); }
+      void main(){ v=vec2(vUv.x,1.0-vUv.y); geo(); float ang=atan(d.y,d.x);
+        float m=1.0+0.48*prof*mn*(n2(vec2(u*9.0+uT*0.76,w*6.0))-0.5);                                                       // lumps going round with the torus
+        float ph=asin(clamp(x,-1.0,1.0))+uT*0.10; vec3 P=vec3(abs(s)*7.0-uT*0.40,cos(ph)*1.8,sin(ph)*1.8+(s<0.0?5.0:0.0));
+        m*=1.0+0.52*lobe*(fbm(P)-0.5)*smoothstep(0.08,0.30,r);                                                              // the outflow: billows travelling outward, and round the axis
+        m*=1.0+(0.045*sin(uT*1.3)+0.03*sin(uT*2.9+1.0))*exp(-r*r/0.006);                                                    // the light at the heart wavers
+        float ray=n2(vec2(ang*9.0,uT*0.22))*n2(vec2(ang*23.0+5.0,uT*0.31));
+        o=vec4(m*0.5,ray*ray*lobe*exp(-r*3.2)*smoothstep(0.03,0.12,r)*4.0,n2(v*5.0+3.1),n2(v*5.0+7.7)); }`, { uT: U.uT });
+    const VSH = /* glsl */`uniform sampler2D tRelief; uniform vec3 uC0; uniform mat3 uR0; uniform vec4 uFr; uniform float uRel; out vec2 v; out vec3 vW; out float vSl;
+      void main(){ v=vec2(uv.x,1.0-uv.y); vec2 rz=texture(tRelief,v).rg; vSl=rz.g;                                         // how far forward this point of the picture stands · and how steeply the relief rises here
+        vW=uC0+uR0*vec3(uFr.x+(v.x-0.475)*uFr.z,uFr.y-(v.y-0.565)*uFr.z,-1.0)*(uFr.w-rz.r*uRel); gl_Position=projectionMatrix*viewMatrix*vec4(vW,1.0); }`;
+    const FSH = /* glsl */`precision highp float; in vec2 v; in vec3 vW; in float vSl; out vec4 o; uniform float uT,uIn,uG; uniform vec2 uNear; uniform vec4 uFr; uniform vec3 uC0; uniform sampler2D t,tl,ta;
+      ${GEO}
+      void main(){
+        // Fading out at the picture's edges. On the left, where the title stands, only the picture's cloud is kept: its dark there is not empty (it holds
+        // faint straight-edged shapes left in the painting), so the dark is let go and the sky's own stars are what is seen.
+        float al=smoothstep(0.0,0.20,v.x)*(1.0-smoothstep(0.90,1.0,v.x))*smoothstep(0.0,0.16,v.y)*(1.0-smoothstep(0.92,1.0,v.y))*uIn*uG; if(al<0.004) discard;
+        if(v.x<0.32) al*=max(smoothstep(0.10,0.32,v.x),smoothstep(0.05,0.12,dot(texture(tl,v).rgb,vec3(0.3,0.5,0.2))));
+        float dC=length(vW-cameraPosition); al*=smoothstep(uNear.x,uNear.y,dC);                                              // (it is let go as a whole, evenly, by uG: no part of it opens before the rest, so nothing reads as a hole. This is only a last fade for anything that comes very near)
+        al*=1.0-smoothstep(1.6,3.2,vSl)*smoothstep(0.8,2.6,length(cameraPosition-uC0));                                    // (and anything steep in the relief, once the camera has left its starting place: seen from there nothing is stretched)
+        if(al<0.004) discard;
+        // Seen from nearer than it was painted to be seen from, it is given finer structure of its own: the place each point's colour is taken from is
+        // nudged a little this way and that (so enlarged brushwork breaks into wisps), and its brightness is ruffled, finer the nearer it is.
+        float mag=uFr.w/max(dC,0.4), k1=smoothstep(1.25,2.2,mag), k2=smoothstep(2.2,4.4,mag); vec2 vv=v;
+        vec2 ra=vec2(v.x*0.839-v.y*0.545,v.x*0.545+v.y*0.839), rb=vec2(v.x*0.407+v.y*0.914,-v.x*0.914+v.y*0.407);          // (the picture's coordinates turned two ways: noise laid along the picture's own axes shows as a grain of little squares)
+        if(k1>0.0) vv+=(vec2(n2(ra*41.0),n2(ra*41.0+17.0))-0.5)*0.0052*k1+(vec2(n2(rb*103.0+3.0),n2(rb*103.0+29.0))-0.5)*0.0021*k2;
+        geo(); vec4 A=texture(ta,vec2(v.x,1.0-v.y)); float tor=mn;
+        vec2 fOut=normalize(normalize(d+1e-4)*0.5+AX*(s<0.0?-1.0:1.0)*0.5)*(0.012+0.075*r)+(A.ba-0.5)*0.012;                // outward from the quasar, drawn toward the axis; faster further out
+        vec2 f=fOut*lobe*(1.0-tor)-TM*0.075*prof*mn;                                                                        // + the torus's near wall, sliding along its length
+        float a0=fract(uT/PER), a1=fract(uT/PER+0.5), wg=abs(1.0-2.0*a0); vec2 q0=vv-f*(a0-0.5), q1=vv-f*(a1-0.5);
+        vec3 c0=texture(t,q0).rgb, c1=texture(t,q1).rgb;
+        if(tor>0.001){ vec3 Lp=texture(tl,v).rgb+0.03; c0=mix(c0,c0*Lp/(texture(tl,q0).rgb+0.03),tor); c1=mix(c1,c1*Lp/(texture(tl,q1).rgb+0.03),tor); }   // on the torus: the markings are carried, the light and shade stay
+        vec3 col=mix(c0,c1,wg)*(A.r*2.0)+vec3(0.70,0.80,1.0)*A.g*0.055;
+        if(k1>0.0) col*=1.0+(n2(rb*67.0+5.0)-0.5)*0.20*k1+(n2(ra*181.0+11.0)-0.5)*0.16*k2;
+        col+=(h1(gl_FragCoord.xy)+h1(gl_FragCoord.xy+vec2(31.7,17.3))-1.0)/255.0;                                           // (a step of dither, against banding in its dark gradients)
+        o=vec4(max(col,0.0)*al,al); }`;                                                                                     // laid over the finished frame: where it has thinned, what is behind shows through
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, SMALL ? 160 : 300, SMALL ? 160 : 300), new THREE.ShaderMaterial({ uniforms: U, vertexShader: VSH, fragmentShader: FSH, glslVersion: THREE.GLSL3, side: THREE.DoubleSide, transparent: true, depthTest: false, depthWrite: false,
+      blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor }));
+    mesh.frustumCulled = false; const oScene = new THREE.Scene(); oScene.add(mesh);
+    const glow = { tPic: { value: null }, uPicK: { value: 0.95 } };   // what the cloud's own shader needs, to make the gas behind glow in the painting's colours
+
+    // the relief, from the picture: W × W values, in picture-widths toward the camera (and, beside each, how steep it is there)
+    const W = 256; let relief = null, ready = false, tIn = 0, on = false;
+    const P_C = [0.472, 0.531], P_TC = [0.480, 0.555], P_TM = [0.919, -0.393], P_TN = [0.393, 0.919], P_AX = [-0.43, -0.903], P_TA = 0.127, P_TB = 0.056;
+    const blur = (a, rad) => { const b = new Float32Array(W * W), c = new Float32Array(W * W); for (let pass = 0; pass < 2; pass++) { const src = pass ? c : a, dst = pass ? b : c;   // (rows then columns)
+        for (let i = 0; i < W; i++) { let sum = 0, n = 0; for (let j = -rad; j <= rad; j++) { const q = clamp(j, 0, W - 1); sum += pass ? src[q * W + i] : src[i * W + q]; n++; }
+          for (let j = 0; j < W; j++) { if (pass) dst[j * W + i] = sum / n; else dst[i * W + j] = sum / n; const a0 = clamp(j - rad, 0, W - 1), a1 = clamp(j + rad + 1, 0, W - 1); sum += (pass ? src[a1 * W + i] : src[i * W + a1]) - (pass ? src[a0 * W + i] : src[i * W + a0]); } } }
+      return b; };
+    const img = new Image(); img.decoding = 'async';
+    img.onload = () => { try {
+      const tex = new THREE.Texture(img); tex.flipY = false; tex.generateMipmaps = true; tex.minFilter = THREE.LinearMipmapLinearFilter; tex.magFilter = THREE.LinearFilter; tex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); tex.needsUpdate = true; U.t.value = tex;
+      const mid = document.createElement('canvas'), low = document.createElement('canvas'); mid.width = mid.height = 512; low.width = low.height = 96;   // the picture's broad light and shade alone: the picture made very small (and so, when it is read back, very soft)
+      const mx = mid.getContext('2d', { willReadFrequently: true }), lx = low.getContext('2d', { willReadFrequently: true }); mx.imageSmoothingQuality = lx.imageSmoothingQuality = 'high'; mx.drawImage(img, 0, 0, 512, 512); lx.drawImage(mid, 0, 0, 96, 96);
+      const lt = new THREE.CanvasTexture(low); lt.flipY = false; lt.generateMipmaps = false; lt.minFilter = lt.magFilter = THREE.LinearFilter; U.tl.value = lt;
+      { const gd = lx.getImageData(0, 0, 96, 96), g = gd.data;                                                              // the same small picture, for the gas behind to take its glow from: faded to nothing toward its edges (and its dark let go on the left) as the surface is, so that the glow has no edge of its own
+        for (let y = 0; y < 96; y++) for (let x = 0; x < 96; x++) { const k = (y * 96 + x) * 4, X = (x + 0.5) / 96, Y = (y + 0.5) / 96, lm = (0.3 * g[k] + 0.5 * g[k + 1] + 0.2 * g[k + 2]) / 255;
+          let m = sst(0.02, 0.16, X) * (1 - sst(0.88, 0.99, X)) * sst(0.02, 0.10, Y) * (1 - sst(0.90, 0.99, Y)) * Math.max(sst(0.10, 0.32, X), sst(0.05, 0.12, lm)); if (x < 1 || y < 1 || x > 94 || y > 94) m = 0;
+          g[k] *= m; g[k + 1] *= m; g[k + 2] *= m; }
+        const gc = document.createElement('canvas'); gc.width = gc.height = 96; gc.getContext('2d').putImageData(gd, 0, 0);
+        const gt = new THREE.CanvasTexture(gc); gt.flipY = false; gt.generateMipmaps = false; gt.minFilter = gt.magFilter = THREE.LinearFilter; gt.wrapS = gt.wrapT = THREE.ClampToEdgeWrapping; glow.tPic.value = tex; }
+      const px = mx.getImageData(0, 0, 512, 512).data, lum = new Float32Array(W * W);
+      for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) { let sum = 0; for (let j = 0; j < 2; j++) for (let i = 0; i < 2; i++) { const k = ((y * 2 + j) * 512 + x * 2 + i) * 4; sum += 0.3 * px[k] + 0.5 * px[k + 1] + 0.2 * px[k + 2]; } lum[y * W + x] = sum / 1020; }
+      const lb = blur(lum, 3), lw = blur(lum, 18), z = new Float32Array(W * W);
+      { const d = qMap.image.data; for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) { const k = y * W + x, X = (x + 0.5) / W, Y = (y + 0.5) / W;   // the cloud map the gas is placed by
+          d[k * 4] = Math.round(255 * clamp(lb[k], 0, 1)); d[k * 4 + 1] = Math.round(255 * clamp(lum[k], 0, 1)); d[k * 4 + 3] = Math.round(255 * sst(0.0, 0.20, X) * (1 - sst(0.93, 1.0, X)) * sst(0.0, 0.07, Y) * (1 - sst(0.985, 1.0, Y))); } qMap.needsUpdate = true; }
+      for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) { const k = y * W + x, X = (x + 0.5) / W, Y = (y + 0.5) / W;
+        const along = (X - P_C[0]) * P_AX[0] + (Y - P_C[1]) * P_AX[1];                                                       // along the outflow's axis, toward the upper lobe: which is toward the camera (the axis leans some 64 degrees from the line of sight, which would make this 0.49; a little less is used, since a height guessed from a painting is better understated)
+        const out = -0.07 + (0.07 + 0.36 * clamp(along, -0.36, 0.36) + clamp(0.15 * (lb[k] - lw[k]), -0.02, 0.02)) * sst(0.06, 0.26, lb[k]);   // cloud, as far forward as the outflow is there (clumps a little more); empty dark, set back
+        const dx = X - P_TC[0], dy = Y - P_TC[1], u = (dx * P_TM[0] + dy * P_TM[1]) / P_TA, w = (dx * P_TN[0] + dy * P_TN[1]) / P_TB, rr = Math.hypot(u, w);
+        const wall = sst(-0.06, 0.05, w - (-0.09 - 0.20 * u * u)), tor = 0.40 * P_TA * (wall * (0.8 + 0.2 * clamp(w, -1, 1)) + (1 - wall) * 0.8 * clamp(w, -1, 0.25));   // the ring: its near wall toward the camera, and through its opening the lit inside of the far wall, beyond the heart
+        z[k] = out + (tor - out) * (1 - sst(0.95, 1.12, rr)); }
+      relief = blur(z, 5); const h = new Uint16Array(W * W * 2);
+      for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) { const k = y * W + x, gx = (relief[y * W + Math.min(W - 1, x + 1)] - relief[y * W + Math.max(0, x - 1)]) * W / 2, gy = (relief[Math.min(W - 1, y + 1) * W + x] - relief[Math.max(0, y - 1) * W + x]) * W / 2;
+        h[k * 2] = THREE.DataUtils.toHalfFloat(relief[k]); h[k * 2 + 1] = THREE.DataUtils.toHalfFloat(Math.hypot(gx, gy)); }
+      const rt = new THREE.DataTexture(h, W, W, THREE.RGFormat, THREE.HalfFloatType); rt.minFilter = rt.magFilter = THREE.LinearFilter; rt.wrapS = rt.wrapT = THREE.ClampToEdgeWrapping; rt.needsUpdate = true; U.tRelief.value = rt;
+      ready = true; build(); calibrateQ(); } catch (e) { console.warn('landing', e); } };
+    img.src = 'img/quasar-clouds.jpg';
+    const dirOf = (X, Y, out) => out.set(U.uFr.value.x + (X - 0.475) * U.uFr.value.z, U.uFr.value.y - (Y - 0.565) * U.uFr.value.z, -1).applyMatrix3(START_R);   // the line of sight, from the starting camera, of a point of the picture
+    const reliefAt = (X, Y) => relief ? relief[clamp(Math.round(Y * W - 0.5), 0, W - 1) * W + clamp(Math.round(X * W - 0.5), 0, W - 1)] * U.uRel.value : 0;
+    const pivot = new THREE.Vector3(), entry = new THREE.Vector3();
+    return { pivot, entry, get ready() { return ready; }, get on() { return on; }, glow,
+      // where it stands for this window: the torus right of centre (above the words on a tall screen), the picture a little taller than the screen
+      fit(aspect, tanv) { const land = aspect >= 1, ax = land ? 0.70 : 0.50, ay = land ? 0.52 : 0.42, side = land ? 1.18 * 2 * tanv : 1.30 * 2 * tanv * aspect;
+        U.uFr.value.set((ax - 0.5) * 2 * tanv * aspect, (0.5 - ay) * 2 * tanv, side, DP); U.uRel.value = side * DP;
+        dirOf(P_C[0], P_C[1], pivot).multiplyScalar(DP).add(START.C);                                                       // the quasar's heart: what the camera drifts round at the title
+        const EX = land ? Q_ENT[0] : 0.44, EY = land ? Q_ENT[1] : 0.40; dirOf(EX, EY, entry).multiplyScalar(DP - reliefAt(EX, EY) + 0.9).add(START.C); },   // and a point just inside the thick of the clouds, up and to the left of the torus: the way in
+      frame(dt, s) { on = false; if (!on) return;   /* the painted surface is not drawn any more: the quasar is gas now */ U.uG.value = sst(4.6, 7.6, cam.position.z);   /* whole until the camera is within about five units of it (some 1.4 times its size at the landing); gone by 2.2 times, before it is enlarged enough to go soft: all of it together */ if (!RM) U.uT.value += dt; tIn = Math.min(1, tIn + dt / 1.2); U.uIn.value = tIn * tIn * (3 - 2 * tIn); run(passA, aRT); },
+      draw() { if (!on) return; renderer.setRenderTarget(null); const ac = renderer.autoClear; renderer.autoClear = false; renderer.render(oScene, cam); renderer.autoClear = ac; } };   // (after everything else: see above)
+  })();
+  Object.assign(cloud.u, quasar.glow);
   /* ── post: restrained bloom, then the same filmic tone curve, grain and vignette as the rest of the site ── */
   const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, depthBuffer: false }));
   composer.addPass(new RenderPass(scene, cam));
@@ -830,14 +1035,15 @@ function boot() {
   function build() {
     const aspect = innerWidth / innerHeight, land = aspect >= 1, tanv = tanFor(aspect);
     const rest = STOPS.map((s) => land ? pose(s.P, s.dist, s.yaw, s.pitch, s.sx * Math.min(1, aspect / ASP_REF), s.sy, aspect, tanv) : pose(s.P, s.dist * 1.15, s.yaw, s.pitch, 0.0, 0.42, aspect, tanv));   // on a tall screen the star goes above and the words below
-    const pts = [START.C]; quats = [START.q];
+    quasar.fit(aspect, tanv);
+    const pts = [START.C, quasar.entry.clone()]; quats = [START.q];                    // (from the start the camera makes for the thick of the quasar's clouds, and goes in there)
     rest.forEach((p, k) => { pts.push(p.C); quats.push(p.q); if (k < 5) pts.push(VIA[k]); });
     curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal'); curve.nPts = pts.length;
   }
   const m4 = new THREE.Matrix4();
   function place(s) {                                         // s: 0 … 6
     const k = Math.min(5, Math.floor(s)), f = s - k, e = sst(0.12, 0.88, f);
-    const idx = k === 0 ? e : 1 + 2 * (k - 1) + 2 * e;
+    const idx = 2 * k + 2 * e;
     curve.getPoint(idx / (curve.nPts - 1), cam.position); cam.quaternion.slerpQuaternions(quats[k], quats[k + 1], e); cam.updateMatrixWorld(true);
     m4.makeRotationFromQuaternion(cam.quaternion); viewU.uRot.value.setFromMatrix4(m4); viewU.uCam.value.copy(cam.position);
     const ex = k === 0 ? STOPS[0].exp : STOPS[k - 1].exp + (STOPS[k].exp - STOPS[k - 1].exp) * e; lens.uniforms.uExp.value = ex;
@@ -863,6 +1069,31 @@ function boot() {
   // pace the gathered picture can take it in: the view comes into focus instead of fizzing.
   const FLOW_STEP = 1.0; let flowClock = 0, coarse = 0.8;
   const pPos = new THREE.Vector3(), pQ = new THREE.Quaternion();
+  /* ── at a stop the camera is never quite still ──
+     A still picture of a cloud is flat however truly it was worked out: what tells the eye that one wisp is in front of another is that they
+     slide past each other when the viewpoint moves. So at each stop the camera drifts, slowly, on a small arc round the star (a couple of degrees
+     either way, a different period across and up-and-down so the path never repeats exactly), and leans a little further toward wherever the
+     pointer is. It turns as it goes so that the star stays exactly where it was on the screen: the star is the pivot, the gas nearer than
+     it moves one way and the gas beyond it the other. The cloud is marched from the new viewpoint every frame (this is a real change of view, not
+     a picture being slid about), and the remembered picture follows it by the gas's own depth, as it does in flight. It fades out as the camera
+     leaves for the next stop. (Not with reduced motion.)
+     The landing is the exception. Its quasar has to stand comparison with a finely detailed reference, and following a drifting camera wore the
+     remembered picture's fine detail down to under half. There the gas is marched from the resting viewpoint only, and the drift is given in
+     the pass that puts the picture on the screen, each part of it moved by its own distance from the camera (see that pass). Near and far still
+     slide past each other; what is lost is the little that a sideways step of a few degrees truly changes in gas seen through gas. */
+  const SWAY = 1.8 * Math.PI / 180, LEAN = 2.6 * Math.PI / 180, ptr = { x: 0, y: 0, tx: 0, ty: 0 }, swQ = new THREE.Quaternion(), swQ2 = new THREE.Quaternion(), swV = new THREE.Vector3();
+  addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; ptr.tx = clamp(e.clientX / innerWidth * 2 - 1, -1, 1); ptr.ty = clamp(e.clientY / innerHeight * 2 - 1, -1, 1); }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', () => { ptr.tx = 0; ptr.ty = 0; });
+  function sway(s, dt) { const n = Math.round(s); wfield.u.uSw.value = 0; ptr.x += (ptr.tx - ptr.x) * (1 - Math.exp(-dt * 1.5)); ptr.y += (ptr.ty - ptr.y) * (1 - Math.exp(-dt * 1.5));   // (the lean follows the pointer slowly: the picture can keep up with a slow camera)
+    if (RM || (stats.nosway && !stats.orbit && !stats.dorbit) || (n < 1 && !quasar.ready)) return; const w = sst(0.2, 0.03, Math.abs(s - n)) * (n < 1 ? 1.5 : 1); if (w <= 0) return;   // (at the title: round the quasar's heart, and half as far again, the quasar being further off than a star is)
+    let ay = w * (SWAY * Math.sin(time * 6.2831853 / 19) + LEAN * ptr.x), ax = w * (SWAY * 0.55 * Math.sin(time * 6.2831853 / 27 + 1.3) + LEAN * 0.6 * ptr.y); const P = n < 1 ? quasar.pivot : STOPS[n - 1].P;
+    if (stats.orbit) { ay = stats.orbit[0] * Math.PI / 180; ax = stats.orbit[1] * Math.PI / 180; }   // (for checking: look at it from another side)
+    if (stats.dorbit) { ay = stats.dorbit[0] * Math.PI / 180; ax = stats.dorbit[1] * Math.PI / 180; }   // (for checking: hold the drift at a given lean)
+    swQ.setFromAxisAngle(swV.set(0, 1, 0).applyQuaternion(cam.quaternion), ay); swQ2.setFromAxisAngle(swV.set(1, 0, 0).applyQuaternion(cam.quaternion), ax); swQ.multiply(swQ2);
+    cam.position.sub(P).applyQuaternion(swQ).add(P); cam.quaternion.premultiply(swQ); cam.updateMatrixWorld(true);
+    m4.makeRotationFromQuaternion(cam.quaternion);
+    if (n < 1 && !stats.orbit) { wfield.u.dRot.value.setFromMatrix4(m4); wfield.u.dCam.value.copy(cam.position); wfield.u.uSw.value = 1; }   // (the landing: the gas is still marched from the resting viewpoint, and the picture is shown from this one. See the pass that bends it)
+    else { viewU.uRot.value.setFromMatrix4(m4); viewU.uCam.value.copy(cam.position); } }
   const stats = {};
   addEventListener('resize', resize); resize();
 
@@ -873,18 +1104,22 @@ function boot() {
     if (RM || stats.snap || snapReq) { sE = s; vE = 0; snapReq = false; }
     else { const gap = s - sE, vmax = (0.27 + 0.6 * Math.max(0, Math.abs(gap) - 1.15)) * (Math.max(s, sE) <= 1.001 ? 0.6 : 1), vt = clamp(gap * 3.0, -vmax, vmax);   // (between the landing and the first project the flight is slower, about six seconds: it is the way in, through the cloud, and is meant to be travelled)
       vE += (vt - vE) * (1 - Math.exp(-dt * 12)); sE += vE * dt; if (Math.abs(gap) < 0.0004 && Math.abs(vE) < 0.002) { sE = s; vE = 0; } }
-    sLive = sE; place(sE); layout(sE); plateAt(sE);
+    sLive = sE; place(sE); layout(sE);
     const moved = cam.position.distanceTo(pPos), mv = (moved / 2.5 + 2 * Math.acos(Math.min(1, Math.abs(cam.quaternion.dot(pQ))))) / (2 * viewU.uTan.value / histA.height);   // how far the picture moved this frame, in its own pixels
     pPos.copy(cam.position); pQ.copy(cam.quaternion);
+    sway(sE, dt);                                               // (after the flight's own movement has been measured: the drift is slow enough for the picture to keep all its detail)
+    quasar.frame(dt, sE); root.classList.toggle('plate-on', sE < 0.12);   // (plate-on: the quasar is up and whole, so its credit is shown with it)
     if (moved > 1.2) fresh = true;                              // a jump (the page reloaded part-way down, or reduced motion): start the picture again
     still = mv < 0.01 ? still + 1 : 0;
-    if (!fresh) { emaDt += (dt - emaDt) * 0.1; slow = emaDt > 0.0205 ? slow + 1 : 0; if (slow > 90 && BUDGET > 110000) { BUDGET *= 0.82; slow = 0; emaDt = 0.016; sizeCloud(); } }
+    if (!fresh && sE >= 0.999) { emaDt += (dt - emaDt) * 0.1; slow = emaDt > 0.0205 ? slow + 1 : 0; if (slow > 90 && BUDGET > 110000) { BUDGET *= 0.82; slow = 0; emaDt = 0.016; sizeCloud(); } } else { slow = 0; emaDt = 0.016; }   // (counted only from the first star on. At the landing and on the way in, what a frame costs is mostly not the gas; counted there, a slow landing lowered the gas's fineness to its least before the visitor had so much as scrolled, and it never came back)
     // At the title the landing's picture covers most of the screen, and what little of the gas shows beside it is unlit and dark. Once the camera has been
     // still there for a few seconds the gas is left as it stands (its clock held too): rendering it afresh every frame for nobody took half the frame.
-    if (!(stopAt === 0 && still > 240 && !fresh && document.documentElement.classList.contains('at-title')))
+    if (true)
     { const tauWas = flowU.uFlowT.value; if (!RM) flowClock += dt; const tau = Math.floor(flowClock / FLOW_STEP) * FLOW_STEP;
       resolve.u.uFlowTp.value = tauWas; flowU.uFlowT.value = tau; resolve.u.uStep.value = tau !== tauWas ? 1 : 0; flowU.uFlowD.value = RM ? tau : flowClock - FLOW_STEP / 2;
-      { const tgt = 0.8 * clamp(mv / dt / 320, 0, 1); coarse += (tgt - coarse) * (1 - Math.exp(-dt * (tgt > coarse ? 10 : 1.1))); cloud.u.uCoarse.value = Math.max(0.015, coarse); }
+      { const atRest0 = Math.max(s, sE) < 0.03; resolve.u.uKer.value = atRest0 ? 1.1 : 4.5; compU.uShp.value += ((atRest0 ? 0.7 : 0) - compU.uShp.value) * (1 - Math.exp(-dt * 4)); }   // (the landing, at rest: a still picture of still gas, which can be gathered and shown at its finest)
+      { const wayIn = Math.max(s, sE) <= 1.001; resolve.u.uMeanK.value = wayIn ? 0.7 : 1; const tgt = (wayIn ? 0.5 : 0.8) * clamp(mv / dt / 320, 0, 1);   // (less is left out on the way in from the landing: that flight is slow, and is meant to be looked at)
+        coarse += (tgt - coarse) * (1 - Math.exp(-dt * (tgt > coarse ? 10 : 1.1))); cloud.u.uCoarse.value = Math.max(0.015, coarse); }
       frameN++; cloud.u.uFrame.value = frameN % 1024; sizeU.uJit.value.set((0.5 + frameN * 0.8566748838545029) % 1 - 0.5, (0.5 + frameN * 0.7338918566271260) % 1 - 0.5);   // this frame's shift of every ray, as a fraction of one of the small picture's pixels (a sequence that never repeats and never clumps; the two numbers, and the two that stagger the samples along each ray, are chosen so that no pair of them ever falls into step)
       run(probe, probeRT); run(cloud, curRT); run(stat, statRT);
       dsm.u.tPrev.value = dsA.texture; dsm.u.uK.value = fresh ? 1 : 0.1 + 0.5 * clamp(mv / dt / 320, 0, 1); run(dsm, dsB); { const t = dsA; dsA = dsB; dsB = t; } warpU.tDS.value = dsA.texture;
@@ -892,91 +1127,18 @@ function boot() {
       { const t = histA; histA = histB; histB = t; } resolve.u.pCam.value.copy(viewU.uCam.value); resolve.u.pRot.value.copy(viewU.uRot.value);
       compU.tCloud.value = histA.texture[0]; compU.tHistN.value = histA.texture[1]; fresh = false;
     }
+    { const l = STOPS[0].lights[0], f = sst(21, 12.5, cam.position.distanceTo(l.pos));   // (0 from the landing, 1 well before the camera arrives)
+      lightU.uLC.value[0].set(l.col[0] * l.L * f, l.col[1] * l.L * f, l.col[2] * l.L * f, lightU.uLC.value[0].w); lightU.uLE.value[0].x = l.em * f;
+      const l2 = STOPS[0].lights[1]; if (l2) lightU.uLC.value[1].set(l2.col[0] * l2.L * f, l2.col[1] * l2.L * f, l2.col[2] * l2.L * f, lightU.uLC.value[1].w); }   // (the lamp that lights the quasar's gas from the front likewise: at the landing the gas has the reference's own light and shade, and the lamp's light on top of it whitened the torus's heart and the mist round it)
+    bloom.strength = 0.32 * sst(0.03, 0.45, sE);                // (none at the landing: the reference carries its own painted glare, and a second one laid over it hid the torus's rim. It comes up on the way in)
     stars(dt); sky.position.copy(cam.position); sky.material.uniforms.uT.value = time; lens.uniforms.uTime.value = time;
-    composer.render();
+    composer.render(); quasar.draw();
   }
-  window.__p3 = { stats, sys: SYSM, lightU, get sE() { return sE; }, set sE(v) { sE = v; vE = 0; }, get size() { return [curRT.width, curRT.height, histA.width, histA.height]; }, setBudget(v) { BUDGET = v; sizeCloud(); }, frame: (t) => frame(t, true) };   // (for measuring; nothing on the page uses it)
+  window.__p3 = { stats, sys: SYSM, lightU, bloom, cloud, compU, resolve, calibrateQ, reset() { fresh = true; }, get sE() { return sE; }, set sE(v) { sE = v; vE = 0; }, get size() { return [curRT.width, curRT.height, histA.width, histA.height]; }, setBudget(v) { BUDGET = v; sizeCloud(); }, frame: (t) => frame(t, true) };   // (for measuring; nothing on the page uses it)
   layout(sE); requestAnimationFrame((t) => { last = t; root.classList.add('ready'); frame(t); });
 }
 if (!renderer) layout(0);
 
-/* ── the landing's picture, given life ──
-   The illustration is a still. Shown through this small program, what is in it moves as it would:
-     · The torus turns. Of a ring seen from a little above its plane it is the near wall that shows the turning: it slides across the screen,
-       fastest in the middle and not at all at the two tips (where the movement is toward or away from the viewer). The surface is carried
-       round; the light on it stays where it is, since the light comes from the quasar and not from the dust. (For that the picture is split
-       into its broad light and shade, kept still, and its fine markings, which are what is moved.)
-     · The outflow streams outward from the quasar along the two lobes, faster the further out (a wind driven from the centre keeps gaining
-       speed), and turns about the lobes' axis as it goes, as gas thrown off a turning ring does.
-     · Shafts of light from the heart shimmer in the lobes, and the heart itself wavers a little.
-   Nothing else moves. (The lit inside of the torus and the thin dust in its plane were moved too, the one sliding the other way and the other
-   drifting in, as they would; but in a flat picture, movements in opposite directions side by side read as a fault, not as depth.)
-   The picture's own clouds are moved by fetching each point from a little way back along its path, in two copies half a cycle apart and faded
-   across each other, so the movement never has to jump back. On top of that, a faint moving unevenness (brighter and dimmer, a few tenths)
-   travels the same way, which is what lets the eye follow the movement. Speeds are for the eye: a real torus takes thousands of years to turn.
-   If the program cannot run, or the visitor asks for reduced motion, the plain image underneath is what shows. */
-(() => { const host = document.querySelector('#plate .pl'); if (!host || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const img = host.querySelector('img'), cv = host.querySelector('canvas'), gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false }); if (!gl) return;
-  const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) { console.warn('plate shader', gl.getShaderInfoLog(o)); return null; } return o; };
-  const prog = (fsrc) => { const a = sh(gl.VERTEX_SHADER, 'attribute vec2 a; varying vec2 v; void main(){ v=vec2(a.x*0.5+0.5,0.5-a.y*0.5); gl_Position=vec4(a,0.0,1.0); }'), b = sh(gl.FRAGMENT_SHADER, fsrc); if (!a || !b) return null;
-    const p = gl.createProgram(); gl.attachShader(p, a); gl.attachShader(p, b); gl.bindAttribLocation(p, 0, 'a'); gl.linkProgram(p); return gl.getProgramParameter(p, gl.LINK_STATUS) ? p : null; };
-  // Where things are in the picture (0…1 across, 0…1 down), and the regions built on them. C: the quasar's heart · TC, TM, TN, TA, TB: the torus's outline
-  // (an ellipse: centre, long axis, short axis toward the viewer's side, half-lengths) · AX: the outflow's axis, toward the upper lobe (the lower is opposite)
-  const GEO = `precision highp float; varying vec2 v; uniform float uT;
-    const vec2 C=vec2(0.472,0.531), TC=vec2(0.480,0.555), TM=vec2(0.919,-0.393), TN=vec2(0.393,0.919), AX=vec2(-0.43,-0.903);
-    const float TA=0.127, TB=0.056, PER=7.0;
-    float r,s,x,lobe,u,w,prof,mn; vec2 d;
-    void geo(){ d=v-C; r=length(d); s=dot(d,AX); x=dot(d,vec2(-AX.y,AX.x))/(0.10+0.40*abs(s));
-      lobe=smoothstep(0.07,0.22,r)*exp(-x*x*1.2)*smoothstep(0.02,0.09,abs(s));              // in one of the two lobes of the outflow (which begin a little way off the torus's plane: right beside the torus nothing streams)
-      vec2 dt=v-TC; u=dot(dt,TM)/TA; w=dot(dt,TN)/TB; float rr=length(vec2(u,w)), we=-0.09-0.20*u*u; prof=sqrt(max(1.0-u*u,0.0));   // across the torus (−1…1 tip to tip) · toward the viewer's side · we: where its near wall's top edge runs
-      mn=smoothstep(-0.06,0.05,w-we)*(1.0-smoothstep(0.90,1.02,rr)); }`;                          // on the torus's near wall
-  // The soft things, worked out small (they have no fine detail) and read back by the pass that fills the screen: the travelling unevenness of the outflow
-  // and of the torus (red) · the shafts of light (green) · the little eddies in the flow (blue, alpha)
-  const pA = prog(GEO + `
-    float h1(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
-    float h3(vec3 p){ return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453); }
-    float n2(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(h1(i),h1(i+vec2(1.0,0.0)),f.x),mix(h1(i+vec2(0.0,1.0)),h1(i+vec2(1.0,1.0)),f.x),f.y); }
-    float n3(vec3 p){ vec3 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
-      return mix(mix(mix(h3(i),h3(i+vec3(1.0,0.0,0.0)),f.x),mix(h3(i+vec3(0.0,1.0,0.0)),h3(i+vec3(1.0,1.0,0.0)),f.x),f.y),
-                 mix(mix(h3(i+vec3(0.0,0.0,1.0)),h3(i+vec3(1.0,0.0,1.0)),f.x),mix(h3(i+vec3(0.0,1.0,1.0)),h3(i+vec3(1.0,1.0,1.0)),f.x),f.y),f.z); }
-    float fbm(vec3 p){ return 0.5*n3(p)+0.3*n3(p*2.03+7.1)+0.2*n3(p*4.01+3.3); }
-    void main(){ geo(); float ang=atan(d.y,d.x);
-      float m=1.0+0.48*prof*mn*(n2(vec2(u*9.0+uT*0.76,w*6.0))-0.5);                                                       // lumps going round with the torus
-      float ph=asin(clamp(x,-1.0,1.0))+uT*0.10; vec3 P=vec3(abs(s)*7.0-uT*0.40,cos(ph)*1.8,sin(ph)*1.8+(s<0.0?5.0:0.0));
-      m*=1.0+0.52*lobe*(fbm(P)-0.5)*smoothstep(0.08,0.30,r);                                                              // the outflow: billows travelling outward, and round the axis
-      m*=1.0+(0.045*sin(uT*1.3)+0.03*sin(uT*2.9+1.0))*exp(-r*r/0.006);                                                    // the light at the heart wavers
-      float ray=n2(vec2(ang*9.0,uT*0.22))*n2(vec2(ang*23.0+5.0,uT*0.31));
-      gl_FragColor=vec4(m*0.5,ray*ray*lobe*exp(-r*3.2)*smoothstep(0.03,0.12,r)*4.0,n2(v*5.0+3.1),n2(v*5.0+7.7)); }`);
-  const pB = prog(GEO + `uniform sampler2D t,tl,ta;
-    void main(){ geo(); vec4 A=texture2D(ta,vec2(v.x,1.0-v.y)); float tor=mn;   // (the small picture of the soft things is stored the other way up: read it so. Read straight, the torus's moving lumps showed again as a ghost above the torus, going the wrong way)
-      vec2 fOut=normalize(normalize(d+1e-4)*0.5+AX*(s<0.0?-1.0:1.0)*0.5)*(0.012+0.075*r)+(A.ba-0.5)*0.012;                // outward from the quasar, drawn toward the axis; faster further out
-      vec2 f=fOut*lobe*(1.0-tor)-TM*0.075*prof*mn;                                                                        // + the torus's near wall, sliding along its length
-      float a0=fract(uT/PER), a1=fract(uT/PER+0.5), wg=abs(1.0-2.0*a0); vec2 q0=v-f*(a0-0.5), q1=v-f*(a1-0.5);
-      vec3 c0=texture2D(t,q0).rgb, c1=texture2D(t,q1).rgb;
-      if(tor>0.001){ vec3 Lp=texture2D(tl,v).rgb+0.03; c0=mix(c0,c0*Lp/(texture2D(tl,q0).rgb+0.03),tor); c1=mix(c1,c1*Lp/(texture2D(tl,q1).rgb+0.03),tor); }   // on the torus: the markings are carried, the light and shade stay
-      float al=smoothstep(0.0,0.14,v.x)*(1.0-smoothstep(0.93,1.0,v.x));                                                    // fading out at the picture's left and right edges
-      gl_FragColor=vec4((mix(c0,c1,wg)*(A.r*2.0)+vec3(0.70,0.80,1.0)*A.g*0.055)*al,al); }`);
-  if (!pA || !pB) return;
-  const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-  const mkTex = (unit, src, size) => { const tex = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tex);
-    if (src) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, src); else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); return tex; };
-  const start = () => { let fbo; const AS = 512;
-    try { mkTex(0, img);
-      const mid = document.createElement('canvas'), low = document.createElement('canvas'); mid.width = mid.height = 512; low.width = low.height = 96;   // the picture's broad light and shade alone: the picture made very small (and so, when it is read back, very soft)
-      const mx = mid.getContext('2d'), lx = low.getContext('2d'); mx.imageSmoothingQuality = lx.imageSmoothingQuality = 'high'; mx.drawImage(img, 0, 0, 512, 512); lx.drawImage(mid, 0, 0, 96, 96); mkTex(1, low);
-      const ta = mkTex(2, null, AS); fbo = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, ta, 0);
-      if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) return; gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    } catch (e) { return; }
-    const uTA = gl.getUniformLocation(pA, 'uT'), uTB = gl.getUniformLocation(pB, 'uT'); gl.useProgram(pB); gl.uniform1i(gl.getUniformLocation(pB, 't'), 0); gl.uniform1i(gl.getUniformLocation(pB, 'tl'), 1); gl.uniform1i(gl.getUniformLocation(pB, 'ta'), 2);
-    const fit = () => { const px = Math.min(2200, Math.round(host.clientWidth * Math.min(devicePixelRatio || 1, 2))) || 1024; if (cv.width !== px) cv.width = cv.height = px; };
-    fit(); addEventListener('resize', fit); const t0 = performance.now();
-    const draw = (now) => { requestAnimationFrame(draw); if (!(plateOp > 0) || document.hidden) return; const T = (now - t0) / 1000;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.viewport(0, 0, AS, AS); gl.useProgram(pA); gl.uniform1f(uTA, T); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, cv.width, cv.height); gl.useProgram(pB); gl.uniform1f(uTB, T); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); cv.classList.add('on'); };
-    requestAnimationFrame(draw); };
-  if (img.complete && img.naturalWidth) start(); else img.addEventListener('load', start, { once: true });
-})();
 </script>
 <script src="../sound.js" defer></script>
 </body>

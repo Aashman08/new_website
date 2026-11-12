@@ -23,7 +23,7 @@ html{background:var(--bg);-webkit-text-size-adjust:100%}
 html,body{overflow:hidden}
 html.done,html.done body{overflow-x:hidden;overflow-y:auto}
 #track{display:none;pointer-events:none}
-#track .gap{height:670vh}   /* how far the page scrolls: it ends as the last project's row arrives (see WORK_AT) */
+#track .gap{height:350vh}   /* how far the page scrolls: 100vh + 3.75 / SCROLL_SPEED screens. It ends just past the point where the Projects index fills itself in (see WORK_ON) */
 html.done #track{display:block}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
@@ -208,23 +208,28 @@ html.scrolled #s-name.show #cue{opacity:0;transition:opacity .4s}
   #about .hello{margin-bottom:16px} #about .hello::after{margin-top:14px}
   #about p.t{font-size:.92rem;line-height:1.6;margin-bottom:11px;text-align:left}   /* (a narrow column justified opens wide gaps between words) */
 }
-/* PROJECTS. After About has gone, the index of projects builds itself as the visitor scrolls: the heading, the framed picture, then the six
-   rows one after another, each arriving as the scroll reaches it. The page ends when the last row is in, so there is nothing left to scroll once
-   the list is complete. It stays put while it builds (it is a fixed layer, like About), with the camera travelling on through the gas clouds
-   behind. A project itself is not in the scroll: clicking its row opens it on a screen of its own (see #sheet). Same type as About. */
+/* PROJECTS. After About has gone, a little more scrolling brings up a short introduction: the heading, a paragraph and a button. The page ends
+   there. It is a fixed layer, like About, with the gas clouds behind. The button opens the Projects page (#ppage), a screen of its own holding the
+   index of projects; clicking a row there opens that project on its own screen over it (#sheet). Same type as About throughout. */
 #work{position:fixed;inset:0;z-index:9;visibility:hidden;font-family:var(--site);color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.6)}
-#work .wrap,#sheet .wrap{width:min(1180px,calc(100vw - 96px));margin:0 auto}
+#ppage .wrap,#sheet .wrap{width:min(1180px,calc(100vw - 96px));margin:0 auto}
 .rv{--cut:-90px;opacity:0;transform:translateY(22px);transition:opacity .9s cubic-bezier(.2,.7,.2,1) var(--d,0s),transform 1.1s cubic-bezier(.2,.7,.2,1) var(--d,0s);
   -webkit-mask-image:linear-gradient(to bottom,transparent var(--cut),#000 calc(var(--cut) + 46px));mask-image:linear-gradient(to bottom,transparent var(--cut),#000 calc(var(--cut) + 46px))}
 .rv.in{opacity:1;transform:none}
 html.rm .rv{opacity:1;transform:none;transition:none}
-#work .kicker,#sheet .kicker{font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,.5)}
-#work .hair,#sheet .hair{width:44px;height:1px;background:rgba(255,255,255,.34);margin:24px 0 24px}
+#ppage .kicker,#sheet .kicker{font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:500;color:rgba(255,255,255,.5)}
+#work .hair,#ppage .hair,#sheet .hair{width:44px;height:1px;background:rgba(255,255,255,.34);margin:24px 0 24px}
 #work h2{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(2.5rem,4.4vw,4rem);line-height:1;letter-spacing:-.015em;margin:14px 0 0;color:#f5f5f5}
 .frame{position:relative;overflow:hidden;border-radius:16px;background:#0a0a0e;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.16)}
 .frame img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.86) brightness(.92)}
-#w-index{height:100%;display:flex;align-items:center;padding:max(13vh,104px) 0 4vh;pointer-events:auto}
-#w-index .rv{transition:none;-webkit-mask-image:none;mask-image:none}   /* (these are moved by the scroll itself: see WORK_AT) */
+#w-intro{height:100%;display:flex;align-items:center;justify-content:center}
+#w-intro .col{width:min(42rem,calc(100vw - 96px));text-align:center;pointer-events:auto}
+#w-intro .rv{transition:none;-webkit-mask-image:none;mask-image:none}   /* (these are moved by the page's own clock: see WORK_AT) */
+#w-intro .hair{margin:24px auto 28px}
+#w-intro p{margin:0 0 34px;font-size:clamp(.95rem,1.1vw,1.04rem);line-height:1.78;letter-spacing:.003em;color:rgba(255,255,255,.7);text-align:justify;text-align-last:center}
+.gobtn{display:inline-flex;align-items:center;gap:12px;font-family:var(--site);font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:#fff;border:1px solid rgba(255,255,255,.34);border-radius:99px;padding:15px 26px;background:rgba(255,255,255,.04);text-shadow:none;transition:background .3s,color .3s,border-color .3s,gap .3s}
+.gobtn:hover,.gobtn:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;gap:18px;outline:none}
+#w-index{min-height:100%;display:flex;align-items:center;padding:104px 0 56px}
 #w-index .wrap{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,.68fr);column-gap:clamp(40px,6vw,96px);align-items:center}
 .plist{list-style:none;margin:0;padding:0;border-top:1px solid rgba(255,255,255,.1)}
 .plist a{display:grid;grid-template-columns:3rem 1fr auto;align-items:baseline;column-gap:6px;padding:11px 4px 12px;border-bottom:1px solid rgba(255,255,255,.1);text-decoration:none;color:inherit;transition:opacity .35s}
@@ -243,11 +248,22 @@ html.rm .rv{opacity:1;transform:none;transition:none}
 .pv .cap{position:absolute;left:20px;right:20px;bottom:18px;z-index:1;font-family:"Playfair Display",Georgia,serif;font-size:1.05rem;line-height:1.25;color:#fff}
 /* A project is not part of the scroll: clicking its row in the index opens it on a screen of its own, over the sky (which stays, dimmed and out
    of focus, behind it). That screen scrolls by itself; the page underneath is held still until it is closed. */
-html.sheet-open,html.sheet-open body{overflow:hidden!important}
+html.layer-open,html.layer-open body{overflow:hidden!important}
 #work,#stage,nav{transition:opacity .4s}
-html.sheet-open #work,html.sheet-open #stage,html.sheet-open nav{opacity:0}   /* (behind a project's screen there is only the sky: the page's own words and menu step back, or they show through as blurred ghosts) */
+html.layer-open #work,html.layer-open #stage,html.layer-open nav{opacity:0}   /* (behind a project's screen there is only the sky: the page's own words and menu step back, or they show through as blurred ghosts) */
 #sheet{position:fixed;inset:0;z-index:40;font-family:var(--site);color:#fff;background:rgba(5,5,9,.7);-webkit-backdrop-filter:blur(22px) saturate(1.15);backdrop-filter:blur(22px) saturate(1.15);opacity:0;transition:opacity .45s cubic-bezier(.2,.7,.2,1)}
 #sheet[hidden]{display:none}
+/* The Projects page: opened by the button in the scroll, it is a screen of its own (with its own address, so the browser's Back button leaves it),
+   holding the index of projects. A project's screen opens over it. Built the same way as #sheet, a little clearer so the sky reads behind it. */
+#ppage{position:fixed;inset:0;z-index:30;font-family:var(--site);color:#fff;background:rgba(5,5,9,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;transition:opacity .45s cubic-bezier(.2,.7,.2,1);text-shadow:0 1px 10px rgba(0,0,0,.6)}
+#ppage[hidden]{display:none}
+html.leaving body{opacity:0;transition:opacity .34s ease}   /* going to the Projects experience (a page of its own): this one dims out first, and that one comes up out of the dark */
+#ppage.on{opacity:1}
+#ppage .sbody{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain}
+#ppage .sbar{position:absolute;left:0;right:0;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:20px var(--pad);pointer-events:none}
+#ppage .sbar button{pointer-events:auto;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:rgba(255,255,255,.88);border:1px solid var(--faint);border-radius:99px;padding:9px 15px;background:rgba(0,0,0,.4);text-shadow:none;transition:background .25s,color .25s,border-color .25s}
+#ppage .sbar button:hover,#ppage .sbar button:focus-visible{background:#fff;color:#0a0a0e;border-color:#fff;outline:none}
+#ppage h2{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(2.5rem,4.4vw,4rem);line-height:1;letter-spacing:-.015em;margin:14px 0 0;color:#f5f5f5}
 #sheet.on{opacity:1}
 #sheet .sbody{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;transform:translateY(26px);transition:transform .7s cubic-bezier(.2,.8,.2,1);text-shadow:0 1px 10px rgba(0,0,0,.5)}
 #sheet.on .sbody{transform:none}
@@ -281,7 +297,7 @@ html.sheet-open #work,html.sheet-open #stage,html.sheet-open nav{opacity:0}   /*
 .concl{font-family:"Playfair Display",Georgia,serif;font-style:italic;font-size:clamp(1rem,1.22vw,1.13rem);line-height:1.62;color:rgba(255,255,255,.84);margin:30px 0 0;padding-top:24px;border-top:1px solid rgba(255,255,255,.12)}
 #w-end{display:none}
 @media (max-width:900px),(orientation:portrait){
-  #work .wrap,#sheet .wrap{width:calc(100vw - 44px)}
+  #ppage .wrap,#sheet .wrap{width:calc(100vw - 44px)}
   #w-index .wrap,.proj .wrap,.proj.alt .wrap{grid-template-columns:1fr;row-gap:28px}
   .pv{display:none} .pm{position:static} .proj.alt .pm{order:0}
   .feats{grid-template-columns:1fr} .proj .intro{text-align:left}
@@ -364,7 +380,7 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
     <button type="button" id="pal-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pal-menu"><span class="sw" aria-hidden="true"></span><span>Customize</span><span class="car" aria-hidden="true"></span></button>
     <div id="pal-menu" role="menu" aria-label="Customize the disk" hidden><h3>Disk colour</h3></div>
   </div>
-  <button type="button" id="sound" aria-pressed="false" aria-label="Toggle ambient sound"><span class="eq"><b></b><b></b><b></b></span><span id="sound-t">Sound off</span></button>
+  <button type="button" id="sound" aria-pressed="false" aria-label="Toggle music"><span class="eq"><b></b><b></b><b></b></span><span id="sound-t">Sound off</span></button>
 </nav>
 
 <main id="stage">
@@ -401,10 +417,23 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
 <div id="track">
   <div class="gap" aria-hidden="true"></div>
   <div id="work">
-    <section id="w-index" aria-labelledby="w-title"><div class="wrap">
+    <section id="w-intro" aria-labelledby="w-title"><div class="col">
+      <h2 id="w-title" class="rv">Projects</h2>
+      <div class="hair rv"></div>
+      <p class="rv">I learn by building. These are the things I&rsquo;ve made along the way, from quantum circuits drawn out of plain language to wildfires read from orbit: early ideas turned into something people can actually use.</p>
+      <div class="rv"><button type="button" class="gobtn" id="go-projects">Go to Projects <span aria-hidden="true">&rarr;</span></button></div>
+    </div></section>
+    <div id="w-end" aria-hidden="true"></div>
+  </div>
+</div>
+
+<div id="ppage" role="dialog" aria-modal="true" aria-labelledby="pp-title" hidden>
+  <div class="sbar"><button type="button" id="ppage-back"><span aria-hidden="true">&larr;</span> Back</button></div>
+  <div class="sbody">
+    <section id="w-index" aria-labelledby="pp-title"><div class="wrap">
       <div>
         <div class="kicker rv">Selected work</div>
-        <h2 id="w-title" class="rv">Projects</h2>
+        <h2 id="pp-title" class="rv">Projects</h2>
         <div class="hair rv"></div>
         <ol class="plist">
           <li class="rv"><a href="#p-quantumviz"><span class="n">01</span><span class="b"><span class="t">QuantumViz</span><span class="s">AI-powered quantum circuit generator using natural language and 3D visualization</span></span><span class="ar" aria-hidden="true">&rarr;</span></a></li>
@@ -425,10 +454,8 @@ html.nogl body{background:radial-gradient(60% 40% at 50% 34%,#3a1c06 0%,#120a05 
         <span class="cap"></span>
       </div>
     </div></section>
-    <div id="w-end" aria-hidden="true"></div>
   </div>
 </div>
-
 <div id="sheet" role="dialog" aria-modal="true" aria-label="Project" hidden>
   <div class="sbar">
     <button type="button" id="sheet-back"><span aria-hidden="true">&larr;</span> All projects</button>
@@ -585,6 +612,7 @@ const SMALL = matchMedia('(max-width: 820px)').matches || matchMedia('(pointer: 
 const P_PARAM = Q.has('p') ? Math.min(1, Math.max(0, parseFloat(Q.get('p')) || 0)) : null;
 const DPR = Math.min(window.devicePixelRatio || 1, EMBED ? 1 : (SMALL ? 1.5 : 2));
 const END_P = 0.985;
+const SCROLL_SPEED = 1.5;                                    // how much of the scroll-driven sequence one screen of scrolling covers (1.5: the whole thing takes a third less scrolling). The page's length follows from it (see #track .gap)
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -612,25 +640,7 @@ function toast(msg, tag = '[PLACEHOLDER]', ms = 2800) {
   const t = $('#toast'); t.innerHTML = '<b></b>'; t.firstChild.textContent = tag; t.append(msg); t.classList.add('show');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
 }
-/* ───────── sound (created only on click) ───────── */
-const audio = { ctx: null, master: null, filter: null, on: false };
-function initAudio() {
-  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
-  const ctx = new AC(); const master = ctx.createGain(); master.gain.value = 0;
-  const filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 320; filter.Q.value = 0.7;
-  [[55, 'sawtooth', 0.10], [55.35, 'sawtooth', 0.10], [82.5, 'sine', 0.16], [110.4, 'sine', 0.08], [27.5, 'sine', 0.22]].forEach(([f, type, g]) => {
-    const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; const gn = ctx.createGain(); gn.gain.value = g; o.connect(gn); gn.connect(filter); o.start();
-  });
-  const lfo = ctx.createOscillator(); lfo.frequency.value = 0.07; const lg = ctx.createGain(); lg.gain.value = 110; lfo.connect(lg); lg.connect(filter.frequency); lfo.start();
-  filter.connect(master); master.connect(ctx.destination);
-  Object.assign(audio, { ctx, master, filter }); return true;
-}
-$('#sound').addEventListener('click', () => {
-  if (!audio.ctx && !initAudio()) return;
-  audio.on = !audio.on; audio.ctx.resume();
-  audio.master.gain.setTargetAtTime(audio.on ? 0.16 : 0, audio.ctx.currentTime, 0.5);
-  $('#sound').setAttribute('aria-pressed', String(audio.on)); $('#sound-t').textContent = audio.on ? 'Sound on' : 'Sound off';
-});
+/* ───────── sound: the music and its button are in sound.js, shared with the other pages of the site ───────── */
 
 if (RM) root.classList.add('rm');
 if (SMALL) { const c = document.getElementById('enter-cap'); if (c) c.textContent = 'Tap to enter'; }
@@ -663,33 +673,46 @@ enterBtn.addEventListener('click', () => { if (orb.moved) { orb.moved = false; r
 skipBtn.addEventListener('click', () => land(RM));
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && (mode === 'playing' || mode === 'paused')) land(false); });
 $('#replay').addEventListener('click', (e) => { e.preventDefault(); replay(); });
-/* Projects: the index's picture follows the row under the pointer (or, while the list is building, the row that has just arrived); the menu jumps to places in the page */
-let projShow = null, projHover = false;
+/* Projects: the index's picture follows the row under the pointer; the menu jumps to places in the page */
 { const rows = [...document.querySelectorAll('.plist a')], pics = [...document.querySelectorAll('.pv img')], cap = $('.pv .cap');
   const go = (y) => scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' }), topOf = (el) => el.getBoundingClientRect().top + scrollY;
   const show = (i) => { pics.forEach((im, k) => im.classList.toggle('on', k === i)); cap.textContent = rows[i].querySelector('.t').textContent; };
-  projShow = show; $('.plist').addEventListener('pointerenter', () => { projHover = true; }); $('.plist').addEventListener('pointerleave', () => { projHover = false; });
   rows.forEach((a, i) => { a.addEventListener('pointerenter', () => show(i)); a.addEventListener('focus', () => show(i));
     a.addEventListener('click', (e) => { e.preventDefault(); openSheet(i, true); }); });
   show(0);
-  // a project's own screen
-  const sheet = $('#sheet'), body = sheet.querySelector('.sbody'), secs = [...sheet.querySelectorAll('.proj')], held = [$('#stage'), $('#track'), document.querySelector('nav')]; let cur = -1, from = null, hideT = 0;
+  // The Projects page (its index), and a project's own screen over it. Both have their own address in the browser's history, so Back steps out of
+  // them one at a time: project, then the page, then the scroll again.
+  const sheet = $('#sheet'), body = sheet.querySelector('.sbody'), secs = [...sheet.querySelectorAll('.proj')], ppage = $('#ppage'), held = [$('#stage'), $('#track'), document.querySelector('nav')]; let cur = -1, from = null, hideT = 0, pageOn = false, pFrom = null, pHideT = 0;
   const pad = (n) => String(n).padStart(2, '0');
+  const sync = () => { const any = pageOn || cur >= 0; root.classList.toggle('layer-open', any); root.classList.toggle('sheet-open', cur >= 0); root.classList.toggle('page-open', pageOn && cur < 0); held.forEach((el) => { el.inert = any; }); ppage.inert = cur >= 0; };
+  const arrive = (els) => { els.forEach((el) => el.classList.remove('in')); requestAnimationFrame(() => requestAnimationFrame(() => els.forEach((el) => el.classList.add('in')))); };   // pieces arrive one after another each time a screen is opened
+  function openPage(push) { if (pageOn) return; pageOn = true; clearTimeout(pHideT); pFrom = document.activeElement; ppage.hidden = false; ppage.querySelector('.sbody').scrollTop = 0; show(0); sync();
+    arrive([...ppage.querySelectorAll('.rv')]); requestAnimationFrame(() => ppage.classList.add('on')); setTimeout(() => { if (cur < 0) $('#ppage-back').focus({ preventScroll: true }); }, 60);
+    try { if (push) history.pushState({ page: 1 }, '', '#projects'); } catch (e) {} }
+  function closePage() { if (!pageOn) return; pageOn = false; ppage.classList.remove('on'); sync(); pHideT = setTimeout(() => { ppage.hidden = true; }, RM ? 0 : 460); if (pFrom && pFrom.focus) pFrom.focus({ preventScroll: true }); }
   function openSheet(i, push) { i = (i + secs.length) % secs.length; const was = cur; cur = i; clearTimeout(hideT);
-    secs.forEach((sec, k) => sec.classList.toggle('cur', k === i)); $('#sheet-n').textContent = pad(i + 1) + ' / ' + pad(secs.length); body.scrollTop = 0;
-    const els = [...secs[i].querySelectorAll('.rv')]; els.forEach((el) => el.classList.remove('in')); requestAnimationFrame(() => requestAnimationFrame(() => els.forEach((el) => el.classList.add('in'))));   // its pieces arrive one after another each time it is opened
-    if (was < 0) { from = document.activeElement; sheet.hidden = false; root.classList.add('sheet-open'); held.forEach((el) => { el.inert = true; }); requestAnimationFrame(() => sheet.classList.add('on')); setTimeout(() => $('#sheet-close').focus({ preventScroll: true }), 60); }
+    secs.forEach((sec, k) => sec.classList.toggle('cur', k === i)); $('#sheet-n').textContent = pad(i + 1) + ' / ' + pad(secs.length); body.scrollTop = 0; arrive([...secs[i].querySelectorAll('.rv')]);
+    if (was < 0) { from = document.activeElement; sheet.hidden = false; requestAnimationFrame(() => sheet.classList.add('on')); setTimeout(() => $('#sheet-close').focus({ preventScroll: true }), 60); } sync();
     const url = '#' + secs[i].id.slice(2); try { if (push && was < 0) history.pushState({ proj: i }, '', url); else history.replaceState({ proj: i }, '', url); } catch (e) {} }
-  function closeSheet() { if (cur < 0) return; cur = -1; sheet.classList.remove('on'); root.classList.remove('sheet-open'); held.forEach((el) => { el.inert = false; });
-    hideT = setTimeout(() => { sheet.hidden = true; }, RM ? 0 : 460); if (from && from.focus) from.focus({ preventScroll: true }); }
-  const leave = () => { if (history.state && history.state.proj != null) history.back(); else closeSheet(); };            // closing goes back in the browser's history, so its Back button closes a project too
-  addEventListener('popstate', (e) => { if (e.state && e.state.proj != null) openSheet(e.state.proj, false); else closeSheet(); });
+  function closeSheet() { if (cur < 0) return; cur = -1; sheet.classList.remove('on'); sync(); hideT = setTimeout(() => { sheet.hidden = true; }, RM ? 0 : 460); if (from && from.focus) from.focus({ preventScroll: true }); }
+  // The Projects experience is a page of its own (projects-3/: the flight through the nebula, a star for each project). The button in the scroll
+  // goes there; each star's "View project" comes back here, straight onto that project's screen (?project=<id>); and closing that screen returns
+  // to the star of whichever project is then showing. (The index list, #ppage, is what the button used to open. It is still here, under the
+  // project screens, but nothing opens it on its own any more.)
+  const EXPERIENCE = 'projects-3/', deep = Q.has('project');
+  const leaveTo = (url) => { if (RM) { location.href = url; return; } root.classList.add('leaving'); setTimeout(() => { location.href = url; }, 360); };
+  addEventListener('pageshow', (e) => { if (e.persisted) root.classList.remove('leaving'); });   // (come back to with the browser's Back button, the page may be shown again exactly as it was left: dimmed out)
+  const leave = () => { if (deep && cur >= 0) { leaveTo(EXPERIENCE + '#' + secs[cur].id.slice(2)); return; } if (history.state && history.state.proj != null) history.back(); else closeSheet(); };            // closing goes back in the browser's history, so its Back button closes it too
+  const leavePage = () => { if (history.state && history.state.page) history.back(); else closePage(); };
+  addEventListener('popstate', (e) => { const st = e.state || {}; if (st.proj != null) { openPage(false); openSheet(st.proj, false); } else if (st.page) { closeSheet(); openPage(false); } else { closeSheet(); closePage(); } });
+  $('#go-projects').addEventListener('click', () => leaveTo(EXPERIENCE)); $('#ppage-back').addEventListener('click', leavePage);
   $('#sheet-close').addEventListener('click', leave); $('#sheet-back').addEventListener('click', leave);
   $('#sheet-prev').addEventListener('click', () => openSheet(cur - 1, false)); $('#sheet-next').addEventListener('click', () => openSheet(cur + 1, false));
-  addEventListener('keydown', (e) => { if (cur < 0 || e.metaKey || e.ctrlKey || e.altKey) return; if (e.key === 'Escape') { e.preventDefault(); leave(); } else if (e.key === 'ArrowRight') openSheet(cur + 1, false); else if (e.key === 'ArrowLeft') openSheet(cur - 1, false); });
+  addEventListener('keydown', (e) => { if (e.metaKey || e.ctrlKey || e.altKey) return; if (cur < 0) { if (pageOn && e.key === 'Escape') { e.preventDefault(); leavePage(); } return; } if (e.key === 'Escape') { e.preventDefault(); leave(); } else if (e.key === 'ArrowRight') openSheet(cur + 1, false); else if (e.key === 'ArrowLeft') openSheet(cur - 1, false); });
   try { if (location.hash) history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
-  document.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => go((b.dataset.go === 'about' ? 2.9 : 5.7) * innerHeight)));
-  document.querySelectorAll('#sheet .rv').forEach((el) => { const sib = [...el.parentElement.children].filter((c) => c.classList.contains('rv')); el.style.setProperty('--d', (Math.min(sib.indexOf(el), 6) * 0.07) + 's'); }); }
+  { const want = Q.get('project'), i = want ? secs.findIndex((sec) => sec.id === 'p-' + want) : -1; if (i >= 0) { openPage(false); openSheet(i, false); } }   // ?project=<id> opens straight onto that project's screen (the opening is skipped)
+  document.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => go((b.dataset.go === 'about' ? 2.9 : 3.75) / SCROLL_SPEED * innerHeight)));
+  document.querySelectorAll('#sheet .rv,#ppage .rv').forEach((el) => { const sib = [...el.parentElement.children].filter((c) => c.classList.contains('rv')); el.style.setProperty('--d', (Math.min(sib.indexOf(el), 6) * 0.07) + 's'); }); }
 /* the menu's sliding piece of glass */
 { const bar = $('.menubar'), lens = bar.querySelector('.lens'), [iL, iM, iR] = lens.children; let cur = null, hov = null;
   const go = (b) => { if (!b) { cur = null; bar.classList.remove('lit', 'press'); return; }
@@ -709,9 +732,74 @@ let projShow = null, projHover = false;
   addEventListener('pointerup', (e) => { bar.classList.remove('press'); if (e.pointerType === 'touch') { hov = null; setTimeout(want, 350); } });
   addEventListener('pointercancel', () => { bar.classList.remove('press'); hov = null; want(); });
   addEventListener('resize', () => { if (cur) { const c = cur; cur = null; go(c); } }); }
-setMode(Q.get('skip') === '1' ? 'done' : 'idle'); if (mode === 'done') prog = 1;
+setMode(Q.get('skip') === '1' || Q.has('project') ? 'done' : 'idle'); if (mode === 'done') prog = 1;
 if (P_PARAM !== null) { prog = P_PARAM; introT = 1; setMode(prog >= 1 ? 'done' : prog <= 0 ? 'idle' : 'paused'); }
 scrollTo(0, 0);
+let snapScroll = mode === 'done' && Q.get('at') === 'projects';     // ?skip=1&at=projects (the way back from the Projects experience): begin at the Projects part of the scroll, where the visitor left from, not at the top
+if (snapScroll) scrollTo(0, 3.75 / SCROLL_SPEED * innerHeight);
+
+let autoRun = 0;                                            // the page is scrolling itself between the landing and About: 1 down, -1 back up, 0 not
+/* ── between the landing and About, by itself, both ways ──
+   Everything between the landing and About (the name leaving, the galaxy rising and turning, the clouds forming, then the greeting, the photo and the
+   three paragraphs, each in its turn) is laid out along the scroll. The visitor does not scroll through it by hand, in either direction: at the landing
+   the first scroll downward (wheel, swipe, or a key) starts the page scrolling itself, at an even pace, to where About stands complete; at About the
+   first scroll upward takes the same stretch back to the landing (About clears at once, all together: nothing waits on each paragraph). While it runs the visitor's own scrolling is held
+   off, except that scrolling the same way again hurries it and scrolling the other way turns it round. Coming up from Projects, the visitor's own
+   scrolling stops at About (it is held there for the rest of that gesture, so a long flick does not carry on through it); the next scroll up runs to
+   the landing. Below About, down to Projects, scrolling is the visitor's as before. (Not with reduced motion: there the page is scrolled by hand.) */
+{ const ABOUT_S = 2.9, FULL_S = 3.0, RUN_DOWN = 5, RUN_UP = 4;   // where About stands complete, in the scroll's own units (where the menu's About goes) · the furthest down it still stands complete · seconds the run down takes, and the run back up
+  // Down: at full pace from the first frame (no wind-up: the scroll's own smoothing is the soft start, and anything slower reads as the page not
+  // answering), then easing off over the last fifth. Up: quickest at first, while About clears and the camera comes back out of the clouds, slowing
+  // as the galaxy returns and the name settles.
+  const easeDown = (u) => { const d = 0.2, vm = 1 / (1 - d / 2); return u < 1 - d ? vm * u : 1 - vm * (1 - u) * (1 - u) / (2 * d); };
+  const easeUp = (u) => 1 - Math.pow(1 - u, 1.8);
+  let run = null, lastWheel = 0, lastDir = 0, acc = 0, gUp = false, hold = false, inputT = -1e9, prevY = scrollY, ty = null, tUp = false, tUsed = false, touching = false, tEnd = -1e9, tCross = false, restT = 0;
+  const aboutY = () => ABOUT_S / SCROLL_SPEED * innerHeight;
+  const ok = () => mode === 'done' && !RM && !root.classList.contains('layer-open');
+  const below = () => scrollY < aboutY() - innerHeight * 0.02;                                                   // short of About: a scroll down from here runs on to it
+  const upZone = () => scrollY > innerHeight * 0.04 && scrollY <= FULL_S / SCROLL_SPEED * innerHeight + 2;      // at About, or on the stretch before it: a scroll up from here runs back to the landing
+  const stop = () => { run = null; autoRun = 0; };
+  const tick = (now) => { if (!run) return; if (!ok()) { stop(); return; } const dt = Math.max(0, Math.min(50, now - run.last)); run.last = now; run.u = Math.min(1, run.u + dt * run.rate / run.dur);
+    scrollTo(0, run.from + (run.to - run.from) * (run.down ? easeDown : easeUp)(run.u)); if (run.u < 1) requestAnimationFrame(tick); else stop(); };
+  const go = (to) => { const first = !run, down = to > scrollY; run = { from: scrollY, to, dur: Math.max(1, (down ? RUN_DOWN : RUN_UP) * Math.min(1, Math.abs(to - scrollY) / aboutY())) * 1000, u: 0, rate: 1, last: performance.now(), t0: performance.now(), down };   // (the same pace whatever the distance left)
+    autoRun = down ? 1 : -1; hold = false; tCross = false; if (first) requestAnimationFrame(tick); };
+  const toAbout = () => go(aboutY()), toLanding = () => go(0);
+  const steer = (dn) => { if (dn === run.down) run.rate = 3; else if (run.down) toLanding(); else toAbout(); };   // the same way again: hurry · the other way: turn round
+  const settle = () => { if (!tCross || touching) return; tCross = false; if (!run && ok() && below() && scrollY > innerHeight * 0.04) toAbout(); };   // (a swipe up from Projects that came to rest part-way: back to About)
+  addEventListener('wheel', (e) => { const now = performance.now(), dy = e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1), dir = Math.sign(dy);
+    const fresh = now - lastWheel > 260 || (dir !== 0 && lastDir !== 0 && dir !== lastDir); lastWheel = now; if (dir) lastDir = dir; inputT = now;   // (fresh: the start of a new gesture, not the tail of the last one)
+    if (fresh) { acc = 0; hold = false; gUp = ok() && upZone(); } acc += dy;
+    if (run) { e.preventDefault(); if (fresh && dir && now - run.t0 > 900) steer(dir > 0); return; }
+    if (!ok()) return;
+    if (acc > 4 && dy > 0 && below()) { e.preventDefault(); toAbout(); }
+    else if (acc < -4 && dy < 0 && gUp && upZone()) { e.preventDefault(); toLanding(); }
+    else if (hold && dir < 0) e.preventDefault(); }, { passive: false });
+  addEventListener('scroll', () => { const y = scrollY, a = aboutY(), now = performance.now();
+    if (hold && now - inputT > 500) hold = false;
+    if (!run && ok() && prevY >= a - 1 && y < a - 1) {                                                           // the visitor's own scrolling, coming up from Projects, has reached About
+      if (touching || now - tEnd < 2500) tCross = true; else if (!gUp && now - inputT < 500) hold = true; }
+    if (hold && !run && y < a) scrollTo(0, a);
+    prevY = hold && y < a ? a : y;
+    if (tCross) { clearTimeout(restT); restT = setTimeout(settle, 200); } }, { passive: true });
+  addEventListener('touchstart', (e) => { ty = e.touches[0] ? e.touches[0].clientY : null; touching = true; tUsed = false; hold = false; tUp = ok() && upZone(); }, { passive: true });
+  addEventListener('touchmove', (e) => { const t = e.touches[0]; if (!t || ty === null) return; const d = ty - t.clientY;                    // (d > 0: the page is being pushed up, a scroll down)
+    if (run) { if (e.cancelable) e.preventDefault(); if (!tUsed && Math.abs(d) > 24 && performance.now() - run.t0 > 900) { tUsed = true; steer(d > 0); } return; }
+    if (!ok()) return;
+    if (d > 10 && below()) { if (e.cancelable) e.preventDefault(); tUsed = true; toAbout(); }
+    else if (d < -10 && tUp && upZone()) { if (e.cancelable) e.preventDefault(); tUsed = true; toLanding(); } }, { passive: false });
+  const tDone = () => { touching = false; tEnd = performance.now(); if (tCross) { clearTimeout(restT); restT = setTimeout(settle, 200); } };
+  addEventListener('touchend', tDone, { passive: true }); addEventListener('touchcancel', tDone, { passive: true });
+  addEventListener('keydown', (e) => { if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const dn = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'End' || (e.key === ' ' && !e.shiftKey), up = e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Home' || (e.key === ' ' && e.shiftKey); if (!dn && !up) return;
+    const tag = (document.activeElement || document.body).tagName; if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (e.key === ' ' && /^(BUTTON|A)$/.test(tag))) return;
+    const now = performance.now();
+    if (run) { e.preventDefault(); if (!e.repeat && now - run.t0 > 300) steer(dn); return; }
+    if (!ok()) return;
+    inputT = now; hold = false; gUp = false;
+    if (dn && below()) { e.preventDefault(); toAbout(); }
+    else if (up && upZone()) { e.preventDefault(); toLanding(); } });
+  document.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => { stop(); hold = false; tCross = false; inputT = -1e9; }));   // (the menu goes where it says: a run under way gives way to it)
+  addEventListener('resize', () => { if (run) run.to = run.down ? aboutY() : 0; prevY = scrollY; }); }
 
 /* ───────── pointer (spring-smoothed; touch drags steer) ───────── */
 const ptr = { x: 0, y: 0, sx: 0, sy: 0, vx: 0, vy: 0, cx: -9999, cy: -9999, act: 0, actT: 0, overUI: false };
@@ -1867,10 +1955,12 @@ function boot() {
   let scS = 0, scStill = 9; const qB = new THREE.Quaternion(), qO = new THREE.Quaternion(), eO = new THREE.Euler(0, 0, 0, 'XYZ'), m4 = new THREE.Matrix4();
   const seg = (x, r) => ease(clamp((x - r[0]) / (r[1] - r[0]), 0, 1));
   const aboutEl = $('#about'), aboutBits = [...document.querySelectorAll('#about .col>*')], whoEl = $('#s-name .who');
-  const rvEls = [...document.querySelectorAll('#sheet .rv')], coolEl = $('#p-lattice-boltzmann'); let coolV = 0;
-  // The Projects index: where in the scroll each piece arrives. Heading first, then the picture, then the six rows, one every 0.3 of a screen.
-  const workEl = $('#work'), workBits = [...document.querySelectorAll('#w-index .rv')], workV = workBits.map(() => 0); let workRow = -1;
-  const WORK_AT = workBits.map((el, k) => el.tagName === 'LI' ? [3.85 + 0.3 * (k - 3), 4.15 + 0.3 * (k - 3)] : el.classList.contains('pv') ? [3.6, 3.95] : [3.4 + 0.06 * k, 3.7 + 0.06 * k]);
+  const rvEls = [...document.querySelectorAll('#sheet .rv')], pageRv = [...document.querySelectorAll('#ppage .rv')], coolEl = $('#p-lattice-boltzmann'); let coolV = 0;
+  // The Projects introduction in the scroll (heading, a paragraph, the button that opens the Projects page) fills itself in. Once the scroll
+  // reaches WORK_ON it plays on its own clock, the pieces a little apart. Scrolling back above WORK_ON takes it away again.
+  const WORK_ON = 3.45, workEl = $('#work'), workBits = [...document.querySelectorAll('#w-intro .rv')], workV = workBits.map(() => 0); let workT = 0, workK = 0, workVis = 0, aboutVis = 0;
+  const WORK_AT = workBits.map((el, k) => 0.14 * k);            // when each piece starts, in seconds on that clock
+  const WORK_LEN = 0.14 * (workBits.length - 1) + 0.6;
   const ABOUT_AT = [[1.3, 1.6], [0.92, 1.2], [1.65, 1.95], [2.0, 2.3], [2.35, 2.65]], aboutV = [0, 0, 0, 0, 0];                  // where in the scroll each piece arrives: the photo, the greeting (first), then the three paragraphs
   const GLIDE = 5.2; let glideT = 0, glideP = -1;
   const FOV_END = 30.8;                                        // the settled frame's field of view on wide screens: narrow enough that the galaxy's arms nearly reach the top and bottom of the frame
@@ -1951,7 +2041,7 @@ function boot() {
       up3.setFromMatrixColumn(gCam.matrixWorld, 1);
       look.addScaledVector(up3, -(pr ? LIFT_TALL : LIFT) * fh * wT); gCam.lookAt(look); }
     gCam.rotateZ(-0.085 * (1 - sst(0.05, 0.14, p)) + ROLL * wT);
-    { const sRaw = mode === 'done' && p >= 1 ? scrollY / Math.max(1, H) : 0, was = scS; scS += (sRaw - scS) * (RM ? 1 : 1 - Math.exp(-dt * 3.2)); if (Math.abs(sRaw - scS) < 0.0004) scS = sRaw;
+    { const sRaw = mode === 'done' && p >= 1 ? scrollY / Math.max(1, H) * SCROLL_SPEED : 0, was = scS; scS += (sRaw - scS) * (RM || snapScroll ? 1 : 1 - Math.exp(-dt * (autoRun ? 8 : 4.2))); if (snapScroll && sRaw > 0) snapScroll = false; if (Math.abs(sRaw - scS) < 0.0004) scS = sRaw;
       scStill = Math.abs(scS - was) > 0.00015 ? 0 : scStill + dt;                                    // how long the scroll has been at rest
       root.classList.toggle('scrolled', sRaw > 0.12);
       // As it leaves, the galaxy turns about its own axis, the way its arms already turn. (It is the camera that is carried round the axis; the
@@ -1969,18 +2059,20 @@ function boot() {
       // the words: the name leaves as the scroll begins; then the photo, the greeting and each paragraph arrive in turn, and stay
       const nameK = 1 - sst(0.02, 0.4, scS); whoEl.style.opacity = nameK.toFixed(3); S.name.style.setProperty('--scrim', nameK.toFixed(3)); whoEl.style.transform = 'translateY(calc(-50% - ' + (scS * 70).toFixed(1) + 'px))';
       // Each piece eases toward where the scroll says it should be over about half a second of its own time, so it never snaps in, however fast the page is scrolled.
-      let anyV = 0; aboutBits.forEach((el, k) => { const want = sst(ABOUT_AT[k][0], ABOUT_AT[k][1], scS) * (1 - sst(3.0, 3.3, scS)); aboutV[k] += (want - aboutV[k]) * (RM ? 1 : 1 - Math.exp(-dt * (want < aboutV[k] ? 9 : 2.6)));   // (it leaves quickly, and is gone before Projects begins) if (Math.abs(want - aboutV[k]) < 0.002) aboutV[k] = want;
+      let anyV = 0; aboutBits.forEach((el, k) => { const want = workVis > 0.02 || autoRun < 0 ? 0 : sst(ABOUT_AT[k][0], ABOUT_AT[k][1], scS) * (1 - sst(3.0, 3.3, scS)); aboutV[k] += (want - aboutV[k]) * (RM ? 1 : 1 - Math.exp(-dt * (want < aboutV[k] ? (autoRun < 0 ? 6 : 9) : 2.6)));   // (it leaves quickly, and is gone before Projects begins) if (Math.abs(want - aboutV[k]) < 0.002) aboutV[k] = want;
         const v = aboutV[k]; anyV = Math.max(anyV, v); el.style.opacity = v.toFixed(3); el.style.transform = 'translateY(' + ((1 - ease(v)) * 26).toFixed(1) + 'px)'; });
-      aboutEl.style.visibility = anyV > 0.003 ? 'visible' : 'hidden';
+      aboutEl.style.visibility = anyV > 0.003 ? 'visible' : 'hidden'; aboutVis = anyV;
       // Projects: each block is wiped away softly as it reaches the menu, and the clouds turn to cool blue while the fluid simulation is on screen
-      { let anyW = 0, top = -1; workBits.forEach((el, k) => { const want = sst(WORK_AT[k][0], WORK_AT[k][1], scS); workV[k] += (want - workV[k]) * (RM ? 1 : 1 - Math.exp(-dt * 7)); if (Math.abs(want - workV[k]) < 0.002) workV[k] = want;
-          const v = workV[k]; anyW = Math.max(anyW, v); if (el._v !== v) { el._v = v; el.style.opacity = v.toFixed(3); el.style.transform = 'translateY(' + ((1 - ease(v)) * 24).toFixed(1) + 'px)'; el.style.pointerEvents = v > 0.6 ? '' : 'none'; }
-          if (el.tagName === 'LI' && v > 0.5) top = k - 3; });
-        workEl.style.visibility = anyW > 0.003 ? 'visible' : 'hidden';
-        if (top !== workRow) { workRow = top; if (top >= 0 && !projHover && projShow) projShow(top); } }                 // while the list builds, the picture shows the row that has just arrived
+      // About and Projects are never on screen together, whichever way the page is scrolled: Projects does not begin until About has gone, and
+      // About does not come back until Projects has gone. Leaving, Projects goes all at once and quickly (it does not play backwards row by row).
+      { const on = scS >= WORK_ON && aboutVis < 0.02;
+        if (on) { workK = 1; workT = RM ? WORK_LEN : Math.min(WORK_LEN, workT + dt); } else { workK = RM ? 0 : workK * Math.exp(-dt * 14); if (workK < 0.01) { workK = 0; workT = 0; } }
+        let anyW = 0; workBits.forEach((el, k) => { const v = sst(WORK_AT[k], WORK_AT[k] + 0.6, workT) * workK; anyW = Math.max(anyW, v);
+          if (el._v !== v) { el._v = v; el.style.opacity = v.toFixed(3); el.style.transform = 'translateY(' + ((1 - ease(v)) * 24).toFixed(1) + 'px)'; el.style.pointerEvents = v > 0.6 ? '' : 'none'; } });
+        workEl.style.visibility = anyW > 0.003 ? 'visible' : 'hidden'; workVis = anyW; }
       // A project's own screen: its blocks are wiped away softly as they pass under its top bar, and the clouds turn to cool blue behind the fluid simulation
       const open = root.classList.contains('sheet-open');
-      if (open) for (const el of rvEls) { if (!el.offsetParent) continue; const r = el.getBoundingClientRect(), c = r.bottom < 0 || r.top > 190 ? -90 : Math.round(clamp(84 - r.top, -90, r.height + 20)); if (el._c !== c) { el._c = c; el.style.setProperty('--cut', c + 'px'); } }
+      for (const el of (open ? rvEls : root.classList.contains('page-open') ? pageRv : [])) { if (!el.offsetParent) continue; const r = el.getBoundingClientRect(), c = r.bottom < 0 || r.top > 190 ? -90 : Math.round(clamp(84 - r.top, -90, r.height + 20)); if (el._c !== c) { el._c = c; el.style.setProperty('--cut', c + 'px'); } }
       coolV += ((open && coolEl.classList.contains('cur') ? 1 : 0) - coolV) * (RM ? 1 : 1 - Math.exp(-dt * 1.3)); cloudU.uCool.value = coolV; }
     gCam.updateProjectionMatrix(); gCam.updateMatrixWorld(true);
     gStars.position.copy(pos); gStars.userData.u.uT.value = time; gStars.userData.u.uGain.value = mix(1.7, 1.15, kw); gStars.userData.u.uOcc.value = kw;
@@ -2011,8 +2103,7 @@ function boot() {
         gk = glassK; }
       else { glassSet = false; glassK = 0;
         if (capK > 0.004) { const r = capEl.getBoundingClientRect(); LU.uGl.value.set(r.left + r.width / 2, r.top + r.height / 2, r.width / 2, r.height / 2); LU.uRes.value.set(W, H); gk = capK; } }   // (it rides with the star, so it is looked up every frame)
-      LU.uGlK.value = root.classList.contains('sheet-open') ? 0 : gk; LU.uGlHot.value = nm ? 0 : coreHot; LU.uGlS.value = 1; LU.uGlLens.value = nm ? 1 : 0; }   // (the menu is the rounded rod, the Enter pill the slab: see glass())
-    if (audio.on && audio.ctx) { const t = audio.ctx.currentTime; audio.filter.frequency.setTargetAtTime(300 + 1000 * vis(p, 0.06, 0.18, 0.22, 0.5), t, 0.3); audio.master.gain.setTargetAtTime(0.16, t, 0.25); }
+      LU.uGlK.value = root.classList.contains('layer-open') ? 0 : gk; LU.uGlHot.value = nm ? 0 : coreHot; LU.uGlS.value = 1; LU.uGlLens.value = nm ? 1 : 0; }   // (the menu is the rounded rod, the Enter pill the slab: see glass())
   }
 
   let shown = false, diskReady = false, pSpin = 0; const tBoot = performance.now();
@@ -2099,5 +2190,6 @@ function boot() {
   if (!document.hidden) raf = requestAnimationFrame(frame);
 }
 </script>
+<script src="sound.js" defer></script>
 </body>
 </html>
